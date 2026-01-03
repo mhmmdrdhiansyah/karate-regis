@@ -71,7 +71,7 @@
                 @canany(['view users', 'view roles', 'view permissions'])
 
                     <div data-kt-menu-trigger="click"
-                        class="menu-item menu-accordion {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'hover show' : '' }}">
+                        class="menu-item menu-accordion {{ request()->routeIs('auth.users.*') || request()->routeIs('auth.roles.*') || request()->routeIs('auth.permissions.*') ? 'hover show' : '' }}">
 
                         <span class="menu-link">
                             <span class="menu-icon">
@@ -85,8 +85,8 @@
                             {{-- Child 1: Users --}}
                             @can('view users')
                                 <div class="menu-item">
-                                    <a class="menu-link {{ request()->routeIs('users.*') ? 'active' : '' }}"
-                                        href="{{ route('users.index') }}">
+                                    <a class="menu-link {{ request()->routeIs('auth.users.*') ? 'active' : '' }}"
+                                        href="{{ route('auth.users.index') }}">
                                         <span class="menu-bullet">
                                             <span class="bullet bullet-dot"></span>
                                         </span>
@@ -98,8 +98,8 @@
                             {{-- Child 2: Roles --}}
                             @can('view roles')
                                 <div class="menu-item">
-                                    <a class="menu-link {{ request()->routeIs('roles.*') ? 'active' : '' }}"
-                                        href="{{ route('roles.index') }}">
+                                    <a class="menu-link {{ request()->routeIs('auth.roles.*') ? 'active' : '' }}"
+                                        href="{{ route('auth.roles.index') }}">
                                         <span class="menu-bullet">
                                             <span class="bullet bullet-dot"></span>
                                         </span>
@@ -111,8 +111,8 @@
                             {{-- Child 3: Permissions --}}
                             @can('view permissions')
                                 <div class="menu-item">
-                                    <a class="menu-link {{ request()->routeIs('permissions.*') ? 'active' : '' }}"
-                                        href="{{ route('permissions.index') }}">
+                                    <a class="menu-link {{ request()->routeIs('auth.permissions.*') ? 'active' : '' }}"
+                                        href="{{ route('auth.permissions.index') }}">
                                         <span class="menu-bullet">
                                             <span class="bullet bullet-dot"></span>
                                         </span>

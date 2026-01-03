@@ -5,12 +5,13 @@
         <div class="card-header">
             <h3 class="card-title">{{ isset($role) ? 'Edit Role' : 'Buat Role Baru' }}</h3>
             <div class="card-toolbar">
-                <a href="{{ route('roles.index') }}" class="btn btn-light btn-sm">Kembali</a>
+                <a href="{{ route('auth.roles.index') }}" class="btn btn-light btn-sm">Kembali</a>
             </div>
         </div>
 
         <div class="card-body">
-            <form action="{{ isset($role) ? route('roles.update', $role->id) : route('roles.store') }}" method="POST">
+            <form action="{{ isset($role) ? route('auth.roles.update', $role->id) : route('auth.roles.store') }}"
+                method="POST">
                 @csrf
                 @if (isset($role))
                     @method('PUT')

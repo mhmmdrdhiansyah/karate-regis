@@ -7,12 +7,13 @@
                 <h3>{{ isset($user) ? 'Edit Data User' : 'Form User Baru' }}</h3>
             </div>
             <div class="card-toolbar">
-                <a href="{{ route('users.index') }}" class="btn btn-light btn-sm">Kembali</a>
+                <a href="{{ route('auth.users.index') }}" class="btn btn-light btn-sm">Kembali</a>
             </div>
         </div>
 
         <div class="card-body py-4">
-            <form action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}" method="POST">
+            <form action="{{ isset($user) ? route('auth.users.update', $user->id) : route('auth.users.store') }}"
+                method="POST">
                 @csrf
 
                 @if (isset($user))

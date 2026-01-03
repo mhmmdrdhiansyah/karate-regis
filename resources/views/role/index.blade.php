@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
-                <form action="{{ route('roles.index') }}" method="GET"
+                <form action="{{ route('auth.roles.index') }}" method="GET"
                     class="d-flex align-items-center position-relative my-1">
                     <span class="svg-icon svg-icon-1 position-absolute ms-6">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -21,7 +21,7 @@
                 </form>
             </div>
             <div class="card-toolbar">
-                <a href="{{ route('roles.create') }}" class="btn btn-primary">Tambah Role</a>
+                <a href="{{ route('auth.roles.create') }}" class="btn btn-primary">Tambah Role</a>
             </div>
         </div>
 
@@ -50,11 +50,11 @@
                             <td class="text-end">
                                 @if ($role->name != 'super-admin')
                                     <div class="d-flex justify-content-end flex-shrink-0">
-                                        <a href="{{ route('roles.edit', $role->id) }}"
+                                        <a href="{{ route('auth.roles.edit', $role->id) }}"
                                             class="btn btn-icon btn-light-warning btn-sm me-1"><i
                                                 class="bi bi-pencil"></i></a>
 
-                                        <form action="{{ route('roles.destroy', $role->id) }}" method="POST"
+                                        <form action="{{ route('auth.roles.destroy', $role->id) }}" method="POST"
                                             id="delete-role-{{ $role->id }}" style="display:none">
                                             @csrf @method('DELETE')
                                         </form>
@@ -103,5 +103,18 @@
                 })
             }
         </script>
+        @if (session('success'))
+            <script>
+                toastr.success("{{ session('success') }}");
+            </script>
+        @endif
+
+        @if (session('error'))
+            <script>
+                toastr.error("{{ session('error') }}");
+            </script>
+        @endif
     @endpush
+
+
 </x-app-layout>

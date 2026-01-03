@@ -5,13 +5,13 @@
         <div class="card-header">
             <h3 class="card-title">{{ isset($permission) ? 'Edit Permission' : 'Buat Permission Baru' }}</h3>
             <div class="card-toolbar">
-                <a href="{{ route('permissions.index') }}" class="btn btn-light btn-sm">Kembali</a>
+                <a href="{{ route('auth.permissions.index') }}" class="btn btn-light btn-sm">Kembali</a>
             </div>
         </div>
 
         <div class="card-body">
             <form
-                action="{{ isset($permission) ? route('permissions.update', $permission->id) : route('permissions.store') }}"
+                action="{{ isset($permission) ? route('auth.permissions.update', $permission->id) : route('auth.permissions.store') }}"
                 method="POST">
                 @csrf
                 @if (isset($permission))

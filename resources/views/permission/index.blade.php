@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
-                <form action="{{ route('permissions.index') }}" method="GET"
+                <form action="{{ route('auth.permissions.index') }}" method="GET"
                     class="d-flex align-items-center position-relative my-1">
                     <span class="svg-icon svg-icon-1 position-absolute ms-6">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -21,7 +21,7 @@
                 </form>
             </div>
             <div class="card-toolbar">
-                <a href="{{ route('permissions.create') }}" class="btn btn-primary">Tambah Permission</a>
+                <a href="{{ route('auth.permissions.create') }}" class="btn btn-primary">Tambah Permission</a>
             </div>
         </div>
 
@@ -41,12 +41,12 @@
                             <td><span class="badge badge-light">{{ $permission->guard_name }}</span></td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end flex-shrink-0">
-                                    <a href="{{ route('permissions.edit', $permission->id) }}"
+                                    <a href="{{ route('auth.permissions.edit', $permission->id) }}"
                                         class="btn btn-icon btn-light-warning btn-sm me-1"><i
                                             class="bi bi-pencil"></i></a>
 
-                                    <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST"
-                                        id="delete-perm-{{ $permission->id }}" style="display:none">
+                                    <form action="{{ route('auth.permissions.destroy', $permission->id) }}"
+                                        method="POST" id="delete-perm-{{ $permission->id }}" style="display:none">
                                         @csrf @method('DELETE')
                                     </form>
                                     <button class="btn btn-icon btn-light-danger btn-sm"
@@ -91,5 +91,16 @@
                 })
             }
         </script>
+        @if (session('success'))
+            <script>
+                toastr.success("{{ session('success') }}");
+            </script>
+        @endif
+
+        @if (session('error'))
+            <script>
+                toastr.error("{{ session('error') }}");
+            </script>
+        @endif
     @endpush
 </x-app-layout>

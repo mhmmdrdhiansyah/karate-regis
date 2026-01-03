@@ -40,7 +40,10 @@ class RolesAndPermissionsSeeder extends Seeder
             // firstOrCreate: Cek apakah nama permission sudah ada?
             // Jika SUDAH ada -> Lewati (Data aman)
             // Jika BELUM ada -> Buat baru
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web'
+            ]);
         }
 
         // =================================================================
@@ -48,12 +51,18 @@ class RolesAndPermissionsSeeder extends Seeder
         // =================================================================
 
         // --- Role: Super Admin ---
-        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdminRole = Role::firstOrCreate([
+            'name' => 'super-admin',
+            'guard_name' => 'web'
+        ]);
         // syncPermissions: Memastikan Super Admin SELALU punya SEMUA akses (termasuk yg baru ditambah)
         $superAdminRole->syncPermissions(Permission::all());
 
         // --- Role: Staff ---
-        $staffRole = Role::firstOrCreate(['name' => 'staff']);
+        $staffRole = Role::firstOrCreate([
+            'name' => 'staff',
+            'guard_name' => 'web'
+        ]);
         // Berikan akses standar jika belum punya
         // givePermissionTo: Menambah akses tanpa menghapus akses lain yang mungkin sudah dikasih manual
         $staffRole->givePermissionTo([

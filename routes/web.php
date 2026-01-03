@@ -2,10 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-// 1. JANGAN LUPA IMPORT INI
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
+use App\Modules\AuthManagement\Controllers\UserController;
+use App\Modules\AuthManagement\Controllers\RoleController;
+use App\Modules\AuthManagement\Controllers\PermissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,14 +20,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 2. GROUP KHUSUS SUPER ADMIN
-    // Hanya user dengan role 'super-admin' yang boleh akses menu ini
+    // Auth Management - Super Admin Only
     Route::middleware(['role:super-admin'])->group(function () {
-
-        // Manajemen User, Role, dan Permission
-        Route::resource('users', UserController::class);
-        Route::resource('roles', RoleController::class);
-        Route::resource('permissions', PermissionController::class);
+        Route::prefix('auth')->name('auth.')->group(function () {
+            Route::resource('users', UserController::class);
+            Route::resource('roles', RoleController::class);
+            Route::resource('permissions', PermissionController::class);
+        });
     });
 });
 

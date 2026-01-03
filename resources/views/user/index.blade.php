@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
-                <form action="{{ route('users.index') }}" method="GET"
+                <form action="{{ route('auth.users.index') }}" method="GET"
                     class="d-flex align-items-center position-relative my-1">
 
                     <span class="svg-icon svg-icon-1 position-absolute ms-6">
@@ -25,7 +25,7 @@
             </div>
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('users.create') }}" class="btn btn-primary d-flex align-items-center">
+                    <a href="{{ route('auth.users.create') }}" class="btn btn-primary d-flex align-items-center">
                         <span class="svg-icon svg-icon-2 me-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none">
@@ -56,14 +56,14 @@
                         <tr>
                             <td class="d-flex align-items-center">
                                 <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
-                                    <a href="{{ route('users.show', $user->id) }}">
+                                    <a href="{{ route('auth.users.show', $user->id) }}">
                                         <div class="symbol-label fs-3 bg-light-primary text-primary">
                                             {{ substr($user->name, 0, 1) }}
                                         </div>
                                     </a>
                                 </div>
                                 <div class="d-flex flex-column">
-                                    <a href="{{ route('users.show', $user->id) }}"
+                                    <a href="{{ route('auth.users.show', $user->id) }}"
                                         class="text-gray-800 text-hover-primary mb-1">{{ $user->name }}</a>
                                     <span>{{ $user->email }}</span>
                                 </div>
@@ -84,7 +84,7 @@
                             <td class="text-end">
                                 <div class="d-flex justify-content-end flex-shrink-0">
 
-                                    <a href="{{ route('users.show', $user->id) }}"
+                                    <a href="{{ route('auth.users.show', $user->id) }}"
                                         class="btn btn-icon btn-light-primary btn-sm me-1" title="Lihat Detail">
                                         <span class="svg-icon svg-icon-3">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -99,7 +99,7 @@
                                         </span>
                                     </a>
                                     @can('edit user')
-                                        <a href="{{ route('users.edit', $user->id) }}"
+                                        <a href="{{ route('auth.users.edit', $user->id) }}"
                                             class="btn btn-icon btn-light-warning btn-sm me-1" title="Edit User">
                                             <span class="svg-icon svg-icon-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -116,7 +116,7 @@
                                     @endcan
 
                                     @can('delete user')
-                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                        <form action="{{ route('auth.users.destroy', $user->id) }}" method="POST"
                                             id="delete-form-{{ $user->id }}" style="display: none;">
                                             @csrf
                                             @method('DELETE')
