@@ -33,7 +33,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit permissions',
             'delete permissions',
             'manage settings',
-            // 'view laporan', // <-- Contoh: Jika nanti ada permission baru, tinggal tulis disini
+            // Event & Registration Permissions
+            'view events',
+            'manage participants',
+            'verify payments',
+            'verify documents',
+            'manage own participants',
+            'manage registrations',
         ];
 
         foreach ($permissions as $permission) {
@@ -58,16 +64,32 @@ class RolesAndPermissionsSeeder extends Seeder
         // syncPermissions: Memastikan Super Admin SELALU punya SEMUA akses (termasuk yg baru ditambah)
         $superAdminRole->syncPermissions(Permission::all());
 
-        // --- Role: Staff ---
-        $staffRole = Role::firstOrCreate([
-            'name' => 'staff',
+        // --- Role: Panitia (Event Organizer) ---
+        $panitiaRole = Role::firstOrCreate([
+            'name' => 'panitia',
             'guard_name' => 'web'
         ]);
-        // Berikan akses standar jika belum punya
-        // givePermissionTo: Menambah akses tanpa menghapus akses lain yang mungkin sudah dikasih manual
-        $staffRole->givePermissionTo([
+        // Panitia dapat mengelola event dan registrasi
+        $panitiaRole->givePermissionTo([
             'view dashboard',
             'view users',
+            'view events',
+            'manage participants',
+            'verify payments',
+            'verify documents',
+            'manage registrations',
+        ]);
+
+        // --- Role: Kontingen (Contingent/Team Representative) ---
+        $kontingenRole = Role::firstOrCreate([
+            'name' => 'kontingen',
+            'guard_name' => 'web'
+        ]);
+        // Kontingen hanya bisa view event dan manage peserta sendiri
+        $kontingenRole->givePermissionTo([
+            'view dashboard',
+            'view events',
+            'manage own participants',
         ]);
 
         // =================================================================
@@ -87,16 +109,27 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin->assignRole($superAdminRole);
 
 
-        // --- User: Staff Biasa ---
-        $staff = User::firstOrCreate(
-            ['email' => 'staff@admin.com'], // 1. Cek email
-            [                              // 2. Data baru jika email belum ada
-                'name' => 'Staff Biasa',
+        // --- User: Panitia ---
+        $panitia = User::firstOrCreate(
+            ['email' => 'panitia@admin.com'],
+            [
+                'name' => 'Panitia Event',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
-        $staff->assignRole($staffRole);
+        $panitia->assignRole($panitiaRole);
+
+        // --- User: Kontingen ---
+        $kontingen = User::firstOrCreate(
+            ['email' => 'kontingen@test.com'],
+            [
+                'name' => 'Kontingen Test',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $kontingen->assignRole($kontingenRole);
 
         $this->command->info('Seeder selesai! Data lama aman, data baru ditambahkan.');
     }
