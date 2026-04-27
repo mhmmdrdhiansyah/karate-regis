@@ -38,6 +38,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit permissions',
             'delete permissions',
             'manage settings',
+            // Event & Registration Permissions
+            'view events',
+            'manage participants',
+            'verify payments',
+            'verify documents',
+            'manage own participants',
+            'manage registrations',
         ];
 
         foreach ($permissions as $permission) {
@@ -62,26 +69,36 @@ class RolesAndPermissionsSeeder extends Seeder
         // syncPermissions: Memastikan Super Admin SELALU punya SEMUA akses (termasuk yg baru ditambah)
         $superAdminRole->syncPermissions(Permission::all());
 
-        // --- Role: Panitia ---
+        // --- Role: Panitia (Event Organizer) ---
         $panitiaRole = Role::firstOrCreate([
             'name' => 'panitia',
             'guard_name' => 'web'
         ]);
+        // Panitia dapat mengelola event dan registrasi serta kontingen
         $panitiaRole->syncPermissions([
             'view dashboard',
+            'view users',
             'view kontingen',
             'create kontingen',
             'edit kontingen',
+            'view events',
+            'manage participants',
+            'verify payments',
+            'verify documents',
+            'manage registrations',
         ]);
 
-        // --- Role: Kontingen ---
+        // --- Role: Kontingen (Contingent/Team Representative) ---
         $kontingenRole = Role::firstOrCreate([
             'name' => 'kontingen',
             'guard_name' => 'web'
         ]);
+        // Kontingen hanya bisa view event dan manage peserta sendiri
         $kontingenRole->syncPermissions([
             'view dashboard',
             'edit own kontingen',
+            'view events',
+            'manage own participants',
         ]);
 
         // =================================================================
