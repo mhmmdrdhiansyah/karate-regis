@@ -16,8 +16,11 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'contingent' => $user->isKontingen() ? $user->contingent : null,
         ]);
     }
 
@@ -35,6 +38,31 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update kontingen profile information.
+     */
+    public function updateKontingen(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'official_name' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'address' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $contingent = $request->user()->contingent;
+
+        if (!$contingent) {
+            return Redirect::route('profile.edit')
+                ->with('error', 'Data kontingen tidak ditemukan');
+        }
+
+        $contingent->update($request->only('name', 'official_name', 'phone', 'address'));
+
+        return Redirect::route('profile.edit')
+            ->with('status', 'kontingen-updated');
     }
 
     /**

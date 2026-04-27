@@ -125,6 +125,28 @@
                     </div>
                 @endcanany
 
+                {{-- KONTINGEN MANAGEMENT (Admin/Panitia) --}}
+                @canany(['create kontingen', 'view kontingen'])
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('kontingen.index') ? 'active' : '' }}"
+                            href="{{ route('kontingen.index') }}">
+                            <span class="menu-icon"><i class="bi bi-people fs-3"></i></span>
+                            <span class="menu-title">Kontingen</span>
+                        </a>
+                    </div>
+                @endcanany
+
+                {{-- PROFIL KONTINGEN (Role Kontingen) --}}
+                @role('kontingen')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
+                            href="{{ route('profile.edit') }}">
+                            <span class="menu-icon"><i class="bi bi-building fs-3"></i></span>
+                            <span class="menu-title">Profil Kontingen</span>
+                        </a>
+                    </div>
+                @endrole
+
                 {{-- 3. MENU SETTINGS (Terpisah/Single) --}}
                 @can('manage settings')
                     <div class="menu-item">

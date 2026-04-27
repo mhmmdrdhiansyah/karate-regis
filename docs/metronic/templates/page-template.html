@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <base href=""/>
+    <title>NAMA_HALAMAN - NAMA_APLIKASI</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="Deskripsi halaman"/>
+    <meta name="keywords" content="keyword1, keyword2, keyword3"/>
+    <meta name="author" content="Nama Author/Organisasi"/>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/media/logos/favicon.ico"/>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"/>
+
+    <!-- Vendor CSS (jika perlu plugin khusus) -->
+    <!-- DataTables -->
+    <!-- <link href="assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet"/> -->
+    <!-- ApexCharts -->
+    <!-- <link href="assets/plugins/custom/apexcharts/apexcharts.bundle.css" rel="stylesheet"/> -->
+    <!-- FullCalendar -->
+    <!-- <link href="assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"/> -->
+
+    <!-- Global CSS Bundle (WAJIB semua halaman) -->
+    <link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet"/>
+    <link href="assets/css/style.bundle.css" rel="stylesheet"/>
+</head>
+<body id="kt_app_body"
+      data-kt-app-layout="dark-sidebar"
+      data-kt-app-header-fixed="true"
+      data-kt-app-sidebar-enabled="true"
+      data-kt-app-sidebar-fixed="true"
+      data-kt-app-toolbar-enabled="true"
+      class="app-default">
+
+<!--layout-partial:layout/_default.html-->
+
+    <!--begin::Content-->
+    <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        JUDUL_HALAMAN
+                    </h1>
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <li class="breadcrumb-item text-muted">
+                            <a href="index.html" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet text-gray-400 fw-bold mx-1"></span>
+                        </li>
+                        <li class="breadcrumb-item text-muted">MODULE</li>
+                        <li class="breadcrumb-item">
+                            <span class="bullet text-gray-400 fw-bold mx-1"></span>
+                        </li>
+                        <li class="breadcrumb-item text-dark">HALAMAN</li>
+                    </ul>
+                </div>
+                <!--end::Page title-->
+
+                <!--begin::Actions (optional)-->
+                <!-- <div class="d-flex align-items-center gap-2">
+                    <a href="#" class="btn btn-sm btn-light-primary">
+                        <span class="svg-icon svg-icon-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M19 11H5M19 11L12 18M19 11L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        Export
+                    </a>
+                </div> -->
+                <!--end::Actions-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+
+        <!--begin::Post-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+
+                <!-- ======================================================= -->
+                <!-- KONTEN HALAMAN DIMULAI DI SINI                             -->
+                <!-- ======================================================= -->
+
+                <!-- Contoh: Card Widget -->
+                <!--begin::Row-->
+                <div class="row g-5 g-xl-8">
+                    <!--begin::Col-->
+                    <div class="col-xl-4">
+                        <!--begin::Card-->
+                        <div class="card card-xl-stretch mb-xl-8">
+                            <!--begin::Header-->
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-dark">Statistik 1</span>
+                                    <span class="text-muted mt-1 fw-semibold fs-7">Deskripsi singkat</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+
+                            <!--begin::Body-->
+                            <div class="card-body d-flex align-items-center">
+                                <div class="d-flex flex-column">
+                                    <div class="fs-2 fw-bold text-dark">1,234</div>
+                                    <div class="fs-7 text-muted">Total data</div>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-xl-4">
+                        <!--begin::Card-->
+                        <div class="card card-xl-stretch mb-xl-8">
+                            <!--begin::Header-->
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-dark">Statistik 2</span>
+                                    <span class="text-muted mt-1 fw-semibold fs-7">Deskripsi singkat</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+
+                            <!--begin::Body-->
+                            <div class="card-body d-flex align-items-center">
+                                <div class="d-flex flex-column">
+                                    <div class="fs-2 fw-bold text-success">+567</div>
+                                    <div class="fs-7 text-muted">Penambahan bulan ini</div>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-xl-4">
+                        <!--begin::Card-->
+                        <div class="card card-xl-stretch mb-xl-8">
+                            <!--begin::Header-->
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-dark">Statistik 3</span>
+                                    <span class="text-muted mt-1 fw-semibold fs-7">Deskripsi singkat</span>
+                                </h3>
+                            </div>
+                            <!--end::Header-->
+
+                            <!--begin::Body-->
+                            <div class="card-body d-flex align-items-center">
+                                <div class="d-flex flex-column">
+                                    <div class="fs-2 fw-bold text-warning">89%</div>
+                                    <div class="fs-7 text-muted">Persentase</div>
+                                </div>
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::Card-->
+                    </div>
+                    <!--end::Col-->
+                </div>
+                <!--end::Row-->
+
+                <!-- Contoh: Data Table -->
+                <!--begin::Card-->
+                <div class="card">
+                    <!--begin::Header-->
+                    <div class="card-header border-0 pt-6">
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <span class="svg-icon svg-icon-1 position-absolute ms-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M21.7 18.9L18.6 15.8C18.2 15.4 17.7 15.2 17.2 15.2H16.2C16.9 14.3 17.4 13.2 17.4 12C17.4 9.2 15.2 7 12.4 7C9.6 7 7.4 9.2 7.4 12C7.4 14.8 9.6 17 12.4 17C13.6 17 14.7 16.5 15.6 14.8V15.8C15.6 16.3 15.8 16.8 16.2 17.2L19.3 20.3C20.1 21.1 21.4 21.1 22.2 20.3C23 19.5 23 18.2 22.2 17.4L21.7 18.9ZM10.4 12C10.4 10.9 11.3 10 12.4 10C13.5 10 14.4 10.9 14.4 12C14.4 13.1 13.5 14 12.4 14C11.3 14 10.4 13.1 10.4 12Z" fill="currentColor"/>
+                                    </svg>
+                                </span>
+                                <input type="text" data-kt-table-filter="search" class="form-control form-control-solid w-250px ps-15" placeholder="Search..."/>
+                            </div>
+                            <!--end::Search-->
+                        </div>
+                        <div class="card-toolbar">
+                            <!--begin::Toolbar-->
+                            <div class="d-flex justify-content-end" data-kt-table-toolbar="base">
+                                <button type="button" class="btn btn-sm btn-light-primary me-2" data-kt-table-action="export">
+                                    <span class="svg-icon svg-icon-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M19 11H5M19 11L12 18M19 11L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                    Export
+                                </button>
+                                <button type="button" class="btn btn-sm btn-primary" data-kt-table-action="add" data-bs-toggle="modal" data-bs-target="#kt_modal_add">
+                                    <span class="svg-icon svg-icon-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <rect x="11" y="4" width="12" height="12" rx="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M4 20H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <path d="M8 16V8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <path d="M4 16H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </span>
+                                    Add New
+                                </button>
+                            </div>
+                            <!--end::Toolbar-->
+                        </div>
+                    </div>
+                    <!--end::Header-->
+
+                    <!--begin::Body-->
+                    <div class="card-body py-4">
+                        <!--begin::Table-->
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_table .form-check-input" value="1"/>
+                                        </div>
+                                    </th>
+                                    <th>Kolom 1</th>
+                                    <th>Kolom 2</th>
+                                    <th>Kolom 3</th>
+                                    <th>Kolom 4</th>
+                                    <th class="text-end min-w-100px">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                <!-- Data rows akan di-generate via JavaScript -->
+                            </tbody>
+                        </table>
+                        <!--end::Table-->
+                    </div>
+                    <!--end::Body-->
+                </div>
+                <!--end::Card-->
+
+                <!-- ======================================================= -->
+                <!-- KONTEN HALAMAN BERAKHIR DI SINI                            -->
+                <!-- ======================================================= -->
+
+            </div>
+            <!--end::Content container-->
+
+        </div>
+        <!--end::Post-->
+
+    </div>
+    <!--end::Content-->
+
+    <!--begin::Modals (optional)-->
+    <!--begin::Modal - Add/Edit-->
+    <div class="modal fade" id="kt_modal_add" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Add New Item</h2>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="svg-icon svg-icon-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form id="kt_modal_add_form">
+                        <div class="fv-row mb-7">
+                            <label class="required form-label">Field 1</label>
+                            <input type="text" name="field1" class="form-control" placeholder="Masukkan nilai"/>
+                        </div>
+                        <div class="fv-row mb-7">
+                            <label class="required form-label">Field 2</label>
+                            <input type="text" name="field2" class="form-control" placeholder="Masukkan nilai"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" data-kt-modal-action="submit">
+                        <span class="indicator-label">Simpan</span>
+                        <span class="indicator-progress">
+                            Please wait...
+                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Modal-->
+
+    <!--begin::Javascript-->
+    <script>
+        var hostUrl = "assets/";
+    </script>
+
+    <!-- Global Javascript Bundle (WAJIB semua halaman) -->
+    <script src="assets/plugins/global/plugins.bundle.js"></script>
+    <script src="assets/js/scripts.bundle.js"></script>
+
+    <!-- Vendor JS (jika perlu plugin khusus) -->
+    <!-- DataTables -->
+    <!-- <script src="assets/plugins/custom/datatables/datatables.bundle.js"></script> -->
+    <!-- ApexCharts -->
+    <!-- <script src="assets/plugins/custom/apexcharts/apexcharts.bundle.js"></script> -->
+    <!-- FullCalendar -->
+    <!-- <script src="assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script> -->
+
+    <!-- Custom JS (per halaman) -->
+    <script src="assets/js/custom/MODULE_NAME/PAGE_NAME.js"></script>
+    <!--end::Javascript-->
+
+</body>
+</html>

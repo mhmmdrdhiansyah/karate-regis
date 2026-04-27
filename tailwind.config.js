@@ -17,5 +17,12 @@ export default {
         },
     },
 
-    plugins: [forms],
+    corePlugins: {
+        preflight: false,
+        collapse: false,
+        container: false,
+        forms: false,
+    },
+
+    plugins: [],
 };

@@ -24,6 +24,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'create users',
             'edit users',
             'delete users',
+            'view kontingen',
+            'create kontingen',
+            'edit kontingen',
+            'delete kontingen',
+            'edit own kontingen',
             'view roles',
             'create roles',
             'edit roles',
@@ -69,10 +74,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'name' => 'panitia',
             'guard_name' => 'web'
         ]);
-        // Panitia dapat mengelola event dan registrasi
-        $panitiaRole->givePermissionTo([
+        // Panitia dapat mengelola event dan registrasi serta kontingen
+        $panitiaRole->syncPermissions([
             'view dashboard',
             'view users',
+            'view kontingen',
+            'create kontingen',
+            'edit kontingen',
             'view events',
             'manage participants',
             'verify payments',
@@ -86,8 +94,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'guard_name' => 'web'
         ]);
         // Kontingen hanya bisa view event dan manage peserta sendiri
-        $kontingenRole->givePermissionTo([
+        $kontingenRole->syncPermissions([
             'view dashboard',
+            'edit own kontingen',
             'view events',
             'manage own participants',
         ]);
@@ -97,23 +106,23 @@ class RolesAndPermissionsSeeder extends Seeder
         // =================================================================
 
         // --- User: Super Admin ---
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@admin.com'], // 1. Cek: Apakah email ini ada?
-            [                              // 2. Jika TIDAK ada, buat dengan data ini:
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
                 'name' => 'Super Admin',
+                'username' => 'superadmin',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
-        // Pastikan role-nya nempel (meskipun usernya sudah lama ada)
         $admin->assignRole($superAdminRole);
 
-
         // --- User: Panitia ---
-        $panitia = User::firstOrCreate(
+        $panitia = User::updateOrCreate(
             ['email' => 'panitia@admin.com'],
             [
-                'name' => 'Panitia Event',
+                'name' => 'Panitia',
+                'username' => 'panitia',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -121,10 +130,11 @@ class RolesAndPermissionsSeeder extends Seeder
         $panitia->assignRole($panitiaRole);
 
         // --- User: Kontingen ---
-        $kontingen = User::firstOrCreate(
-            ['email' => 'kontingen@test.com'],
+        $kontingen = User::updateOrCreate(
+            ['email' => 'kontingen@admin.com'],
             [
-                'name' => 'Kontingen Test',
+                'name' => 'Kontingen',
+                'username' => 'kontingen',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
