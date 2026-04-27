@@ -24,6 +24,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
     ];
 
@@ -48,5 +49,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function contingent()
+    {
+        return $this->hasOne(Contingent::class);
+    }
+
+    public function isKontingen(): bool
+    {
+        return $this->hasRole('kontingen');
+    }
+
+    public function isPanitia(): bool
+    {
+        return $this->hasRole('panitia');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super-admin');
     }
 }

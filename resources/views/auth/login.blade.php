@@ -4,16 +4,14 @@
 
         <div class="text-center mb-10">
             <h1 class="text-dark mb-3">Sign In to Metronic</h1>
-            <div class="text-gray-400 fw-bold fs-4">New Here?
-                <a href="{{ route('register') }}" class="link-primary fw-bolder">Create an Account</a>
-            </div>
+            <div class="text-gray-400 fw-bold fs-4">Sign In to your account</div>
         </div>
 
         <div class="fv-row mb-10">
-            <label class="form-label fs-6 fw-bolder text-dark">Email</label>
-            <input class="form-control form-control-lg form-control-solid" type="email" name="email"
-                value="{{ old('email') }}" autocomplete="off" required autofocus />
-            @error('email')
+            <label class="form-label fs-6 fw-bolder text-dark">Username</label>
+            <input class="form-control form-control-lg form-control-solid" type="text" name="username"
+                value="{{ old('username') }}" autocomplete="off" required autofocus />
+            @error('username')
                 <div class="text-danger mt-2 small">{{ $message }}</div>
             @enderror
         </div>
@@ -21,9 +19,6 @@
         <div class="fv-row mb-10">
             <div class="d-flex flex-stack mb-2">
                 <label class="form-label fw-bolder text-dark fs-6 mb-0">Password</label>
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="link-primary fs-6 fw-bolder">Forgot Password ?</a>
-                @endif
             </div>
             <input class="form-control form-control-lg form-control-solid" type="password" name="password"
                 autocomplete="off" required />

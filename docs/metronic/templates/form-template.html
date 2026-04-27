@@ -1,0 +1,590 @@
+<!-- =======================================================
+     METRONIC FORM TEMPLATE WITH VALIDATION
+     Usage: Copy to your HTML file and customize as needed
+======================================================= -->
+
+<!--begin::Form Container-->
+<div class="card">
+    <!--begin::Form Header (optional)-->
+    <div class="card-header border-0 pt-5">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bold text-dark">Form Title</span>
+            <span class="text-muted mt-1 fw-semibold fs-7">Form description goes here</span>
+        </h3>
+    </div>
+    <!--end::Form Header-->
+
+    <!--begin::Form Body-->
+    <div class="card-body py-5">
+        <!--begin::Form-->
+        <form id="kt_form" class="form" action="#" method="post">
+
+            <!-- =======================================================
+                 BASIC INPUT FIELDS
+            ======================================================== -->
+
+            <!--begin::Input group - Text input-->
+            <div class="fv-row mb-7">
+                <label class="required form-label">Nama Lengkap</label>
+                <input type="text" name="fullname" class="form-control mb-2" placeholder="Masukkan nama lengkap" value=""/>
+                <span class="text-muted fs-7">Contoh: John Doe</span>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Email input-->
+            <div class="fv-row mb-7">
+                <label class="required form-label">Email</label>
+                <input type="email" name="email" class="form-control mb-2" placeholder="email@contoh.com" value=""/>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Password input-->
+            <div class="fv-row mb-7">
+                <label class="required form-label">Password</label>
+                <div class="position-relative mb-2">
+                    <input type="password" class="form-control" name="password" placeholder="Password" minlength="8"/>
+                    <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" data-kt-password-toggle="true">
+                        <span class="svg-icon svg-icon-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M2 12C2 8.5 5 5.5 8.5 5.5H15.5C19 5.5 22 8.5 22 12C22 15.5 19 18.5 15.5 18.5H8.5C5 18.5 2 15.5 2 12Z" fill="currentColor"/>
+                                <circle cx="8.5" cy="12" r="2.5" fill="white"/>
+                            </svg>
+                        </span>
+                    </span>
+                </div>
+                <span class="text-muted fs-7">Minimal 8 karakter</span>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - URL input-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Website</label>
+                <input type="url" name="website" class="form-control mb-2" placeholder="https://contoh.com" value=""/>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Phone input-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="tel" name="phone" class="form-control mb-2" placeholder="+62 xxx xxxx xxxx" value=""/>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 NUMBER INPUT FIELDS
+            ======================================================== -->
+
+            <!--begin::Input group - Number input-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Umur</label>
+                <input type="number" name="age" class="form-control mb-2" placeholder="Masukkan umur" min="18" max="100" value=""/>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Range slider-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Range Value: <span id="kt_range_value">50</span></label>
+                <input type="range" class="form-range" name="range" min="0" max="100" value="50" id="kt_range_input"/>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 TEXT AREA
+            ======================================================== -->
+
+            <!--begin::Input group - Textarea-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Alamat</label>
+                <textarea class="form-control" name="address" rows="3" placeholder="Masukkan alamat lengkap"></textarea>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 SELECT DROPDOWN
+            ======================================================== -->
+
+            <!--begin::Input group - Select (native)-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Provinsi</label>
+                <select name="province" class="form-select" data-control="select2" data-placeholder="Pilih provinsi">
+                    <option></option>
+                    <option value="jawa-barat">Jawa Barat</option>
+                    <option value="jawa-tengah">Jawa Tengah</option>
+                    <option value="jawa-timur">Jawa Timur</option>
+                    <option value="dki-jakarta">DKI Jakarta</option>
+                </select>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Select with groups-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Kategori</label>
+                <select name="category" class="form-select" data-control="select2" data-placeholder="Pilih kategori">
+                    <option></option>
+                    <optgroup label="Elektronik">
+                        <option value="smartphone">Smartphone</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="tablet">Tablet</option>
+                    </optgroup>
+                    <optgroup label="Fashion">
+                        <option value="pria">Pria</option>
+                        <option value="wanita">Wanita</option>
+                        <option value="anak">Anak</option>
+                    </optgroup>
+                </select>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 CHECKBOX & RADIO
+            ======================================================== -->
+
+            <!--begin::Input group - Checkbox-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Hobi</label>
+                <!--begin::Options-->
+                <div class="d-flex flex-column">
+                    <label class="form-check form-check-sm form-check-custom form-check-solid mb-2">
+                        <input class="form-check-input" type="checkbox" name="hobbies[]" value="reading"/>
+                        <span class="form-check-label text-gray-600">Membaca</span>
+                    </label>
+                    <label class="form-check form-check-sm form-check-custom form-check-solid mb-2">
+                        <input class="form-check-input" type="checkbox" name="hobbies[]" value="sports"/>
+                        <span class="form-check-label text-gray-600">Olahraga</span>
+                    </label>
+                    <label class="form-check form-check-sm form-check-custom form-check-solid mb-2">
+                        <input class="form-check-input" type="checkbox" name="hobbies[]" value="music"/>
+                        <span class="form-check-label text-gray-600">Musik</span>
+                    </label>
+                    <label class="form-check form-check-sm form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" name="hobbies[]" value="travel"/>
+                        <span class="form-check-label text-gray-600">Traveling</span>
+                    </label>
+                </div>
+                <!--end::Options-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Radio buttons-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Jenis Kelamin</label>
+                <!--begin::Options-->
+                <div class="d-flex flex-wrap gap-5">
+                    <label class="form-check form-check-sm form-check-custom form-check-solid">
+                        <input class="form-check-input" type="radio" name="gender" value="male"/>
+                        <span class="form-check-label text-gray-600">Pria</span>
+                    </label>
+                    <label class="form-check form-check-sm form-check-custom form-check-solid">
+                        <input class="form-check-input" type="radio" name="gender" value="female"/>
+                        <span class="form-check-label text-gray-600">Wanita</span>
+                    </label>
+                </div>
+                <!--end::Options-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Toggle switch-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Status Aktif</label>
+                <div class="form-check form-switch form-check-custom form-check-solid">
+                    <input class="form-check-input" type="checkbox" name="is_active" value="1" id="kt_form_is_active" checked/>
+                    <label class="form-check-label fw-semibold text-gray-600" for="kt_form_is_active">
+                        Aktifkan akun ini
+                    </label>
+                </div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 DATE & TIME PICKER
+            ======================================================== -->
+
+            <!--begin::Input group - Date picker-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Tanggal Lahir</label>
+                <input class="form-control" name="birthdate" placeholder="Pick a date" data-flatpickr="true" inputmode="none"/>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Date range picker-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Periode</label>
+                <input class="form-control" name="period" placeholder="Pick a date range" data-flatpickr-range="true" inputmode="none"/>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Time picker-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Waktu</label>
+                <input class="form-control" name="time" placeholder="Pick a time" data-flatpickr-time="true" inputmode="none"/>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 FILE UPLOAD
+            ======================================================== -->
+
+            <!--begin::Input group - File upload (single)-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Upload Foto</label>
+                <input type="file" name="avatar" class="form-control" accept="image/*"/>
+                <div class="form-text">Maksimal 2MB. Format: JPG, PNG.</div>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - File upload (drag & drop)-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Upload Dokumen</label>
+                <!--begin::Dropzone-->
+                <div class="dropzone" id="kt_dropzone">
+                    <div class="dz-message needsclick">
+                        <span class="svg-icon svg-icon-3x">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M19 11H5M19 11L12 18M19 11L12 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <h3 class="fs-5 fw-bold mb-1">Drop files here or click to upload.</h3>
+                        <span class="fs-7 fw-semibold text-gray-400">Upload up to 10 files</span>
+                    </div>
+                </div>
+                <!--end::Dropzone-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - Image preview with remove-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Current Avatar</label>
+                <div class="image-input image-input-outline" data-kt-image-input="true">
+                    <div class="image-input-wrapper w-125px h-125px"></div>
+                    <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
+                        <i class="bi bi-pencil-fill fs-7"></i>
+                        <input type="file" name="avatar" accept=".png,.jpg,.jpeg"/>
+                        <input type="hidden" name="avatar_remove"/>
+                    </label>
+                    <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
+                        <i class="bi bi-x fs-2"></i>
+                    </span>
+                    <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-white shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
+                        <i class="bi bi-x fs-2"></i>
+                    </span>
+                </div>
+                <div class="form-text">Supported formats: PNG, JPG.</div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 RICH TEXT EDITOR
+            ======================================================== -->
+
+            <!--begin::Input group - Quill Editor-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Deskripsi Lengkap</label>
+                <div id="kt_quill_editor" style="height: 200px;"></div>
+                <textarea name="description" id="kt_quill_editor_content" hidden></textarea>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 INPUT GROUPS (with prefix/suffix)
+            ======================================================== -->
+
+            <!--begin::Input group - With prefix-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Harga</label>
+                <div class="input-group">
+                    <span class="input-group-text">Rp</span>
+                    <input type="text" class="form-control" name="price" placeholder="0" value=""/>
+                </div>
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group - With suffix-->
+            <div class="fv-row mb-7">
+                <label class="form-label">Berat</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="weight" placeholder="0" value=""/>
+                    <span class="input-group-text">kg</span>
+                </div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- =======================================================
+                 ACTIONS
+            ======================================================== -->
+
+            <!--begin::Actions-->
+            <div class="card-footer d-flex justify-content-end py-6 px-9">
+                <button type="button" class="btn btn-light btn-active-light-primary me-2" data-kt-form-cancel="true">
+                    Batal
+                </button>
+                <button type="submit" class="btn btn-primary" data-kt-indicator="on">
+                    <span class="indicator-label">Simpan</span>
+                    <span class="indicator-progress">
+                        Please wait...
+                        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                    </span>
+                </button>
+            </div>
+            <!--end::Actions-->
+
+        </form>
+        <!--end::Form-->
+    </div>
+    <!--end::Form Body-->
+</div>
+<!--end::Form Container-->
+
+
+<!-- =======================================================
+     JAVASCRIPT FOR FORM VALIDATION
+======================================================= -->
+
+<script>
+"use strict";
+
+var KtForm = function() {
+    var form;
+    var submitButton;
+    var validator;
+    var avatarInput;
+
+    var initElements = function() {
+        form = document.querySelector('#kt_form');
+        submitButton = form.querySelector('[type="submit"]');
+        avatarInput = form.querySelector('[data-kt-image-input="true"]');
+    };
+
+    var handleImageInput = function() {
+        if (avatarInput) {
+            var imageInput = new KTImageInput(avatarInput);
+        }
+    };
+
+    var handleQuillEditor = function() {
+        var quill = new Quill('#kt_quill_editor', {
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['link', 'code-block']
+                ]
+            },
+            placeholder: 'Type your text here...',
+            theme: 'snow'
+        });
+
+        quill.on('text-change', function() {
+            document.querySelector('#kt_quill_editor_content').value = quill.root.innerHTML;
+        });
+    };
+
+    var handleFormValidation = function() {
+        validator = FormValidation.formValidation(
+            form,
+            {
+                fields: {
+                    'fullname': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Nama lengkap wajib diisi'
+                            },
+                            stringLength: {
+                                min: 3,
+                                message: 'Minimal 3 karakter'
+                            }
+                        }
+                    },
+                    'email': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Email wajib diisi'
+                            },
+                            emailAddress: {
+                                message: 'Format email tidak valid'
+                            }
+                        }
+                    },
+                    'password': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Password wajib diisi'
+                            },
+                            stringLength: {
+                                min: 8,
+                                message: 'Minimal 8 karakter'
+                            }
+                        }
+                    },
+                    'province': {
+                        validators: {
+                            notEmpty: {
+                                message: 'Silakan pilih provinsi'
+                            }
+                        }
+                    },
+                    'avatar': {
+                        validators: {
+                            file: {
+                                extension: 'jpeg,jpg,png',
+                                type: 'image/jpeg,image/png',
+                                maxSize: 2000000, // 2MB
+                                message: 'File harus berupa gambar (JPG/PNG) maksimal 2MB'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    trigger: new FormValidation.plugins.Trigger(),
+                    bootstrap: new FormValidation.plugins.Bootstrap5({
+                        rowSelector: '.fv-row',
+                        eleInvalidClass: '',
+                        eleValidClass: ''
+                    }),
+                    submitButton: new FormValidation.plugins.SubmitButton(),
+                    icon: new FormValidation.plugins.Icon({
+                        valid: 'fa fa-check',
+                        invalid: 'fa fa-times',
+                        validating: 'fa fa-sync'
+                    })
+                }
+            }
+        );
+    };
+
+    var handleSubmit = function() {
+        submitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            validator.validate().then(function(status) {
+                if (status === 'Valid') {
+                    submitForm();
+                } else {
+                    Swal.fire({
+                        text: "Mohon periksa kembali formulir Anda.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, mengerti!",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        });
+    };
+
+    var submitForm = function() {
+        var formData = new FormData(form);
+
+        submitButton.setAttribute('data-kt-indicator', 'on');
+        submitButton.disabled = true;
+
+        // AJAX request
+        fetch('/api/submit', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            submitButton.removeAttribute('data-kt-indicator');
+            submitButton.disabled = false;
+
+            if (data.success) {
+                Swal.fire({
+                    text: data.message || "Form berhasil disubmit!",
+                    icon: "success",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, mengerti!",
+                    customClass: {
+                        confirmButton: "btn btn-primary"
+                    }
+                }).then(function() {
+                    // Redirect or reload
+                    window.location.href = '/success';
+                });
+            } else {
+                Swal.fire({
+                    text: data.message || "Terjadi kesalahan.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, mengerti!",
+                    customClass: {
+                        confirmButton: "btn btn-primary"
+                    }
+                });
+            }
+        })
+        .catch(function(error) {
+            submitButton.removeAttribute('data-kt-indicator');
+            submitButton.disabled = false;
+
+            Swal.fire({
+                text: "Terjadi kesalahan koneksi.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, mengerti!",
+                customClass: {
+                    confirmButton: "btn btn-primary"
+                }
+            });
+        });
+    };
+
+    var handleCancel = function() {
+        var cancelButton = form.querySelector('[data-kt-form-cancel]');
+        if (cancelButton) {
+            cancelButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                form.reset();
+                validator.resetForm();
+            });
+        }
+    };
+
+    var handlePasswordToggle = function() {
+        var toggleButtons = form.querySelectorAll('[data-kt-password-toggle="true"]');
+        toggleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var target = this.closest('div').querySelector('input');
+                if (target.type === 'password') {
+                    target.type = 'text';
+                } else {
+                    target.type = 'password';
+                }
+            });
+        });
+    };
+
+    var handleRangeInput = function() {
+        var rangeInput = document.querySelector('#kt_range_input');
+        var rangeValue = document.querySelector('#kt_range_value');
+
+        if (rangeInput && rangeValue) {
+            rangeInput.addEventListener('input', function() {
+                rangeValue.textContent = this.value;
+            });
+        }
+    };
+
+    return {
+        init: function() {
+            if (!form) return;
+
+            initElements();
+            handleImageInput();
+            handleQuillEditor();
+            handleFormValidation();
+            handleSubmit();
+            handleCancel();
+            handlePasswordToggle();
+            handleRangeInput();
+        }
+    };
+}();
+
+KTUtil.onDOMContentLoaded(function() {
+    KtForm.init();
+});
+</script>

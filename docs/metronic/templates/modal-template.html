@@ -1,0 +1,352 @@
+<!-- =======================================================
+     METRONIC MODAL TEMPLATE
+     Usage: Copy to your HTML file and customize as needed
+======================================================= -->
+
+<!--begin::Modal - Small Size-->
+<div class="modal fade" id="kt_modal_small" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <!--begin::Header-->
+            <div class="modal-header">
+                <h2 class="modal-title">Modal Title</h2>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="modal-body">
+                <p>Modal content goes here...</p>
+            </div>
+            <!--end::Body-->
+
+            <!--begin::Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary">Simpan</button>
+            </div>
+            <!--end::Footer-->
+        </div>
+    </div>
+</div>
+<!--end::Modal-->
+
+
+<!--begin::Modal - Medium Size (default)-->
+<div class="modal fade" id="kt_modal_medium" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!--begin::Header-->
+            <div class="modal-header">
+                <h2 class="modal-title">Modal Title</h2>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="modal-body">
+                <!--begin::Form-->
+                <form id="kt_modal_form">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="required form-label">Nama Lengkap</label>
+                        <input type="text" name="fullname" class="form-control" placeholder="Masukkan nama lengkap"/>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="required form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="email@contoh.com"/>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" data-control="select2" data-placeholder="Pilih role">
+                            <option></option>
+                            <option value="admin">Administrator</option>
+                            <option value="user">User</option>
+                            <option value="guest">Guest</option>
+                        </select>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Masukkan deskripsi"></textarea>
+                    </div>
+                    <!--end::Input group-->
+
+                    <!--begin::Input group (Checkbox)-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label">Status</label>
+                        <div class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" name="status" value="1" id="kt_modal_status"/>
+                            <label class="form-check-label fw-semibold text-gray-600" for="kt_modal_status">
+                                Aktif
+                            </label>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </form>
+                <!--end::Form-->
+            </div>
+            <!--end::Body-->
+
+            <!--begin::Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" data-kt-modal-action="submit">
+                    <span class="indicator-label">Simpan</span>
+                    <span class="indicator-progress">
+                        Please wait...
+                        <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                    </span>
+                </button>
+            </div>
+            <!--end::Footer-->
+        </div>
+    </div>
+</div>
+<!--end::Modal-->
+
+
+<!--begin::Modal - Large Size-->
+<div class="modal fade" id="kt_modal_large" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <!--begin::Header-->
+            <div class="modal-header">
+                <h2 class="modal-title">Modal Title</h2>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="modal-body py-5">
+                <!-- Large modal content -->
+            </div>
+            <!--end::Body-->
+
+            <!--begin::Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary">Simpan</button>
+            </div>
+            <!--end::Footer-->
+        </div>
+    </div>
+</div>
+<!--end::Modal-->
+
+
+<!--begin::Modal - Extra Large Size-->
+<div class="modal fade" id="kt_modal_xl" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <!--begin::Header-->
+            <div class="modal-header">
+                <h2 class="modal-title">Modal Title</h2>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="modal-body">
+                <!-- Extra large modal content -->
+            </div>
+            <!--end::Body-->
+
+            <!--begin::Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary">Simpan</button>
+            </div>
+            <!--end::Footer-->
+        </div>
+    </div>
+</div>
+<!--end::Modal-->
+
+
+<!--begin::Modal - Scrollable Content-->
+<div class="modal fade" id="kt_modal_scrollable" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <!--begin::Header-->
+            <div class="modal-header">
+                <h2 class="modal-title">Modal Title</h2>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="svg-icon svg-icon-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="modal-body">
+                <p>Scrollable content...</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p>More content...</p>
+            </div>
+            <!--end::Body-->
+
+            <!--begin::Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary">Simpan</button>
+            </div>
+            <!--end::Footer-->
+        </div>
+    </div>
+</div>
+<!--end::Modal-->
+
+
+<!--begin::Modal - Confirmation (SweetAlert2 style)-->
+<!-- Use SweetAlert2 for confirmation dialogs -->
+<script>
+// Example: Show confirmation dialog
+function showConfirmation(callback) {
+    Swal.fire({
+        text: "Apakah Anda yakin ingin melanjutkan?",
+        icon: "warning",
+        showCancelButton: true,
+        buttonsStyling: false,
+        confirmButtonText: "Ya, lanjutkan!",
+        cancelButtonText: "Tidak, batalkan",
+        customClass: {
+            confirmButton: "btn btn-primary",
+            cancelButton: "btn btn-active-light"
+        }
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            callback();
+        }
+    });
+}
+
+// Example: Show success dialog
+function showSuccess(message) {
+    Swal.fire({
+        text: message || "Operasi berhasil!",
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, mengerti!",
+        customClass: {
+            confirmButton: "btn btn-primary"
+        }
+    });
+}
+
+// Example: Show error dialog
+function showError(message) {
+    Swal.fire({
+        text: message || "Terjadi kesalahan!",
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, mengerti!",
+        customClass: {
+            confirmButton: "btn btn-primary"
+        }
+    });
+}
+</script>
+
+
+<!-- =======================================================
+     MODAL TRIGGER EXAMPLES
+======================================================= -->
+
+<!-- Button to open modal with data attributes -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_medium">
+    Open Modal
+</button>
+
+<!-- Button to open modal with JavaScript -->
+<button type="button" class="btn btn-primary" id="btn_open_modal">
+    Open Modal via JS
+</button>
+
+<script>
+// Open modal with JavaScript
+var openModalButton = document.querySelector('#btn_open_modal');
+if (openModalButton) {
+    openModalButton.addEventListener('click', function() {
+        var myModal = new bootstrap.Modal(document.querySelector('#kt_modal_medium'));
+        myModal.show();
+    });
+}
+</script>
+
+
+<!-- =======================================================
+     MODAL WITH LOADING STATE
+======================================================= -->
+
+<script>
+// Handle modal form submission with loading state
+var handleModalSubmit = function() {
+    var submitButton = document.querySelector('[data-kt-modal-action="submit"]');
+    var modalElement = document.querySelector('#kt_modal_medium');
+
+    if (submitButton) {
+        submitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Show loading state
+            submitButton.setAttribute('data-kt-indicator', 'on');
+            submitButton.disabled = true;
+
+            // Simulate AJAX request
+            setTimeout(function() {
+                // Hide loading state
+                submitButton.removeAttribute('data-kt-indicator');
+                submitButton.disabled = false;
+
+                // Close modal
+                var modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+
+                // Show success message
+                toastr.success('Data berhasil disimpan');
+            }, 2000);
+        });
+    }
+};
+
+// Initialize on DOM ready
+KTUtil.onDOMContentLoaded(function() {
+    handleModalSubmit();
+});
+</script>

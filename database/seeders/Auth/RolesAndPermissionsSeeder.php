@@ -24,6 +24,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'create users',
             'edit users',
             'delete users',
+            'view kontingen',
+            'create kontingen',
+            'edit kontingen',
+            'delete kontingen',
+            'edit own kontingen',
             'view roles',
             'create roles',
             'edit roles',
@@ -33,7 +38,6 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit permissions',
             'delete permissions',
             'manage settings',
-            // 'view laporan', // <-- Contoh: Jika nanti ada permission baru, tinggal tulis disini
         ];
 
         foreach ($permissions as $permission) {
@@ -58,16 +62,26 @@ class RolesAndPermissionsSeeder extends Seeder
         // syncPermissions: Memastikan Super Admin SELALU punya SEMUA akses (termasuk yg baru ditambah)
         $superAdminRole->syncPermissions(Permission::all());
 
-        // --- Role: Staff ---
-        $staffRole = Role::firstOrCreate([
-            'name' => 'staff',
+        // --- Role: Panitia ---
+        $panitiaRole = Role::firstOrCreate([
+            'name' => 'panitia',
             'guard_name' => 'web'
         ]);
-        // Berikan akses standar jika belum punya
-        // givePermissionTo: Menambah akses tanpa menghapus akses lain yang mungkin sudah dikasih manual
-        $staffRole->givePermissionTo([
+        $panitiaRole->syncPermissions([
             'view dashboard',
-            'view users',
+            'view kontingen',
+            'create kontingen',
+            'edit kontingen',
+        ]);
+
+        // --- Role: Kontingen ---
+        $kontingenRole = Role::firstOrCreate([
+            'name' => 'kontingen',
+            'guard_name' => 'web'
+        ]);
+        $kontingenRole->syncPermissions([
+            'view dashboard',
+            'edit own kontingen',
         ]);
 
         // =================================================================
@@ -75,28 +89,40 @@ class RolesAndPermissionsSeeder extends Seeder
         // =================================================================
 
         // --- User: Super Admin ---
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@admin.com'], // 1. Cek: Apakah email ini ada?
-            [                              // 2. Jika TIDAK ada, buat dengan data ini:
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
                 'name' => 'Super Admin',
+                'username' => 'superadmin',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
-        // Pastikan role-nya nempel (meskipun usernya sudah lama ada)
         $admin->assignRole($superAdminRole);
 
-
-        // --- User: Staff Biasa ---
-        $staff = User::firstOrCreate(
-            ['email' => 'staff@admin.com'], // 1. Cek email
-            [                              // 2. Data baru jika email belum ada
-                'name' => 'Staff Biasa',
+        // --- User: Panitia ---
+        $panitia = User::updateOrCreate(
+            ['email' => 'panitia@admin.com'],
+            [
+                'name' => 'Panitia',
+                'username' => 'panitia',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
-        $staff->assignRole($staffRole);
+        $panitia->assignRole($panitiaRole);
+
+        // --- User: Kontingen ---
+        $kontingen = User::updateOrCreate(
+            ['email' => 'kontingen@admin.com'],
+            [
+                'name' => 'Kontingen',
+                'username' => 'kontingen',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $kontingen->assignRole($kontingenRole);
 
         $this->command->info('Seeder selesai! Data lama aman, data baru ditambahkan.');
     }
