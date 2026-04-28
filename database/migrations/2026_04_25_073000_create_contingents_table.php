@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('contingents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
             $table->string('name');
             $table->string('official_name');
             $table->string('phone', 20)->nullable();

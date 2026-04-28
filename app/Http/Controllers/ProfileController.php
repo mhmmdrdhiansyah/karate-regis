@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateContingentProfileRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,14 +44,9 @@ class ProfileController extends Controller
     /**
      * Update kontingen profile information.
      */
-    public function updateKontingen(Request $request): RedirectResponse
+    public function updateKontingen(UpdateContingentProfileRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'official_name' => ['nullable', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:500'],
-        ]);
+        $validated = $request->validated();
 
         $contingent = $request->user()->contingent;
 
@@ -59,7 +55,7 @@ class ProfileController extends Controller
                 ->with('error', 'Data kontingen tidak ditemukan');
         }
 
-        $contingent->update($request->only('name', 'official_name', 'phone', 'address'));
+        $contingent->update($validated);
 
         return Redirect::route('profile.edit')
             ->with('status', 'kontingen-updated');

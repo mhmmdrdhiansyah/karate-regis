@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Contingent;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -38,6 +39,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit permissions',
             'delete permissions',
             'manage settings',
+            'view participants',
+            'create participants',
+            'edit participants',
+            'delete participants',
         ];
 
         foreach ($permissions as $permission) {
@@ -82,6 +87,10 @@ class RolesAndPermissionsSeeder extends Seeder
         $kontingenRole->syncPermissions([
             'view dashboard',
             'edit own kontingen',
+            'view participants',
+            'create participants',
+            'edit participants',
+            'delete participants',
         ]);
 
         // =================================================================
@@ -123,6 +132,17 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $kontingen->assignRole($kontingenRole);
+
+        // Buat Contingent untuk user kontingen
+        Contingent::updateOrCreate(
+            ['user_id' => $kontingen->id],
+            [
+                'name' => 'Kontingen Contoh',
+                'official_name' => 'Kontingen Contoh Official',
+                'phone' => '08123456789',
+                'address' => 'Alamat Contoh',
+            ]
+        );
 
         $this->command->info('Seeder selesai! Data lama aman, data baru ditambahkan.');
     }

@@ -147,6 +147,16 @@
                     </div>
                 @endrole
 
+                @role('kontingen')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('participants.*') ? 'active' : '' }}"
+                            href="{{ route('participants.index') }}">
+                            <span class="menu-icon"><i class="bi bi-person-lines-fill fs-3"></i></span>
+                            <span class="menu-title">Bank Peserta</span>
+                        </a>
+                    </div>
+                @endrole
+
                 {{-- 3. MENU SETTINGS (Terpisah/Single) --}}
                 @can('manage settings')
                     <div class="menu-item">

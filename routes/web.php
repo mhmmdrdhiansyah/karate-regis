@@ -44,4 +44,37 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+    // TEMP: Participant preview routes (hapus setelah controller siap)
+    Route::prefix('participants')->name('participants.')->group(function () {
+        Route::get('/', fn () => view('participants.index', ['participants' => collect()]))->name('index');
+        Route::get('/create', fn () => view('participants.create'))->name('create');
+        Route::post('/', fn () => redirect()->route('participants.index'))->name('store');
+        Route::get('/{id}/edit', fn ($id) => view('participants.edit', [
+            'participant' => \App\Models\Participant::factory()->make([
+                'type' => \App\Enums\ParticipantType::Athlete,
+                'name' => 'John Doe',
+                'nik' => '1234567890123456',
+                'birth_date' => '2000-01-15',
+                'gender' => \App\Enums\ParticipantGender::Male,
+                'provinsi' => 'Jawa Barat',
+                'institusi' => 'Dojo Nusantara',
+            ]),
+            'lockedFields' => [],
+            'canDelete' => true,
+        ]))->name('edit');
+        Route::put('/{id}', fn ($id) => redirect()->route('participants.index'))->name('update');
+        Route::delete('/{id}', fn ($id) => redirect()->route('participants.index'))->name('destroy');
+        Route::get('/{id}', fn ($id) => view('participants.show', [
+            'participant' => \App\Models\Participant::factory()->make([
+                'type' => \App\Enums\ParticipantType::Athlete,
+                'name' => 'John Doe',
+                'nik' => '1234567890123456',
+                'birth_date' => '2000-01-15',
+                'gender' => \App\Enums\ParticipantGender::Male,
+                'provinsi' => 'Jawa Barat',
+                'institusi' => 'Dojo Nusantara',
+            ]),
+        ]))->where('id', '[0-9]+')->name('show');
+    });
+
 require __DIR__ . '/auth.php';

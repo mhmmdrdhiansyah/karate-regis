@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -12,12 +13,6 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
 
     protected $guard_name = 'web';
 
@@ -28,21 +23,11 @@ class User extends Authenticatable
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -51,14 +36,39 @@ class User extends Authenticatable
         ];
     }
 
-    public function contingent()
+    public function contingent(): HasOne
     {
         return $this->hasOne(Contingent::class);
     }
 
-    public function isKontingen(): bool
+    public function verifiedParticipants(): HasMany
     {
-        return $this->hasRole('kontingen');
+        return $this->hasMany(Participant::class, 'verified_by');
+    }
+
+    public function verifiedPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'verified_by');
+    }
+
+    public function verifiedRegistrations(): HasMany
+    {
+        return $this->hasMany(Registration::class, 'verified_by');
+    }
+
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('super-admin') || $this->hasRole('panitia');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super-admin');
     }
 
     public function isPanitia(): bool
@@ -66,8 +76,8 @@ class User extends Authenticatable
         return $this->hasRole('panitia');
     }
 
-    public function isSuperAdmin(): bool
+    public function isKontingen(): bool
     {
-        return $this->hasRole('super-admin');
+        return $this->hasRole('kontingen');
     }
 }
