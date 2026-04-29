@@ -58,6 +58,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'verify documents',
             'manage own participants',
             'manage registrations',
+            'create registrations',
+            'view registrations',
         ];
 
         foreach ($permissions as $permission) {
@@ -123,6 +125,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete participants',
             'view events',
             'manage own participants',
+            'create registrations',
+            'view registrations',
         ]);
 
         // =================================================================

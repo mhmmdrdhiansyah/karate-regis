@@ -81,6 +81,13 @@ Route::middleware('auth')->group(function () {
 
     // Laporan (Reports) - simple index page
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Pendaftaran Event (User/Kontingen)
+    Route::middleware(['permission:create registrations'])->group(function () {
+        Route::get('registration', function () {
+            return view('registration.index');
+        })->name('registration.index');
+    });
 });
 
 require __DIR__ . '/auth.php';
