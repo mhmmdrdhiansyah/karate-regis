@@ -65,7 +65,11 @@ class ParticipantController extends Controller
     {
         $this->authorizeParticipant($participant);
 
-        return view('participants.show', compact('participant'));
+        $canDelete = $this->participantService->canDelete($participant);
+        $deleteReason = $this->participantService->getDeleteReason($participant);
+        $hasActiveRegistration = $participant->registrations()->whereNull('deleted_at')->exists();
+
+        return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration'));
     }
 
     public function edit(Participant $participant)
@@ -75,7 +79,12 @@ class ParticipantController extends Controller
         $lockedFields = $this->participantService->getLockedFields($participant);
         $canDelete = $this->participantService->canDelete($participant);
 
-        return view('participants.edit', compact('participant', 'lockedFields', 'canDelete'));
+        $lockReasons = [];
+        foreach ($lockedFields as $field) {
+            $lockReasons[$field] = $this->participantService->getLockReason($participant, $field);
+        }
+
+        return view('participants.edit', compact('participant', 'lockedFields', 'canDelete', 'lockReasons'));
     }
 
     public function update(UpdateParticipantRequest $request, Participant $participant)
@@ -85,8 +94,12 @@ class ParticipantController extends Controller
         $validated = $request->validated();
         $lockedFields = $this->participantService->getLockedFields($participant);
 
+        $skippedFields = [];
         foreach ($lockedFields as $field) {
-            unset($validated[$field]);
+            if (array_key_exists($field, $validated)) {
+                $skippedFields[] = $field;
+                unset($validated[$field]);
+            }
         }
 
         if ($request->hasFile('photo')) {
@@ -109,7 +122,12 @@ class ParticipantController extends Controller
 
         $participant->update($validated);
 
-        return redirect()->route('participants.index')->with('success', 'Data peserta berhasil diperbarui.');
+        $message = 'Data peserta berhasil diperbarui.';
+        if (count($skippedFields) > 0) {
+            $message .= ' (' . count($skippedFields) . ' field terkunci dilewati)';
+        }
+
+        return redirect()->route('participants.index')->with('success', $message);
     }
 
     public function destroy(Participant $participant)
@@ -118,9 +136,7 @@ class ParticipantController extends Controller
 
         if (!$this->participantService->canDelete($participant)) {
             return back()->withErrors([
-                'delete' => $participant->is_verified
-                    ? 'Peserta yang sudah terverifikasi tidak dapat dihapus.'
-                    : 'Peserta memiliki registrasi aktif dan tidak dapat dihapus.',
+                'delete' => $this->participantService->getDeleteReason($participant),
             ]);
         }
 

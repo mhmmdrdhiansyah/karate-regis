@@ -1,6 +1,42 @@
 <x-app-layout>
     @section('title', 'Detail Peserta - ' . $participant->name)
 
+    @if($hasActiveRegistration && !$participant->is_verified)
+        <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex align-items-center p-5 mb-5">
+            <span class="svg-icon svg-icon-2 me-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path opacity="0.3"
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="currentColor" />
+                    <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
+                </svg>
+            </span>
+            <div class="d-flex flex-column">
+                <h5 class="mb-1 text-warning">Peserta terdaftar di event</h5>
+                <span class="text-gray-600">
+                    NIK, tanggal lahir, dan jenis kelamin tidak dapat diubah. Peserta tidak dapat dihapus.
+                </span>
+            </div>
+        </div>
+    @elseif($participant->is_verified)
+        <div class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
+            <span class="svg-icon svg-icon-2 me-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path opacity="0.3"
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="currentColor" />
+                    <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
+                </svg>
+            </span>
+            <div class="d-flex flex-column">
+                <h5 class="mb-1 text-danger">Data sudah terverifikasi</h5>
+                <span class="text-gray-600">
+                    Semua field terkunci kecuali foto. Peserta tidak dapat dihapus.
+                </span>
+            </div>
+        </div>
+    @endif
+
     <div class="card mb-5 mb-xl-10">
         <div class="card-body border-0 pt-9 pb-0">
             <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
@@ -37,6 +73,11 @@
                                 @else
                                     <span class="badge badge-light-warning fw-bolder ms-2 fs-8">Belum</span>
                                 @endif
+                                @if($hasActiveRegistration)
+                                    <span class="badge badge-light-info fw-bolder ms-2 fs-8">
+                                        <i class="bi bi-clipboard-check me-1"></i>Terdaftar Event
+                                    </span>
+                                @endif
                             </div>
                             <span class="text-muted fw-semibold fs-6">
                                 @if($participant->nik)
@@ -49,8 +90,24 @@
                         <div class="d-flex flex-wrap">
                             <a href="{{ route('participants.edit', $participant) }}"
                                 class="btn btn-light-primary btn-sm me-2">
-                                Edit
+                                <i class="bi bi-pencil me-1"></i> Edit
                             </a>
+                            @if($canDelete)
+                                <form action="{{ route('participants.destroy', $participant) }}" method="POST"
+                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus peserta ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-light-danger btn-sm me-2">
+                                        <i class="bi bi-trash me-1"></i> Hapus
+                                    </button>
+                                </form>
+                            @else
+                                <span class="btn btn-light-danger btn-sm me-2 opacity-50 cursor-default" data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom" title="{{ $deleteReason ?? 'Peserta tidak dapat dihapus' }}"
+                                    style="cursor: not-allowed;">
+                                    <i class="bi bi-trash me-1"></i> Hapus
+                                </span>
+                            @endif
                             <a href="{{ route('participants.index') }}" class="btn btn-light btn-sm">
                                 Kembali
                             </a>
@@ -186,8 +243,15 @@
     </div>
 
     @push('scripts')
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            new bootstrap.Tooltip(el);
+        });
+
         @if (session('success'))
-            <script>toastr.success("{{ session('success') }}");</script>
+            toastr.success("{{ session('success') }}");
+        @endif
+        @if ($errors->has('delete'))
+            toastr.error("{{ $errors->first('delete') }}");
         @endif
     @endpush
 </x-app-layout>

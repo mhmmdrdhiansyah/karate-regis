@@ -43,6 +43,32 @@ class ParticipantService
         return [];
     }
 
+    public function getLockReason(Participant $participant, string $fieldName): ?string
+    {
+        if ($participant->is_verified) {
+            return 'Field ini terkunci karena data sudah terverifikasi.';
+        }
+
+        if ($this->hasActiveRegistration($participant) && in_array($fieldName, ['nik', 'birth_date', 'gender'])) {
+            return 'Field ini terkunci karena peserta sudah terdaftar di event.';
+        }
+
+        return null;
+    }
+
+    public function getDeleteReason(Participant $participant): ?string
+    {
+        if ($participant->is_verified) {
+            return 'Peserta yang sudah terverifikasi tidak dapat dihapus.';
+        }
+
+        if ($this->hasActiveRegistration($participant)) {
+            return 'Peserta memiliki registrasi aktif dan tidak dapat dihapus.';
+        }
+
+        return null;
+    }
+
     private function hasActiveRegistration(Participant $participant): bool
     {
         return $participant->registrations()->whereNull('deleted_at')->exists();

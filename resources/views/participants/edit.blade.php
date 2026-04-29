@@ -1,7 +1,24 @@
 <x-app-layout>
     @section('title', 'Edit Peserta - ' . $participant->name)
 
-    @if(count($lockedFields) > 0)
+    @if($participant->is_verified)
+        <div class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
+            <span class="svg-icon svg-icon-2 me-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path opacity="0.3"
+                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                        fill="currentColor" />
+                    <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
+                </svg>
+            </span>
+            <div class="d-flex flex-column">
+                <h5 class="mb-1 text-danger">Data sudah terverifikasi</h5>
+                <span class="text-gray-600">
+                    Hanya foto yang dapat diubah. Semua field lainnya terkunci.
+                </span>
+            </div>
+        </div>
+    @elseif(count($lockedFields) > 0)
         <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex align-items-center p-5 mb-5">
             <span class="svg-icon svg-icon-2 me-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -14,7 +31,7 @@
             <div class="d-flex flex-column">
                 <h5 class="mb-1 text-warning">Perhatian</h5>
                 <span class="text-gray-600">
-                    Beberapa field tidak dapat diubah karena peserta sudah terdaftar dalam pendaftaran aktif dan/atau sudah terverifikasi.
+                    Peserta sudah terdaftar di event. NIK, tanggal lahir, dan jenis kelamin tidak dapat diubah.
                 </span>
             </div>
         </div>
@@ -59,7 +76,8 @@
                                 Nama Lengkap
                                 @if($isNameLocked)
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['name'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <input type="text" name="name" class="form-control form-control-solid"
@@ -105,7 +123,8 @@
                                 NIK
                                 @if($isNikLocked)
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['nik'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <input type="text" name="nik" class="form-control form-control-solid"
@@ -126,7 +145,8 @@
                                 Tanggal Lahir
                                 @if($isBirthDateLocked)
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['birth_date'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <input type="text" name="birth_date" class="form-control form-control-solid"
@@ -150,7 +170,8 @@
                                 Jenis Kelamin
                                 @if($isGenderLocked)
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['gender'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <div class="d-flex flex-wrap gap-5">
@@ -181,7 +202,8 @@
                                 Provinsi
                                 @if(in_array('provinsi', $lockedFields))
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['provinsi'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <input type="text" name="provinsi" class="form-control form-control-solid"
@@ -204,7 +226,8 @@
                                 Institusi
                                 @if(in_array('institusi', $lockedFields))
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['institusi'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             <input type="text" name="institusi" class="form-control form-control-solid"
@@ -224,7 +247,8 @@
                                 Dokumen
                                 @if($isDocumentLocked)
                                     <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                        data-bs-placement="right" title="Field ini terkunci dan tidak dapat diubah"></i>
+                                        data-bs-placement="right"
+                                        title="{{ $lockReasons['document'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                 @endif
                             </label>
                             @if($participant->document)
