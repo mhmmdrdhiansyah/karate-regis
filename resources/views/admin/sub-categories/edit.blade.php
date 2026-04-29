@@ -63,10 +63,16 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex justify-content-end">
-            <a href="{{ route('admin.event-categories.show', $subCategory->eventCategory) }}"
-                class="btn btn-light btn-active-light-primary me-2">Batal</a>
-            <button type="submit" class="btn btn-primary">Simpan</button>
+        <div class="d-flex justify-content-between">
+            <div>
+                <a href="{{ route('admin.events.show', $subCategory->eventCategory->event) }}"
+                    class="btn btn-light btn-sm me-2">← Kembali ke Event</a>
+            </div>
+            <div>
+                <a href="{{ route('admin.event-categories.show', $subCategory->eventCategory) }}"
+                    class="btn btn-light btn-active-light-primary me-2">Batal</a>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
         </div>
     </form>
 </x-app-layout>

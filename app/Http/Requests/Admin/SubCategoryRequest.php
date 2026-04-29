@@ -15,7 +15,7 @@ class SubCategoryRequest extends FormRequest
             'gender' => ['required', Rule::enum(SubCategoryGender::class)],
             'price' => ['required', 'numeric', 'min:0'],
             'min_participants' => ['required', 'integer', 'min:1'],
-            'max_participants' => ['required', 'integer', 'min:min_participants'],
+            'max_participants' => ['required', 'integer', 'gte:min_participants'],
         ];
     }
 }
