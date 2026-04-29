@@ -13,6 +13,14 @@ use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view events')->only(['index', 'show']);
+        $this->middleware('permission:create events')->only(['create', 'store']);
+        $this->middleware('permission:edit events')->only(['edit', 'update', 'transition']);
+        $this->middleware('permission:delete events')->only(['destroy']);
+    }
+
     public function index()
     {
         $events = Event::query()

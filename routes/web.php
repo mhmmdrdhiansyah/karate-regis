@@ -56,20 +56,27 @@ Route::middleware('auth')->group(function () {
         Route::delete('participants/{participant}', [ParticipantController::class, 'destroy'])->name('participants.destroy');
     });
 
-    Route::middleware(['role:super-admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('events', EventController::class);
-        Route::patch('events/{event}/transition', [EventController::class, 'transition'])->name('events.transition');
+    // Event Management — Protected by permission middleware (checked at controller level)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::middleware(['permission:view events|create events|edit events|delete events'])->group(function () {
+            Route::resource('events', EventController::class);
+            Route::patch('events/{event}/transition', [EventController::class, 'transition'])->name('events.transition');
+        });
 
-        Route::post('events/{event}/categories', [EventCategoryController::class, 'store'])->name('events.categories.store');
-        Route::get('event-categories/{eventCategory}', [EventCategoryController::class, 'show'])->name('event-categories.show');
-        Route::get('event-categories/{eventCategory}/edit', [EventCategoryController::class, 'edit'])->name('event-categories.edit');
-        Route::put('event-categories/{eventCategory}', [EventCategoryController::class, 'update'])->name('event-categories.update');
-        Route::delete('event-categories/{eventCategory}', [EventCategoryController::class, 'destroy'])->name('event-categories.destroy');
-        Route::post('event-categories/{eventCategory}/sub-categories', [SubCategoryController::class, 'store'])->name('event-categories.sub-categories.store');
+        Route::middleware(['permission:manage event categories'])->group(function () {
+            Route::post('events/{event}/categories', [EventCategoryController::class, 'store'])->name('events.categories.store');
+            Route::get('event-categories/{eventCategory}', [EventCategoryController::class, 'show'])->name('event-categories.show');
+            Route::get('event-categories/{eventCategory}/edit', [EventCategoryController::class, 'edit'])->name('event-categories.edit');
+            Route::put('event-categories/{eventCategory}', [EventCategoryController::class, 'update'])->name('event-categories.update');
+            Route::delete('event-categories/{eventCategory}', [EventCategoryController::class, 'destroy'])->name('event-categories.destroy');
+        });
 
-        Route::get('sub-categories/{subCategory}/edit', [SubCategoryController::class, 'edit'])->name('sub-categories.edit');
-        Route::put('sub-categories/{subCategory}', [SubCategoryController::class, 'update'])->name('sub-categories.update');
-        Route::delete('sub-categories/{subCategory}', [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy');
+        Route::middleware(['permission:manage sub-categories'])->group(function () {
+            Route::post('event-categories/{eventCategory}/sub-categories', [SubCategoryController::class, 'store'])->name('event-categories.sub-categories.store');
+            Route::get('sub-categories/{subCategory}/edit', [SubCategoryController::class, 'edit'])->name('sub-categories.edit');
+            Route::put('sub-categories/{subCategory}', [SubCategoryController::class, 'update'])->name('sub-categories.update');
+            Route::delete('sub-categories/{subCategory}', [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy');
+        });
     });
 
     // Laporan (Reports) - simple index page

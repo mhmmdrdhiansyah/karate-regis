@@ -13,7 +13,12 @@ class ParticipantController extends Controller
 {
     public function __construct(
         private ParticipantService $participantService
-    ) {}
+    ) {
+        $this->middleware('permission:view participants|create participants|edit participants')->only(['index', 'show']);
+        $this->middleware('permission:create participants')->only(['create', 'store']);
+        $this->middleware('permission:edit participants')->only(['edit', 'update']);
+        $this->middleware('permission:delete participants')->only(['destroy']);
+    }
 
     public function index(Request $request)
     {

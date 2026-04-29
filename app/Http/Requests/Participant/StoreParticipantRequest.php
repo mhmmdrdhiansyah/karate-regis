@@ -8,7 +8,14 @@ class StoreParticipantRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        return $user->can('create participants')
+            || $user->can('manage participants')
+            || $user->can('manage own participants');
     }
 
     public function rules(): array

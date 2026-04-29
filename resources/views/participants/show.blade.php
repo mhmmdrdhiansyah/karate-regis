@@ -1,8 +1,9 @@
 <x-app-layout>
     @section('title', 'Detail Peserta - ' . $participant->name)
 
-    @if($hasActiveRegistration && !$participant->is_verified)
-        <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex align-items-center p-5 mb-5">
+    @if ($hasActiveRegistration && !$participant->is_verified)
+        <div
+            class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex align-items-center p-5 mb-5">
             <span class="svg-icon svg-icon-2 me-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path opacity="0.3"
@@ -19,9 +20,11 @@
             </div>
         </div>
     @elseif($participant->is_verified)
-        <div class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
+        <div
+            class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
             <span class="svg-icon svg-icon-2 me-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none">
                     <path opacity="0.3"
                         d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
                         fill="currentColor" />
@@ -42,11 +45,12 @@
             <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
                 <div class="me-7 mb-4">
                     <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
-                        @if($participant->photo)
+                        @if ($participant->photo)
                             <img src="{{ Storage::url($participant->photo) }}" alt="{{ $participant->name }}"
                                 class="w-100 h-100 object-fit-cover" />
                         @else
-                            <div class="symbol-label fs-1 fw-bolder {{ $participant->type === \App\Enums\ParticipantType::Coach ? 'bg-light-success text-success' : ($participant->type === \App\Enums\ParticipantType::Official ? 'bg-light-info text-info' : 'bg-light-warning text-warning') }}">
+                            <div
+                                class="symbol-label fs-1 fw-bolder {{ $participant->type === \App\Enums\ParticipantType::Coach ? 'bg-light-success text-success' : ($participant->type === \App\Enums\ParticipantType::Official ? 'bg-light-info text-info' : 'bg-light-warning text-warning') }}">
                                 {{ strtoupper(substr($participant->name, 0, 1)) }}
                             </div>
                         @endif
@@ -59,28 +63,28 @@
                                 <span class="text-gray-900 fs-2 fw-bolder me-1">
                                     {{ $participant->name }}
                                 </span>
-                                @if($participant->type === \App\Enums\ParticipantType::Athlete)
+                                @if ($participant->type === \App\Enums\ParticipantType::Athlete)
                                     <span class="badge badge-light-primary fw-bolder ms-2 fs-8">Atlet</span>
                                 @elseif($participant->type === \App\Enums\ParticipantType::Coach)
                                     <span class="badge badge-light-success fw-bolder ms-2 fs-8">Pelatih</span>
                                 @else
                                     <span class="badge badge-light-info fw-bolder ms-2 fs-8">Official</span>
                                 @endif
-                                @if($participant->is_verified)
+                                @if ($participant->is_verified)
                                     <span class="badge badge-light-success fw-bolder ms-2 fs-8">
                                         <i class="bi bi-check-circle me-1"></i>Terverifikasi
                                     </span>
                                 @else
                                     <span class="badge badge-light-warning fw-bolder ms-2 fs-8">Belum</span>
                                 @endif
-                                @if($hasActiveRegistration)
+                                @if ($hasActiveRegistration)
                                     <span class="badge badge-light-info fw-bolder ms-2 fs-8">
                                         <i class="bi bi-clipboard-check me-1"></i>Terdaftar Event
                                     </span>
                                 @endif
                             </div>
                             <span class="text-muted fw-semibold fs-6">
-                                @if($participant->nik)
+                                @if ($participant->nik)
                                     NIK: {{ $participant->nik }}
                                 @else
                                     {{ $participant->type === \App\Enums\ParticipantType::Coach ? 'Pelatih' : ($participant->type === \App\Enums\ParticipantType::Official ? 'Official' : 'Peserta') }}
@@ -88,11 +92,30 @@
                             </span>
                         </div>
                         <div class="d-flex flex-wrap">
-                            <a href="{{ route('participants.edit', $participant) }}"
-                                class="btn btn-light-primary btn-sm me-2">
-                                <i class="bi bi-pencil me-1"></i> Edit
-                            </a>
-                            @if($canDelete)
+                            @php
+                                $__puser = auth()->user();
+                                $canEditBtn =
+                                    $__puser &&
+                                    ($__puser->can('edit participants') ||
+                                        $__puser->can('manage participants') ||
+                                        ($__puser->can('manage own participants') &&
+                                            $participant->contingent_id === $__puser->contingent?->id));
+                                $canDeleteBtn =
+                                    $__puser &&
+                                    ($__puser->can('delete participants') ||
+                                        $__puser->can('manage participants') ||
+                                        ($__puser->can('manage own participants') &&
+                                            $participant->contingent_id === $__puser->contingent?->id));
+                            @endphp
+
+                            @if ($canEditBtn)
+                                <a href="{{ route('participants.edit', $participant) }}"
+                                    class="btn btn-light-primary btn-sm me-2">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+                            @endif
+
+                            @if ($canDeleteBtn && $canDelete)
                                 <form action="{{ route('participants.destroy', $participant) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin ingin menghapus peserta ini?')">
                                     @csrf
@@ -101,13 +124,15 @@
                                         <i class="bi bi-trash me-1"></i> Hapus
                                     </button>
                                 </form>
-                            @else
-                                <span class="btn btn-light-danger btn-sm me-2 opacity-50 cursor-default" data-bs-toggle="tooltip"
-                                    data-bs-placement="bottom" title="{{ $deleteReason ?? 'Peserta tidak dapat dihapus' }}"
+                            @elseif(!$canDeleteBtn)
+                                <span class="btn btn-light-danger btn-sm me-2 opacity-50 cursor-default"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                    title="{{ $deleteReason ?? 'Peserta tidak dapat dihapus' }}"
                                     style="cursor: not-allowed;">
                                     <i class="bi bi-trash me-1"></i> Hapus
                                 </span>
                             @endif
+
                             <a href="{{ route('participants.index') }}" class="btn btn-light btn-sm">
                                 Kembali
                             </a>
@@ -138,7 +163,7 @@
                                 <tr>
                                     <td class="text-gray-600 fw-bold">Jenis</td>
                                     <td>
-                                        @if($participant->type === \App\Enums\ParticipantType::Athlete)
+                                        @if ($participant->type === \App\Enums\ParticipantType::Athlete)
                                             <span class="badge badge-light-primary">Atlet</span>
                                         @elseif($participant->type === \App\Enums\ParticipantType::Coach)
                                             <span class="badge badge-light-success">Pelatih</span>
@@ -147,14 +172,15 @@
                                         @endif
                                     </td>
                                 </tr>
-                                @if($participant->type === \App\Enums\ParticipantType::Athlete)
+                                @if ($participant->type === \App\Enums\ParticipantType::Athlete)
                                     <tr>
                                         <td class="text-gray-600 fw-bold">NIK</td>
                                         <td class="text-gray-800">{{ $participant->nik ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-gray-600 fw-bold">Tanggal Lahir</td>
-                                        <td class="text-gray-800">{{ $participant->birth_date?->format('d M Y') ?? '-' }}</td>
+                                        <td class="text-gray-800">
+                                            {{ $participant->birth_date?->format('d M Y') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-gray-600 fw-bold">Jenis Kelamin</td>
@@ -193,7 +219,7 @@
                                 <tr>
                                     <td class="text-gray-600 fw-bold w-150px">Status Verifikasi</td>
                                     <td>
-                                        @if($participant->is_verified)
+                                        @if ($participant->is_verified)
                                             <span class="badge badge-light-success">
                                                 <i class="bi bi-check-circle me-1"></i>Terverifikasi
                                             </span>
@@ -202,7 +228,7 @@
                                         @endif
                                     </td>
                                 </tr>
-                                @if($participant->document)
+                                @if ($participant->document)
                                     <tr>
                                         <td class="text-gray-600 fw-bold">Dokumen</td>
                                         <td>
@@ -218,7 +244,7 @@
                                         <td class="text-gray-800">-</td>
                                     </tr>
                                 @endif
-                                @if($participant->is_verified)
+                                @if ($participant->is_verified)
                                     <tr>
                                         <td class="text-gray-600 fw-bold">Diverifikasi oleh</td>
                                         <td class="text-gray-800">{{ $participant->verifiedBy->name ?? '-' }}</td>
@@ -232,7 +258,8 @@
                                 @endif
                                 <tr>
                                     <td class="text-gray-600 fw-bold">Terdaftar</td>
-                                    <td class="text-gray-800">{{ $participant->created_at->format('d M Y, H:i') }}</td>
+                                    <td class="text-gray-800">{{ $participant->created_at->format('d M Y, H:i') }}
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -244,7 +271,7 @@
 
     @push('scripts')
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
-            new bootstrap.Tooltip(el);
+        new bootstrap.Tooltip(el);
         });
 
         @if (session('success'))

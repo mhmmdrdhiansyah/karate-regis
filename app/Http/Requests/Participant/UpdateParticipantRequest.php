@@ -19,7 +19,22 @@ class UpdateParticipantRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return auth()->check();
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+
+        $participant = $this->route('participant');
+
+        if ($user->can('manage participants') || $user->can('edit participants')) {
+            return true;
+        }
+
+        if ($user->can('manage own participants') && $participant) {
+            return $participant->contingent_id === $user->contingent?->id;
+        }
+
+        return false;
     }
 
     public function rules(): array

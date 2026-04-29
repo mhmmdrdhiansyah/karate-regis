@@ -8,6 +8,21 @@ use Illuminate\Validation\Rule;
 
 class EventRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        $event = $this->route('event');
+        if ($event) {
+            return $user->can('edit events') || $user->can('manage events');
+        }
+
+        return $user->can('create events') || $user->can('manage events');
+    }
+
     public function rules(): array
     {
         $event = $this->route('event');

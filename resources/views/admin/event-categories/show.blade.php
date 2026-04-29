@@ -130,6 +130,8 @@
                 <h3 class="card-label fw-bold text-dark">{{ $eventCategory->class_name }}</h3>
             </div>
             <div class="card-toolbar d-flex gap-2 flex-wrap">
+                <a href="{{ route('admin.events.show', $eventCategory->event) }}" class="btn btn-light btn-sm">← Kembali
+                    ke Event</a>
                 <a href="{{ route('admin.event-categories.edit', $eventCategory) }}"
                     class="btn btn-light-warning btn-sm">Edit Kategori</a>
             </div>
