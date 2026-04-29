@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 
     // Pendaftaran Event (User/Kontingen)
-    Route::middleware(['permission:create registrations'])->group(function () {
+    Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {
         Route::get('registration', function () {
             return view('registration.index');
         })->name('registration.index');
