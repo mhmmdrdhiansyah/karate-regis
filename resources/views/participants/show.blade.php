@@ -102,7 +102,7 @@
                                     <tr>
                                         <td class="text-gray-600 fw-bold">Jenis Kelamin</td>
                                         <td class="text-gray-800">
-                                            {{ $participant->gender === \App\Enums\ParticipantGender::M ? 'Laki-laki' : 'Perempuan' }}
+                                            {{ $participant->gender === \App\Enums\ParticipantGender::Male ? 'Laki-laki' : 'Perempuan' }}
                                         </td>
                                     </tr>
                                 @endif

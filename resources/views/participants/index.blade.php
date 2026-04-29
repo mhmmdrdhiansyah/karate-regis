@@ -84,7 +84,7 @@
                                 <td>{{ $participant->birth_date?->format('d M Y') ?? '-' }}</td>
                                 <td>
                                     @if ($participant->gender)
-                                        {{ $participant->gender === \App\Enums\ParticipantGender::M ? 'Laki-laki' : 'Perempuan' }}
+                                        {{ $participant->gender === \App\Enums\ParticipantGender::Male ? 'Laki-laki' : 'Perempuan' }}
                                     @else
                                         -
                                     @endif
@@ -239,7 +239,7 @@
                                 <div class="p-card-row">
                                     <span class="p-card-lbl">Gender</span>
                                     <span class="p-card-val">
-                                        {{ $participant->gender === \App\Enums\ParticipantGender::M ? 'Laki-laki' : 'Perempuan' }}
+                                        {{ $participant->gender === \App\Enums\ParticipantGender::Male ? 'Laki-laki' : 'Perempuan' }}
                                     </span>
                                 </div>
                                 <div class="p-card-row">
