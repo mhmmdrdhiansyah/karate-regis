@@ -7,13 +7,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EventRequest;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::withCount(['categories', 'payments'])
+        $events = Event::query()
+            ->select(['id', 'poster', 'name', 'status', 'event_fee'])
             ->orderByDesc('event_date')
             ->paginate(10)
             ->withQueryString();
@@ -30,7 +33,13 @@ class EventController extends Controller
 
     public function store(EventRequest $request)
     {
-        $event = Event::create($request->validated());
+        $validated = $request->validated();
+
+        if ($request->hasFile('poster')) {
+            $validated['poster'] = $this->storePoster($request->file('poster'));
+        }
+
+        $event = Event::create($validated);
 
         return redirect()->route('admin.events.show', $event)->with('success', 'Event berhasil dibuat.');
     }
@@ -51,6 +60,13 @@ class EventController extends Controller
     {
         $validated = $request->validated();
 
+        if ($request->hasFile('poster')) {
+            $validated['poster'] = $this->storePoster($request->file('poster'));
+            $this->deletePoster($event->poster);
+        } else {
+            unset($validated['poster']);
+        }
+
         if ($event->isLocked()) {
             unset($validated['event_date'], $validated['coach_fee']);
         }
@@ -69,6 +85,8 @@ class EventController extends Controller
                 'delete' => 'Event tidak dapat dihapus karena sudah memiliki kategori atau pembayaran.',
             ]);
         }
+
+        $this->deletePoster($event->poster);
 
         $event->delete();
 
@@ -92,5 +110,17 @@ class EventController extends Controller
         $event->update(['status' => $nextStatus]);
 
         return back()->with('success', 'Status event berhasil diubah.');
+    }
+
+    private function storePoster(UploadedFile $file): string
+    {
+        return $file->store('events/posters', 'public');
+    }
+
+    private function deletePoster(?string $poster): void
+    {
+        if ($poster) {
+            Storage::disk('public')->delete($poster);
+        }
     }
 }

@@ -7,7 +7,8 @@
                 <h3 class="card-label fw-bold text-dark">Manajemen Event</h3>
             </div>
             <div class="card-toolbar">
-                <a href="{{ route('admin.events.create') }}" class="btn btn-primary d-flex align-items-center">
+                <a href="{{ route('admin.events.create') }}" class="btn btn-primary btn-sm d-flex align-items-center"
+                    title="Tambah Event" aria-label="Tambah Event">
                     <span class="svg-icon svg-icon-2 me-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none">
@@ -23,15 +24,14 @@
         </div>
 
         <div class="card-body py-4">
-            <div class="table-responsive d-none d-lg-block">
-                <table class="table align-middle table-row-dashed fs-6 gy-5">
+            <div class="table-responsive event-table-responsive d-none d-lg-block">
+                <table class="table align-middle table-row-dashed fs-6 gy-5 event-table">
                     <thead>
                         <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
-                            <th class="min-w-200px">Nama</th>
-                            <th class="min-w-125px">Tanggal</th>
-                            <th class="min-w-125px">Deadline</th>
-                            <th class="min-w-125px">Coach Fee</th>
-                            <th class="min-w-125px">Kategori</th>
+                            <th class="min-w-70px" style="width: 3ch;">No</th>
+                            <th class="min-w-125px">Poster</th>
+                            <th class="min-w-200px">Nama Event</th>
+                            <th class="min-w-125px">Fee Event</th>
                             <th class="min-w-125px">Status</th>
                             <th class="text-end min-w-150px">Actions</th>
                         </tr>
@@ -39,14 +39,19 @@
                     <tbody class="text-gray-600 fw-bold">
                         @forelse ($events as $event)
                             <tr>
+                                <td>{{ ($events->firstItem() ?? 0) + $loop->index }}</td>
+                                <td>
+                                    <div class="rounded-3 overflow-hidden border bg-light"
+                                        style="width: 108px; height: 144px;">
+                                        <img src="{{ $event->poster ? asset('storage/' . $event->poster) : asset('assets/media/avatars/blank.png') }}"
+                                            alt="Poster {{ $event->name }}" class="w-100 h-100 object-fit-cover">
+                                    </div>
+                                </td>
                                 <td>
                                     <a href="{{ route('admin.events.show', $event) }}"
                                         class="text-gray-800 text-hover-primary fw-bold">{{ $event->name }}</a>
                                 </td>
-                                <td>{{ $event->event_date?->format('d M Y') ?? '-' }}</td>
-                                <td>{{ $event->registration_deadline?->format('d M Y H:i') ?? '-' }}</td>
-                                <td>{{ number_format($event->coach_fee, 2, ',', '.') }}</td>
-                                <td>{{ $event->categories_count }}</td>
+                                <td>{{ number_format($event->event_fee, 2, ',', '.') }}</td>
                                 <td>
                                     <span
                                         class="badge {{ $event->statusBadgeClass() }}">{{ $event->statusLabel() }}</span>
@@ -54,20 +59,29 @@
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end flex-shrink-0 gap-2">
                                         <a href="{{ route('admin.events.show', $event) }}"
-                                            class="btn btn-light-primary btn-sm">Detail</a>
+                                            class="btn btn-icon btn-light-primary btn-sm" title="Detail"
+                                            aria-label="Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a href="{{ route('admin.events.edit', $event) }}"
-                                            class="btn btn-light-warning btn-sm">Edit</a>
+                                            class="btn btn-icon btn-light-warning btn-sm" title="Edit"
+                                            aria-label="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
                                         <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
                                             onsubmit="return confirm('Hapus event ini?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-light-danger btn-sm">Hapus</button>
+                                            <button type="submit" class="btn btn-icon btn-light-danger btn-sm"
+                                                title="Hapus" aria-label="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-10">Belum ada event</td>
+                                <td colspan="6" class="text-center text-muted py-10">Belum ada event</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -78,35 +92,39 @@
                 @forelse ($events as $event)
                     <div class="k-card">
                         <div class="k-card-hd" onclick="this.parentElement.classList.toggle('open')">
-                            <div class="k-card-av bg-light-primary text-primary">E</div>
+                            <div class="k-card-av bg-light overflow-hidden border">
+                                <img src="{{ $event->poster ? asset('storage/' . $event->poster) : asset('assets/media/avatars/blank.png') }}"
+                                    alt="Poster {{ $event->name }}" class="w-100 h-100 object-fit-cover">
+                            </div>
                             <div style="flex:1;min-width:0">
                                 <div class="k-card-nm">{{ $event->name }}</div>
-                                <div class="k-card-em">{{ $event->event_date?->format('d M Y') ?? '-' }}</div>
+                                <div class="k-card-em">{{ number_format($event->event_fee, 2, ',', '.') }}</div>
                             </div>
+                            <div class="badge {{ $event->statusBadgeClass() }}">{{ $event->statusLabel() }}</div>
                             <div class="k-card-arr"><i class="bi bi-chevron-down"></i></div>
                         </div>
                         <div class="k-card-bd">
                             <div class="k-card-dt">
-                                <div class="k-card-row"><span class="k-card-lbl">Deadline</span><span
-                                        class="k-card-val">{{ $event->registration_deadline?->format('d M Y H:i') ?? '-' }}</span>
-                                </div>
-                                <div class="k-card-row"><span class="k-card-lbl">Coach Fee</span><span
-                                        class="k-card-val">{{ number_format($event->coach_fee, 2, ',', '.') }}</span>
-                                </div>
-                                <div class="k-card-row"><span class="k-card-lbl">Status</span><span
-                                        class="k-card-val"><span
-                                            class="badge {{ $event->statusBadgeClass() }}">{{ $event->statusLabel() }}</span></span>
+                                <div class="k-card-row"><span class="k-card-lbl">Nama Event</span><span
+                                        class="k-card-val">{{ $event->name }}</span>
                                 </div>
                             </div>
                             <div class="k-card-acts">
                                 <a href="{{ route('admin.events.show', $event) }}"
-                                    class="btn btn-light-primary">Detail</a>
+                                    class="btn btn-icon btn-light-primary" title="Detail" aria-label="Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
                                 <a href="{{ route('admin.events.edit', $event) }}"
-                                    class="btn btn-light-warning">Edit</a>
+                                    class="btn btn-icon btn-light-warning" title="Edit" aria-label="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
                                 <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
                                     onsubmit="return confirm('Hapus event ini?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-light-danger">Hapus</button>
+                                    <button type="submit" class="btn btn-icon btn-light-danger" title="Hapus"
+                                        aria-label="Hapus">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -134,6 +152,38 @@
 
     @push('scripts')
         <style>
+            .event-table-responsive {
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: thin;
+                scrollbar-color: #4b5563 #e5e7eb;
+                -ms-overflow-style: auto;
+                padding-bottom: 6px;
+            }
+
+            .event-table-responsive::-webkit-scrollbar {
+                height: 10px;
+            }
+
+            .event-table-responsive::-webkit-scrollbar-track {
+                background: #e5e7eb;
+                border-radius: 999px;
+            }
+
+            .event-table-responsive::-webkit-scrollbar-thumb {
+                background: #4b5563;
+                border-radius: 999px;
+                border: 2px solid #e5e7eb;
+            }
+
+            .event-table-responsive::-webkit-scrollbar-thumb:hover {
+                background: #374151;
+            }
+
+            .event-table {
+                min-width: 1200px;
+            }
+
             .k-card {
                 background: #fff;
                 border: 1px dashed #e4e6ef;
@@ -153,8 +203,8 @@
             }
 
             .k-card-av {
-                width: 42px;
-                height: 42px;
+                width: 63px;
+                height: 63px;
                 border-radius: 50%;
                 overflow: hidden;
                 flex-shrink: 0;

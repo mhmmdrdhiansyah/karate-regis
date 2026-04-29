@@ -50,12 +50,12 @@
                         @enderror
                     </div>
                 </div>
+                <div class="d-flex flex-column flex-sm-row justify-content-end gap-3 mt-6">
+                    <a href="{{ route('admin.events.show', $eventCategory->event) }}"
+                        class="btn btn-light btn-active-light-primary w-100 w-sm-auto">Batal</a>
+                    <button type="submit" class="btn btn-primary w-100 w-sm-auto">Simpan</button>
+                </div>
             </div>
-        </div>
-        <div class="d-flex justify-content-end">
-            <a href="{{ route('admin.events.show', $eventCategory->event) }}"
-                class="btn btn-light btn-active-light-primary me-2">Batal</a>
-            <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
     </form>
 
