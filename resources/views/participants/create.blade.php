@@ -80,7 +80,7 @@
                             @enderror
                         </div>
 
-                        <div class="fv-row mb-7 athlete-fields" id="field_nik">
+                        <div class="fv-row mb-7" id="field_nik">
                             <label class="required form-label">NIK</label>
                             <input type="text" name="nik" class="form-control form-control-solid"
                                 placeholder="Masukkan 16 digit NIK" value="{{ old('nik') }}" maxlength="16"
@@ -91,7 +91,7 @@
                             @enderror
                         </div>
 
-                        <div class="fv-row mb-7 athlete-fields" id="field_birth_date">
+                        <div class="fv-row mb-7" id="field_birth_date">
                             <label class="required form-label">Tanggal Lahir</label>
                             <input type="text" name="birth_date" class="form-control form-control-solid"
                                 placeholder="Pilih tanggal lahir" value="{{ old('birth_date') }}"
@@ -101,7 +101,7 @@
                             @enderror
                         </div>
 
-                        <div class="fv-row mb-7 athlete-fields" id="field_gender">
+                        <div class="fv-row mb-7" id="field_gender">
                             <label class="required form-label">Jenis Kelamin</label>
                             <div class="d-flex flex-wrap gap-5">
                                 <label class="form-check form-check-sm form-check-custom form-check-solid">
@@ -138,7 +138,7 @@
                             @enderror
                         </div>
 
-                        <div class="fv-row mb-7 athlete-fields" id="field_document">
+                        <div class="fv-row mb-7" id="field_document">
                             <label class="required form-label">Dokumen</label>
                             <input type="file" name="document" class="form-control" accept=".jpg,.jpeg,.png,.pdf"
                                 id="document_input" />
@@ -171,31 +171,6 @@
 
     @push('scripts')
         <script>
-            function toggleTypeFields() {
-                const selectedType = document.querySelector('input[name="type"]:checked')?.value || 'athlete';
-                const athleteFields = document.querySelectorAll('.athlete-fields');
-                athleteFields.forEach(function(el) {
-                    if (selectedType === 'athlete') {
-                        el.classList.remove('d-none');
-                        el.querySelectorAll('input, select').forEach(function(input) {
-                            if (input.type === 'radio') return;
-                            input.removeAttribute('disabled');
-                        });
-                    } else {
-                        el.classList.add('d-none');
-                        el.querySelectorAll('input').forEach(function(input) {
-                            if (input.type === 'radio') return;
-                            input.setAttribute('disabled', 'disabled');
-                        });
-                    }
-                });
-            }
-
-            document.querySelectorAll('input[name="type"]').forEach(function(radio) {
-                radio.addEventListener('change', toggleTypeFields);
-            });
-            toggleTypeFields();
-
             flatpickr("#kt_datepicker_birth_date", {
                 dateFormat: "Y-m-d",
                 maxDate: "today",
