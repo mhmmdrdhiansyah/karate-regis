@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('name')->notNull();
+            $table->string('poster')->nullable();
             $table->date('event_date')->notNull();
             $table->dateTime('registration_deadline')->nullable();
             $table->decimal('coach_fee', 12, 2)->notNull();

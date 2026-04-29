@@ -13,9 +13,11 @@ class Event extends Model
 
     protected $fillable = [
         'name',
+        'poster',
         'event_date',
         'registration_deadline',
         'coach_fee',
+        'event_fee',
         'status',
     ];
 
@@ -25,6 +27,7 @@ class Event extends Model
             'event_date' => 'date',
             'registration_deadline' => 'datetime',
             'coach_fee' => 'decimal:2',
+            'event_fee' => 'decimal:2',
             'status' => EventStatus::class,
         ];
     }

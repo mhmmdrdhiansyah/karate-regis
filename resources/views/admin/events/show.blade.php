@@ -183,7 +183,11 @@
                     <div class="fw-bold">{{ $event->registration_deadline?->format('d M Y H:i') ?? '-' }}</div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-muted fs-7">Coach Fee</div>
+                    <div class="text-muted fs-7">Fee Event</div>
+                    <div class="fw-bold">{{ number_format($event->event_fee, 2, ',', '.') }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted fs-7">Fee Coach</div>
                     <div class="fw-bold">{{ number_format($event->coach_fee, 2, ',', '.') }}</div>
                 </div>
                 <div class="col-md-3">
@@ -202,9 +206,10 @@
             </div>
         </div>
         <div class="card-body py-4">
-            <form action="{{ route('admin.events.categories.store', $event) }}" method="POST" class="row g-4 mb-6">
+            <form action="{{ route('admin.events.categories.store', $event) }}" method="POST"
+                class="row g-4 mb-6 align-items-end">
                 @csrf
-                <div class="col-md-2">
+                <div class="col-12 col-md-2">
                     <label class="required form-label">Type</label>
                     <select name="type" class="form-select form-select-solid">
                         <option value="Open" @selected(old('type') === 'Open')>Open</option>
@@ -214,7 +219,7 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="required form-label">Class Name</label>
                     <input type="text" name="class_name" class="form-control form-control-solid"
                         value="{{ old('class_name') }}">
@@ -222,7 +227,7 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="required form-label">Min Birth Date</label>
                     <input type="text" name="min_birth_date" class="form-control form-control-solid"
                         id="kt_min_birth_date" value="{{ old('min_birth_date') }}">
@@ -230,7 +235,7 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <label class="required form-label">Max Birth Date</label>
                     <input type="text" name="max_birth_date" class="form-control form-control-solid"
                         id="kt_max_birth_date" value="{{ old('max_birth_date') }}">
@@ -238,8 +243,12 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Tambah</button>
+                <div class="col-12 col-md-1 d-flex align-items-end">
+                    <button type="submit"
+                        class="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+                        title="Tambah Kategori" aria-label="Tambah Kategori">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
                 </div>
             </form>
 
