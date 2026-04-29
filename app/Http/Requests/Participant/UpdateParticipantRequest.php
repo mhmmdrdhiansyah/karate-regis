@@ -3,15 +3,18 @@
 namespace App\Http\Requests\Participant;
 
 use App\Models\Participant;
+use App\Services\ParticipantService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateParticipantRequest extends FormRequest
 {
     private ?Participant $participant;
 
-    public function __construct()
-    {
-        $this->participant = $this->route('participant');
+    public function __construct(
+        private ParticipantService $participantService
+    ) {
+        parent::__construct();
     }
 
     public function authorize(): bool
@@ -34,6 +37,37 @@ class UpdateParticipantRequest extends FormRequest
             'photo' => 'nullable|image|max:2048',
             'document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $participant = $this->route('participant');
+
+            if (!$participant) {
+                return;
+            }
+
+            $lockedFields = $this->participantService->getLockedFields($participant);
+
+            foreach ($lockedFields as $field) {
+                $inputValue = $validator->getValue($field);
+                $dbValue = $participant->$field;
+
+                if ($field === 'gender') {
+                    $dbValue = $participant->gender?->value;
+                } elseif ($field === 'birth_date') {
+                    $dbValue = $participant->birth_date?->format('Y-m-d');
+                } elseif ($field === 'type') {
+                    $dbValue = $participant->type?->value;
+                }
+
+                if ((string) $inputValue !== (string) $dbValue) {
+                    $reason = $this->participantService->getLockReason($participant, $field);
+                    $validator->errors()->add($field, "Field {$field} tidak dapat diubah: {$reason}");
+                }
+            }
+        });
     }
 
     public function messages(): array
