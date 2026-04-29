@@ -157,6 +157,16 @@
                     </div>
                 @endrole
 
+                @can('create registrations')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('registration.*') ? 'active' : '' }}"
+                            href="{{ route('registration.index') }}">
+                            <span class="menu-icon"><i class="bi bi-journal-text fs-3"></i></span>
+                            <span class="menu-title">Pendaftaran Event</span>
+                        </a>
+                    </div>
+                @endcan
+
                 {{-- 3. MENU SETTINGS (Terpisah/Single) --}}
                 @can('manage settings')
                     <div class="menu-item">

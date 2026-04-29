@@ -81,6 +81,18 @@ Route::middleware('auth')->group(function () {
 
     // Laporan (Reports) - simple index page
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Pendaftaran Event (User/Kontingen)
+    Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {
+        Route::get('registration', function () {
+            return view('registration.index');
+        })->name('registration.index');
+        
+        // Placeholder for the next module
+        Route::get('registration/create', function () {
+            return 'Form pendaftaran atlet placeholder';
+        })->name('registration.create');
+    });
 });
 
 require __DIR__ . '/auth.php';
