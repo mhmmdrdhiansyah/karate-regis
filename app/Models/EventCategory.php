@@ -38,4 +38,21 @@ class EventCategory extends Model
     {
         return $this->hasMany(SubCategory::class);
     }
+
+    public function hasActiveRegistrations(): bool
+    {
+        return $this->subCategories()
+            ->whereHas('registrations', fn($query) => $query->whereNull('deleted_at'))
+            ->exists();
+    }
+
+    public function canDelete(): bool
+    {
+        return ! $this->hasActiveRegistrations();
+    }
+
+    public function readableBirthRange(): string
+    {
+        return 'Lahir: ' . $this->min_birth_date?->translatedFormat('j M Y') . ' - ' . $this->max_birth_date?->translatedFormat('j M Y');
+    }
 }

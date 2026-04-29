@@ -45,4 +45,29 @@ class SubCategory extends Model
     {
         return $this->max_participants > 1;
     }
+
+    public function hasActiveRegistrations(): bool
+    {
+        return $this->registrations()->whereNull('deleted_at')->exists();
+    }
+
+    public function hasPayments(): bool
+    {
+        return $this->registrations()->whereHas('payment')->exists();
+    }
+
+    public function canDelete(): bool
+    {
+        return ! $this->hasActiveRegistrations();
+    }
+
+    public function canEditPrice(): bool
+    {
+        return ! $this->hasPayments();
+    }
+
+    public function labelType(): string
+    {
+        return $this->isTeam() ? 'Beregu' : 'Individu';
+    }
 }
