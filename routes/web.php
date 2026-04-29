@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\AuthManagement\Controllers\UserController;
 use App\Modules\AuthManagement\Controllers\RoleController;
 use App\Modules\AuthManagement\Controllers\PermissionController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,6 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:delete participants'])->group(function () {
         Route::delete('participants/{participant}', [ParticipantController::class, 'destroy'])->name('participants.destroy');
     });
+
+    // Laporan (Reports) - simple index page
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
 });
 
 require __DIR__ . '/auth.php';
