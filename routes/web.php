@@ -89,9 +89,8 @@ Route::middleware('auth')->group(function () {
         })->name('registration.index');
         
         // Placeholder for the next module
-        Route::get('registration/create', function () {
-            return 'Form pendaftaran atlet placeholder';
-        })->name('registration.create');
+        Route::get('registration/create/{event}/{category}/{sub_category}', \App\Livewire\AthleteSelectionForm::class)
+            ->name('registration.create');
     });
 });
 
