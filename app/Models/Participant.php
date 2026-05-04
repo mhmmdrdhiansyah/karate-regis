@@ -71,17 +71,33 @@ class Participant extends Model
         $eventCategory = $subCategory->eventCategory;
 
         return $query->athletes()
-            ->where('contingent_id', auth()->user()->contingent_id)
+            ->where('contingent_id', auth()->user()->contingent->id)
             ->where(function ($q) use ($subCategory) {
-                $q->where('gender', $subCategory->gender)
-                    ->when($subCategory->gender === SubCategoryGender::Mixed, function ($q) {
-                        $q->orWhereIn('gender', [ParticipantGender::Male, ParticipantGender::Female]);
-                    });
+                if ($subCategory->gender === SubCategoryGender::Mixed) {
+                    $q->whereNotNull('gender');
+                } else {
+                    $q->where('gender', $subCategory->gender->value);
+                }
             })
             ->where('birth_date', '>=', $eventCategory->min_birth_date)
             ->where('birth_date', '<=', $eventCategory->max_birth_date)
             ->whereDoesntHave('registrations', function ($q) use ($subCategory) {
                 $q->where('sub_category_id', $subCategory->id);
             });
+    }
+
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute(): string
+    {
+        if (!$this->photo) {
+            return asset('assets/media/avatars/blank.png');
+        }
+
+        if (str_starts_with($this->photo, 'assets/')) {
+            return asset($this->photo);
+        }
+
+        return \Illuminate\Support\Facades\Storage::url($this->photo);
     }
 }
