@@ -167,12 +167,21 @@
                         </span>
                         <div class="menu-sub menu-sub-accordion">
                             <div class="menu-item">
-                                <a class="menu-link {{ request()->routeIs('registration.index') || request()->routeIs('registration.create') || request()->routeIs('registration.invoice') ? 'active' : '' }}"
+                                <a class="menu-link {{ request()->routeIs('registration.index') || request()->routeIs('registration.create') ? 'active' : '' }}"
                                     href="{{ route('registration.index') }}">
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot"></span>
                                     </span>
                                     <span class="menu-title">Pendaftaran Atlet</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('registration.coaches') ? 'active' : '' }}"
+                                    href="{{ route('registration.coaches') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Pendaftaran Pelatih</span>
                                 </a>
                             </div>
                         </div>
