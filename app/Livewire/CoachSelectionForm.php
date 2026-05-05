@@ -190,6 +190,12 @@ class CoachSelectionForm extends Component
         return $this->getRegisteredCoachIds();
     }
 
+    #[Computed]
+    public function confirmedCoachIds(): array
+    {
+        return $this->getConfirmedCoachIds();
+    }
+
     // Render
     public function render()
     {

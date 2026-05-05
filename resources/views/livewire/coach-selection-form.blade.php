@@ -39,14 +39,14 @@
 
                     @if ($this->coaches->count() > 0)
                         @php
-                            $hasConfirmedCoaches = collect($this->coaches)->contains(fn($coach) => in_array($coach->id, $getConfirmedCoachIds()));
+                            $hasConfirmedCoaches = collect($this->coaches)->contains(fn($coach) => in_array($coach->id, $this->confirmedCoachIds));
                         @endphp
 
                         <div class="border rounded p-4 bg-light">
                             @foreach ($this->coaches as $coach)
                                 @php
-                                    $isRegistered = in_array($coach->id, $registeredCoachIds);
-                                    $isConfirmed = in_array($coach->id, $getConfirmedCoachIds());
+                                    $isRegistered = in_array($coach->id, $this->registeredCoachIds);
+                                    $isConfirmed = in_array($coach->id, $this->confirmedCoachIds);
                                 @endphp
 
                                 <div class="d-flex align-items-center py-3 @if(!$loop->last) border-bottom @endif">
