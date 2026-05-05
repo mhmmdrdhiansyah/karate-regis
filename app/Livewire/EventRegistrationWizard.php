@@ -24,7 +24,6 @@ class EventRegistrationWizard extends Component
     public string $selectedEventName = '';
     public string $selectedCategoryName = '';
     public string $errorMessage = '';
-    public array $selectedCoachIds = [];
 
     public function mount(): void
     {
@@ -55,63 +54,9 @@ class EventRegistrationWizard extends Component
         $this->selectedEventId = $eventId;
         $this->ensureDraft($eventId, $contingent->id);
 
-        $this->selectedCoachIds = $this->getDraftCoachIds();
         $this->selectedEventName = $event->name;
         $this->currentStep = 2;
     }
-
-    public function updatedSelectedCoachIds(): void
-    {
-        $this->selectedCoachIds = array_values(array_unique(array_map('intval', $this->selectedCoachIds)));
-        $draft = $this->getActiveDraft();
-        if (! $draft) {
-            return;
-        }
-
-        $registrationService = app(RegistrationService::class);
-        $event = Event::find($this->selectedEventId);
-        if (! $event || ! $registrationService->isRegistrationOpen($event)) {
-            $this->errorMessage = 'Pendaftaran event sudah ditutup.';
-            return;
-        }
-
-        $registeredIds = $this->getRegisteredCoachIds();
-        if (count($registeredIds) > 0) {
-            $this->selectedCoachIds = array_values(array_diff($this->selectedCoachIds, $registeredIds));
-        }
-
-        $validCoachIds = $this->getCoaches()->pluck('id')->toArray();
-        $this->selectedCoachIds = array_values(array_intersect($this->selectedCoachIds, $validCoachIds));
-
-        $existingIds = RegistrationDraftItem::query()
-            ->where('registration_draft_id', $draft->id)
-            ->whereNull('sub_category_id')
-            ->pluck('participant_id')
-            ->toArray();
-
-        $toInsert = array_diff($this->selectedCoachIds, $existingIds);
-        $toDelete = array_diff($existingIds, $this->selectedCoachIds);
-
-        if (count($toInsert) > 0) {
-            $rows = collect($toInsert)->map(fn ($id) => [
-                'registration_draft_id' => $draft->id,
-                'participant_id' => $id,
-                'sub_category_id' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])->all();
-            RegistrationDraftItem::insert($rows);
-        }
-
-        if (count($toDelete) > 0) {
-            RegistrationDraftItem::query()
-                ->where('registration_draft_id', $draft->id)
-                ->whereNull('sub_category_id')
-                ->whereIn('participant_id', $toDelete)
-                ->delete();
-        }
-    }
-
 
     public function selectCategory(int $categoryId): void
     {
@@ -124,7 +69,6 @@ class EventRegistrationWizard extends Component
         $this->selectedCategoryId = $categoryId;
         $this->selectedCategoryName = $category->type->value . ' - ' . $category->class_name;
         $this->currentStep = 3;
-        $this->selectedCoachIds = $this->getDraftCoachIds();
     }
 
     public function selectSubCategory(int $subCategoryId): void
@@ -155,12 +99,10 @@ class EventRegistrationWizard extends Component
             $this->selectedCategoryId = null;
             $this->selectedCategoryName = '';
             $this->selectedSubCategoryId = null;
-            $this->selectedCoachIds = [];
         } elseif ($step === 2) {
             $this->selectedCategoryId = null;
             $this->selectedCategoryName = '';
             $this->selectedSubCategoryId = null;
-            $this->selectedCoachIds = $this->getDraftCoachIds();
         }
     }
 
@@ -180,11 +122,6 @@ class EventRegistrationWizard extends Component
             ],
             3 => [
                 'subCategories' => EventCategory::find($this->selectedCategoryId)?->subCategories ?? collect(),
-                'coaches' => $this->getCoaches(),
-                'draftSelections' => $this->getDraftSelections(),
-                'selectedCoachCount' => $this->getSelectedCoachCount(),
-                'registeredCoachIds' => $this->getRegisteredCoachIds(),
-                'draftCoachIds' => $this->getDraftCoachIds(),
             ],
             default => [],
         };
@@ -192,19 +129,6 @@ class EventRegistrationWizard extends Component
         return view('livewire.event-registration-wizard', $data);
     }
 
-
-    private function getSelectedCoachCount(): int
-    {
-        $draft = $this->getActiveDraft();
-        if (! $draft) {
-            return 0;
-        }
-
-        return RegistrationDraftItem::query()
-            ->where('registration_draft_id', $draft->id)
-            ->whereNull('sub_category_id')
-            ->count();
-    }
 
     private function getDraftSelections(): Collection
     {
@@ -265,58 +189,5 @@ class EventRegistrationWizard extends Component
             ->where('event_id', $this->selectedEventId)
             ->where('status', 'draft')
             ->first();
-    }
-
-    private function getCoaches(): Collection
-    {
-        $contingent = auth()->user()->contingent;
-        if (! $contingent) {
-            return collect();
-        }
-
-        return Participant::coaches()
-            ->where('contingent_id', $contingent->id)
-            ->orderBy('name')
-            ->get();
-    }
-
-    private function getDraftCoachIds(): array
-    {
-        $draft = $this->getActiveDraft();
-        if (! $draft) {
-            return [];
-        }
-
-        return RegistrationDraftItem::query()
-            ->where('registration_draft_id', $draft->id)
-            ->whereNull('sub_category_id')
-            ->pluck('participant_id')
-            ->unique()
-            ->toArray();
-    }
-
-    private function getRegisteredCoachIds(): array
-    {
-        if (! $this->selectedEventId) {
-            return [];
-        }
-
-        $contingent = auth()->user()->contingent;
-        if (! $contingent) {
-            return [];
-        }
-
-        return Registration::query()
-            ->whereNull('sub_category_id')
-            ->whereHas('payment', function ($query) {
-                $query->where('event_id', $this->selectedEventId)
-                    ->where('status', '!=', \App\Enums\PaymentStatus::Cancelled->value);
-            })
-            ->whereHas('participant', function ($query) use ($contingent) {
-                $query->where('contingent_id', $contingent->id);
-            })
-            ->pluck('participant_id')
-            ->unique()
-            ->toArray();
     }
 }
