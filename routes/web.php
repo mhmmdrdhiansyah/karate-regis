@@ -92,6 +92,9 @@ Route::middleware('auth')->group(function () {
         Route::get('registration/create/{event}/{category}/{sub_category}', \App\Livewire\AthleteSelectionForm::class)
             ->name('registration.create');
 
+        Route::get('registration/coaches', \App\Livewire\CoachSelectionForm::class)
+            ->name('registration.coaches');
+
         Route::get('registration/invoice/{event}', \App\Livewire\EventRegistrationInvoice::class)
             ->name('registration.invoice');
     });
