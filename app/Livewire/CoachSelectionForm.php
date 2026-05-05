@@ -118,7 +118,7 @@ class CoachSelectionForm extends Component
             [
                 'contingent_id' => $contingent->id,
                 'event_id' => $this->selectedEventId,
-                'status' => 'draft',
+                'status' => \App\Enums\PaymentStatus::Pending,
             ],
             [
                 'total_amount' => 0,
@@ -142,7 +142,7 @@ class CoachSelectionForm extends Component
                     'participant_id' => $coachId,
                     'payment_id' => $payment->id,
                     'sub_category_id' => null,
-                    'status_berkas' => 'pending',
+                    'status_berkas' => \App\Enums\RegistrationStatus::Unsubmitted,
                     'verified_at' => null,
                     'verified_by' => null,
                 ]);
