@@ -178,7 +178,8 @@ class AthleteSelectionForm extends Component
                 ->delete();
         }
 
-        if (count($eligibleIds) !== count($this->selectedAthleteIds)) {
+        $ineligibleSelection = array_diff($this->selectedAthleteIds, $eligibleIds);
+        if (count($ineligibleSelection) > 0) {
             $this->errorMessage = 'Salah satu atlet yang dipilih tidak memenuhi syarat.';
             $this->selectedAthleteIds = array_values(array_intersect($this->selectedAthleteIds, $eligibleIds));
 

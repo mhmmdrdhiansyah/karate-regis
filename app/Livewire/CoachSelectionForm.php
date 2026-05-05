@@ -18,6 +18,8 @@ class CoachSelectionForm extends Component
     public ?int $selectedEventId = null;
     public array $selectedCoachIds = [];
     public string $errorMessage = '';
+    public string $search = '';
+    public bool $showSavedIndicator = false;
 
     // Lifecycle
     public function mount(): void
@@ -32,6 +34,7 @@ class CoachSelectionForm extends Component
     public function updatedSelectedEventId(string|int|null $value): void
     {
         $this->errorMessage = '';
+        $this->showSavedIndicator = false;
 
         // Handle empty/invalid values
         if (empty($value) || !is_numeric($value)) {
@@ -70,6 +73,7 @@ class CoachSelectionForm extends Component
     public function updatedSelectedCoachIds(): void
     {
         $this->errorMessage = '';
+        $this->showSavedIndicator = false;
         $this->selectedCoachIds = array_values(array_unique(array_map('intval', $this->selectedCoachIds)));
 
         if (! $this->selectedEventId) {
@@ -90,76 +94,61 @@ class CoachSelectionForm extends Component
             return;
         }
 
-        // Get confirmed coach IDs
+        // Get draft
+        $draft = \App\Models\RegistrationDraft::firstOrCreate([
+            'contingent_id' => $contingent->id,
+            'event_id' => $this->selectedEventId,
+            'status' => 'draft',
+        ]);
+
+        // Get confirmed coach IDs (those already in a verified/pending payment)
         $confirmedCoachIds = $this->getConfirmedCoachIds();
 
-        // Remove confirmed coaches from selection
-        $this->selectedCoachIds = array_values(array_diff($this->selectedCoachIds, $confirmedCoachIds));
-
-        if (count($confirmedCoachIds) > 0) {
+        // If user tries to uncheck a confirmed coach, warn them and re-add it
+        $tryingToRemoveConfirmed = count(array_diff($confirmedCoachIds, $this->selectedCoachIds)) > 0;
+        if ($tryingToRemoveConfirmed) {
             $this->errorMessage = 'Pelatih yang sudah masuk invoice confirmed tidak dapat diubah.';
+            $this->selectedCoachIds = array_values(array_unique(array_merge($this->selectedCoachIds, $confirmedCoachIds)));
         }
 
-        // Validate coach IDs (must belong to contingent)
+        // Validate coach IDs (must belong to contingent and be of type Coach)
         $validCoachIds = $this->coaches()->pluck('id')->toArray();
         $this->selectedCoachIds = array_values(array_intersect($this->selectedCoachIds, $validCoachIds));
 
-        // Get currently registered coaches
-        $registeredCoachIds = $this->getRegisteredCoachIds();
+        // Get current coach IDs in draft
+        $draftCoachIds = \App\Models\RegistrationDraftItem::query()
+            ->where('registration_draft_id', $draft->id)
+            ->whereNull('sub_category_id')
+            ->pluck('participant_id')
+            ->toArray();
 
-        // Coaches to insert (newly selected)
-        $toInsert = array_diff($this->selectedCoachIds, $registeredCoachIds);
+        // Coaches to insert into draft
+        $toInsert = array_diff($this->selectedCoachIds, $draftCoachIds);
+        $toInsert = array_diff($toInsert, $confirmedCoachIds); // Don't re-insert confirmed ones
 
-        // Coaches to delete (unselected)
-        $toDelete = array_diff($registeredCoachIds, $this->selectedCoachIds);
+        // Coaches to delete from draft
+        $toDelete = array_diff($draftCoachIds, $this->selectedCoachIds);
 
-        // Insert new registrations - need to find or create payment first
-        $payment = \App\Models\Payment::firstOrCreate(
-            [
-                'contingent_id' => $contingent->id,
-                'event_id' => $this->selectedEventId,
-                'status' => \App\Enums\PaymentStatus::Pending,
-            ],
-            [
-                'total_amount' => 0,
-                'transfer_proof' => null,
-                'verified_at' => null,
-                'verified_by' => null,
-                'rejection_reason' => null,
-            ]
-        );
-
-        foreach ($toInsert as $coachId) {
-            // Check if already exists to prevent duplicates
-            $exists = \App\Models\Registration::query()
-                ->where('participant_id', $coachId)
-                ->where('payment_id', $payment->id)
-                ->whereNull('sub_category_id')
-                ->exists();
-
-            if (! $exists) {
-                \App\Models\Registration::create([
-                    'participant_id' => $coachId,
-                    'payment_id' => $payment->id,
-                    'sub_category_id' => null,
-                    'status_berkas' => \App\Enums\RegistrationStatus::Unsubmitted,
-                    'verified_at' => null,
-                    'verified_by' => null,
-                ]);
-            }
+        if (count($toInsert) > 0) {
+            $rows = collect($toInsert)->map(fn ($id) => [
+                'registration_draft_id' => $draft->id,
+                'participant_id' => $id,
+                'sub_category_id' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])->all();
+            \App\Models\RegistrationDraftItem::insert($rows);
         }
 
-        // Delete unselected registrations
         if (count($toDelete) > 0) {
-            \App\Models\Registration::query()
-                ->whereHas('participant', function ($query) use ($contingent) {
-                    $query->where('contingent_id', $contingent->id);
-                })
+            \App\Models\RegistrationDraftItem::query()
+                ->where('registration_draft_id', $draft->id)
                 ->whereNull('sub_category_id')
-                ->where('payment_id', $payment->id)
                 ->whereIn('participant_id', $toDelete)
                 ->delete();
         }
+
+        $this->showSavedIndicator = true;
     }
 
     // Computed Properties
@@ -168,6 +157,12 @@ class CoachSelectionForm extends Component
     {
         $registrationService = app(RegistrationService::class);
         return $registrationService->getOpenEvents();
+    }
+
+    #[Computed]
+    public function selectedEvent(): ?Event
+    {
+        return $this->selectedEventId ? Event::find($this->selectedEventId) : null;
     }
 
     #[Computed]
@@ -180,6 +175,7 @@ class CoachSelectionForm extends Component
 
         return Participant::coaches()
             ->where('contingent_id', $contingent->id)
+            ->when($this->search !== '', fn($q) => $q->where('name', 'like', "%{$this->search}%"))
             ->orderBy('name')
             ->get();
     }
@@ -214,18 +210,30 @@ class CoachSelectionForm extends Component
             return [];
         }
 
-        return Registration::query()
+        // Combine IDs from Draft and existing active Registrations
+        $draftIds = \App\Models\RegistrationDraftItem::query()
+            ->whereHas('draft', function ($query) use ($contingent) {
+                $query->where('contingent_id', $contingent->id)
+                    ->where('event_id', $this->selectedEventId)
+                    ->where('status', 'draft');
+            })
+            ->whereNull('sub_category_id')
+            ->pluck('participant_id')
+            ->toArray();
+
+        $activeIds = Registration::query()
             ->whereHas('participant', function ($query) use ($contingent) {
                 $query->where('contingent_id', $contingent->id);
             })
             ->whereNull('sub_category_id')
             ->whereHas('payment', function ($query) {
                 $query->where('event_id', $this->selectedEventId)
-                    ->where('status', '!=', 'cancelled');
+                    ->where('status', '!=', \App\Enums\PaymentStatus::Cancelled);
             })
             ->pluck('participant_id')
-            ->unique()
             ->toArray();
+
+        return array_values(array_unique(array_merge($draftIds, $activeIds)));
     }
 
     private function getConfirmedCoachIds(): array
@@ -246,10 +254,12 @@ class CoachSelectionForm extends Component
             ->whereNull('sub_category_id')
             ->whereHas('payment', function ($query) {
                 $query->where('event_id', $this->selectedEventId)
-                    ->where('status', 'confirmed');
+                    ->where('status', '!=', \App\Enums\PaymentStatus::Cancelled);
             })
             ->pluck('participant_id')
             ->unique()
             ->toArray();
     }
+
+
 }
