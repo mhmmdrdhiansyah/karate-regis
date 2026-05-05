@@ -188,69 +188,6 @@
                         <div class="text-muted fw-bold fs-6 mt-2">Pilih sub-kategori pertandingan untuk lanjut ke pengisian data peserta.</div>
                     </div>
 
-                    <div class="card shadow-sm mb-7">
-                        <div class="card-body d-flex flex-wrap flex-column flex-md-row justify-content-between align-items-start gap-4">
-                            <div>
-                                <h3 class="fw-bolder text-dark mb-2">
-                                    <i class="fas fa-user-tie text-primary me-2"></i>
-                                    Pendaftaran Pelatih
-                                </h3>
-                                <div class="text-muted fw-bold fs-7">
-                                    Pelatih didaftarkan untuk event (opsional), tidak per kelas.
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap gap-3">
-                                <span class="badge badge-light-primary fw-bolder align-self-center">
-                                    {{ $selectedCoachCount }} pelatih terpilih
-                                </span>
-                                <a href="{{ $selectedEventId ? route('registration.invoice', ['event' => $selectedEventId]) : '#' }}"
-                                    class="btn btn-primary fw-bolder {{ $selectedEventId ? '' : 'disabled' }}">
-                                    Lanjut ke Invoice
-                                </a>
-                            </div>
-                        </div>
-                        <div class="card-body pt-0">
-                            @if(($coaches ?? collect())->count() === 0)
-                                <div class="text-center py-6 bg-light rounded border border-dashed">
-                                    <i class="fas fa-user-slash fs-2x text-muted mb-2"></i>
-                                    <div class="text-muted fw-bold">Belum ada pelatih di bank peserta.</div>
-                                </div>
-                            @else
-                                <div class="row g-4">
-                                    @foreach(($coaches ?? collect()) as $coach)
-                                        @php
-                                            $isRegistered = in_array($coach->id, $registeredCoachIds ?? [], true);
-                                            $isSelected = in_array($coach->id, $draftCoachIds ?? [], true);
-                                        @endphp
-                                        <div class="col-md-6">
-                                            <label wire:key="coach-{{ $coach->id }}"
-                                                class="d-flex flex-stack p-4 rounded border border-dashed {{ $isRegistered ? 'bg-light-danger' : 'bg-hover-light' }}">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="symbol symbol-40px me-4">
-                                                        <img src="{{ $coach->photo_url }}" alt="{{ $coach->name }}" class="coach-photo">
-                                                    </div>
-                                                    <div class="d-flex flex-column">
-                                                        <span class="fw-bolder text-gray-800">{{ $coach->name }}</span>
-                                                        @if($isRegistered)
-                                                            <span class="text-danger fw-bold fs-7">Sudah terdaftar di event ini</span>
-                                                        @else
-                                                            <span class="text-muted fw-bold fs-7">Pelatih</span>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                <div class="form-check form-check-solid form-check-custom form-check-primary">
-                                                    <input class="form-check-input" type="checkbox" value="{{ $coach->id }}"
-                                                        wire:model.live="selectedCoachIds" id="coach_{{ $coach->id }}"
-                                                        {{ $isRegistered ? 'disabled' : '' }}>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
                     @if(($draftSelections ?? collect())->count() > 0)
                         <div class="card shadow-sm mb-7">
                             <div class="card-header">
