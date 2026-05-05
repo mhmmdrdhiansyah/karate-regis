@@ -15,6 +15,18 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    
+                    @can('view participants')
+                    <x-nav-link :href="route('participants.index')" :active="request()->routeIs('participants.*')">
+                        {{ __('Bank Peserta') }}
+                    </x-nav-link>
+                    @endcan
+
+                    @can('create registrations')
+                    <x-nav-link :href="route('registration.index')" :active="request()->routeIs('registration.index') || request()->routeIs('registration.create') || request()->routeIs('registration.invoice')">
+                        {{ __('Pendaftaran Atlet') }}
+                    </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -70,6 +82,18 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @can('view participants')
+            <x-responsive-nav-link :href="route('participants.index')" :active="request()->routeIs('participants.*')">
+                {{ __('Bank Peserta') }}
+            </x-responsive-nav-link>
+            @endcan
+
+            @can('create registrations')
+            <x-responsive-nav-link :href="route('registration.index')" :active="request()->routeIs('registration.index') || request()->routeIs('registration.create') || request()->routeIs('registration.invoice')">
+                {{ __('Pendaftaran Atlet') }}
+            </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

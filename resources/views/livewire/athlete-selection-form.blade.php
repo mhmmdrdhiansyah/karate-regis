@@ -44,6 +44,13 @@
         @include('partials.error-alert', ['message' => $errorMessage])
     @endif
 
+    @if ($showSavedIndicator)
+        <div class="alert alert-success d-flex align-items-center p-4 mb-6">
+            <i class="fas fa-check-circle fs-2 text-success me-3"></i>
+            <div class="text-success fw-bold">Tersimpan</div>
+        </div>
+    @endif
+
     @php
         $selectedCount = count($selectedAthleteIds);
         $maxParticipants = $this->subCategory->max_participants;
@@ -100,7 +107,7 @@
                                 <div
                                     class="form-check form-check-solid form-check-custom form-check-success form-switch">
                                     <input class="form-check-input w-45px h-25px" type="checkbox"
-                                        wire:model="selectedAthleteIds" value="{{ $athlete->id }}"
+                                        wire:model.live="selectedAthleteIds" value="{{ $athlete->id }}"
                                         id="athlete_{{ $athlete->id }}"
                                         {{ !$isSelected && $isLimitReached ? 'disabled' : '' }}>
                                     <label class="form-check-label" for="athlete_{{ $athlete->id }}"></label>
@@ -213,96 +220,17 @@
                     @endif
 
                     <div class="d-flex flex-column gap-4">
-                        <button wire:click="confirmSubmit" wire:loading.attr="disabled"
-                            {{ count($selectedAthleteIds) < $this->subCategory->min_participants || count($selectedAthleteIds) > $this->subCategory->max_participants ? 'disabled' : '' }}
-                            class="btn btn-primary w-100 fw-bolder">
-                            <span wire:loading.remove wire:target="submit">
-                                @if (count($selectedAthleteIds) === 0)
-                                    Pilih atlet terlebih dahulu
-                                @elseif(count($selectedAthleteIds) < $this->subCategory->min_participants)
-                                    Pilih minimal {{ $this->subCategory->min_participants }} atlet
-                                @else
-                                    <i class="fas fa-arrow-right me-2"></i> Lanjutkan
-                                @endif
-                            </span>
-                            <span wire:loading wire:target="submit">
-                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span> Memproses...
-                            </span>
-                        </button>
-
                         <a href="{{ route('registration.index') }}" wire:navigate
-                            class="btn btn-light-danger w-100 fw-bold">
-                            Batalkan
+                            class="btn btn-primary w-100 fw-bolder">
+                            Kembali ke Pendaftaran
+                        </a>
+                        <a href="{{ route('registration.invoice', ['event' => $eventId]) }}" wire:navigate
+                            class="btn btn-light-primary w-100 fw-bolder">
+                            Lanjut ke Invoice
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    {{-- Confirmation Modal --}}
-    <div class="modal fade {{ $showConfirmation ? 'show d-block' : '' }}" tabindex="-1"
-        aria-hidden="{{ !$showConfirmation }}">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title fw-bolder">Konfirmasi Pendaftaran</h3>
-                    <button type="button" class="btn btn-icon btn-sm btn-active-light-primary"
-                        wire:click="cancelConfirmation">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-6">
-                        <div class="text-muted fw-bold fs-6 mb-2">SUB-KATEGORI</div>
-                        <div class="fw-bolder fs-5 text-dark">{{ $this->subCategory->name }}</div>
-                        <div class="text-muted fs-7 mt-1">
-                            {{ $this->subCategory->eventCategory->event->name }}
-                            <span class="mx-1">&bull;</span>
-                            {{ $this->subCategory->eventCategory->class_name }}
-                            <span class="mx-1">&bull;</span>
-                            {{ $this->subCategory->gender->value === 'M' ? 'Putra' : ($this->subCategory->gender->value === 'F' ? 'Putri' : 'Campuran') }}
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <div class="text-muted fw-bold fs-6 mb-2">ATLET ({{ count($selectedAthleteIds) }})</div>
-                        @foreach ($this->eligibleAthletes->whereIn('id', $selectedAthleteIds) as $athlete)
-                            <div class="d-flex align-items-center mb-1">
-                                <i class="fas fa-check text-success me-2"></i>
-                                <span class="text-gray-700">{{ $athlete->name }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="separator separator-dashed my-5"></div>
-
-                    <div class="d-flex flex-stack">
-                        <span class="text-gray-600 fw-bold fs-5">Total Biaya:</span>
-                        <span class="fw-bolder fs-3 text-primary">
-                            Rp {{ number_format($this->subCategory->price * count($selectedAthleteIds), 0, ',', '.') }}
-                        </span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" wire:click="cancelConfirmation" class="btn btn-light fw-bold">
-                        Kembali
-                    </button>
-                    <button type="button" wire:click="submit" wire:loading.attr="disabled"
-                        class="btn btn-primary fw-bolder">
-                        <span wire:loading.remove wire:target="submit">
-                            <i class="fas fa-check me-2"></i> Konfirmasi
-                        </span>
-                        <span wire:loading wire:target="submit">
-                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span> Memproses...
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if ($showConfirmation)
-        <div class="modal-backdrop fade show"></div>
-    @endif
 </div>

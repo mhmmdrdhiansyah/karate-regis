@@ -87,10 +87,13 @@ Route::middleware('auth')->group(function () {
         Route::get('registration', function () {
             return view('registration.index');
         })->name('registration.index');
-        
+
         // Placeholder for the next module
         Route::get('registration/create/{event}/{category}/{sub_category}', \App\Livewire\AthleteSelectionForm::class)
             ->name('registration.create');
+
+        Route::get('registration/invoice/{event}', \App\Livewire\EventRegistrationInvoice::class)
+            ->name('registration.invoice');
     });
 });
 

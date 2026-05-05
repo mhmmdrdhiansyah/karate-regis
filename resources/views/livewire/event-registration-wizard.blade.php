@@ -1,171 +1,337 @@
 <div>
     <!-- Error Message -->
     @if($errorMessage)
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            {{ $errorMessage }}
+        @include('partials.error-alert', ['message' => $errorMessage, 'title' => 'Terjadi Kesalahan'])
+    @endif
+
+    @if (session('success'))
+        <div class="alert alert-success d-flex align-items-center p-5 mb-6">
+            <i class="fas fa-check-circle fs-2hx text-success me-4"></i>
+            <div class="d-flex flex-column">
+                <h4 class="mb-1 text-success">Berhasil</h4>
+                <span>{{ session('success') }}</span>
+            </div>
         </div>
     @endif
 
-    <!-- Breadcrumb / Step Indicator -->
-    <nav class="flex items-center space-x-2 mb-6 text-sm">
-        <button wire:click="goToStep(1)"
-            class="{{ $currentStep >= 1 ? 'text-blue-600 font-semibold' : 'text-gray-400' }}">
-            1. Pilih Event
-        </button>
-        <span class="text-gray-400">→</span>
-        <button wire:click="goToStep(2)" {{ $currentStep < 2 ? 'disabled' : '' }}
-            class="{{ $currentStep >= 2 ? 'text-blue-600 font-semibold' : 'text-gray-400' }}">
-            2. Pilih Kategori
-        </button>
-        <span class="text-gray-400">→</span>
-        <span class="{{ $currentStep >= 3 ? 'text-blue-600 font-semibold' : 'text-gray-400' }}">
-            3. Pilih Sub-Kategori
-        </span>
-    </nav>
+    <div class="d-flex flex-column flex-xl-row">
+        <!-- Stepper Panel (Left Sidebar) -->
+        <div class="flex-column flex-lg-row-auto w-100 w-xl-350px mb-10 mb-xl-0">
+            <div class="card shadow-sm stepper-panel">
+                <div class="card-body p-8 p-lg-10">
+                    <h3 class="fw-bolder text-dark mb-8">Tahapan Pendaftaran</h3>
 
-    <!-- Loading State -->
-    <div wire:loading class="w-full text-center py-8">
-        <span class="text-gray-500 font-medium">Memuat data...</span>
-    </div>
-
-    <div wire:loading.remove>
-        <!-- Step 1: Pilih Event -->
-        @if($currentStep === 1)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($events ?? [] as $event)
-                    @php
-                        $isClosed = !$event->is_open;
-                        $regService = app(\App\Services\RegistrationService::class);
-                        $statusLabel = $regService->getRegistrationStatusLabel($event);
-                    @endphp
-                    <div class="bg-white border rounded-lg p-5 shadow-sm flex flex-col {{ $isClosed ? 'opacity-60 grayscale' : 'hover:shadow-md hover:border-blue-300 transition' }}">
-                        <h3 class="text-lg font-bold text-gray-800 mb-1">{{ $event->name }}</h3>
-                        <p class="text-sm text-gray-500 mb-3">
-                            <i class="fas fa-calendar-alt mr-1"></i> {{ $event->event_date->translatedFormat('d F Y') }}
-                        </p>
-                        
-                        <div class="mb-4 flex-grow">
-                            @if($isClosed)
-                                <span class="inline-block px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded">
-                                    {{ $statusLabel }}
-                                </span>
-                            @else
-                                <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">
-                                    {{ $statusLabel }}
-                                </span>
-                            @endif
-                        </div>
-
-                        <button 
-                            wire:click="selectEvent({{ $event->id }})" 
-                            {{ $isClosed ? 'disabled' : '' }}
-                            class="w-full py-2 rounded font-semibold text-white {{ $isClosed ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 transition' }}">
-                            {{ $isClosed ? 'Pendaftaran Ditutup' : 'Pilih Event' }}
-                        </button>
-                    </div>
-                @empty
-                    <div class="col-span-full p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <p class="text-gray-500">Belum ada event pendaftaran yang dibuka saat ini.</p>
-                    </div>
-                @endforelse
-            </div>
-        @endif
-
-        <!-- Step 2: Pilih Kategori -->
-        @if($currentStep === 2)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Kategori untuk Event: {{ $selectedEventName }}</h2>
-                <p class="text-sm text-gray-500">Silakan pilih kategori yang ingin diikuti.</p>
-            </div>
-
-            @forelse($categoriesGrouped ?? [] as $type => $categories)
-                <div class="mb-8">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Tipe: {{ $type }}</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($categories as $category)
-                            <div class="bg-white border rounded-lg p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-bold text-gray-800 text-lg">{{ $category->class_name }}</h4>
-                                    <span class="px-2 py-1 text-xs font-bold rounded {{ $type === 'Open' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">
-                                        {{ $type }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-600 mb-2">
-                                    <i class="fas fa-child mr-1"></i> {{ $category->readableBirthRange() }}
-                                </p>
-                                <p class="text-sm font-medium text-gray-500 mb-4">
-                                    {{ $category->subCategories->count() }} sub-kategori tersedia
-                                </p>
-                                <button 
-                                    wire:click="selectCategory({{ $category->id }})" 
-                                    class="w-full py-2 border border-blue-600 text-blue-600 hover:bg-blue-50 hover:border-blue-700 font-semibold rounded text-sm transition">
-                                    Lihat Sub-Kategori
-                                </button>
+                    <div class="custom-stepper">
+                        <!-- Step 1 -->
+                        <div class="custom-stepper-item {{ $currentStep === 1 ? 'active' : ($currentStep > 1 ? 'completed' : '') }}" wire:click="goToStep(1)" style="cursor: pointer;">
+                            <div class="custom-stepper-circle">
+                                @if($currentStep > 1)
+                                    <i class="fas fa-check"></i>
+                                @else
+                                    <span>1</span>
+                                @endif
                             </div>
-                        @endforeach
+                            <div class="custom-stepper-content">
+                                <h4 class="custom-stepper-title">Event</h4>
+                                <p class="custom-stepper-desc">Pilih Event</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="custom-stepper-item {{ $currentStep === 2 ? 'active' : ($currentStep > 2 ? 'completed' : '') }}" @if($currentStep >= 2) wire:click="goToStep(2)" style="cursor: pointer;" @endif>
+                            <div class="custom-stepper-circle">
+                                @if($currentStep > 2)
+                                    <i class="fas fa-check"></i>
+                                @else
+                                    <span>2</span>
+                                @endif
+                            </div>
+                            <div class="custom-stepper-content">
+                                <h4 class="custom-stepper-title">Kategori</h4>
+                                <p class="custom-stepper-desc">Pilih Kategori</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="custom-stepper-item {{ $currentStep === 3 ? 'active' : '' }}">
+                            <div class="custom-stepper-circle">
+                                <span>3</span>
+                            </div>
+                            <div class="custom-stepper-content">
+                                <h4 class="custom-stepper-title">Sub-Kategori</h4>
+                                <p class="custom-stepper-desc">Pilih Kelas</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            @empty
-                <div class="p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <p class="text-gray-500">Tidak ada kategori untuk event ini.</p>
-                </div>
-            @endforelse
-        @endif
+            </div>
+        </div>
 
-        <!-- Step 3: Pilih Sub Kategori -->
-        @if($currentStep === 3)
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Sub-Kategori: {{ $selectedCategoryName }}</h2>
-                <p class="text-sm text-gray-500">Pilih sub-kategori pertandingan untuk lanjut ke pengisian data peserta.</p>
+        <!-- Content Panel (Right Side) -->
+        <div class="flex-lg-row-fluid ms-xl-10">
+            <!-- Loading State -->
+            <div wire:loading class="w-100 text-center py-10">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Memuat data...</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                @forelse($subCategories ?? [] as $subCategory)
-                    <div class="bg-white border rounded-lg p-5 shadow-sm flex flex-col hover:border-blue-400 hover:shadow-md transition cursor-pointer" wire:click="selectSubCategory({{ $subCategory->id }})">
-                        <div class="flex justify-between items-start mb-3">
-                            <h4 class="font-bold text-gray-800 text-lg">{{ $subCategory->name }}</h4>
+            <div wire:loading.remove>
+                <!-- Step 1: Pilih Event -->
+                @if($currentStep === 1)
+                    <div class="mb-7">
+                        <h2 class="fw-bolder text-dark">Pilih Event Pendaftaran</h2>
+                        <div class="text-muted fw-bold fs-6 mt-2">Silakan pilih event yang sedang membuka pendaftaran.</div>
+                    </div>
+                    <div class="row g-6">
+                        @forelse($events ?? [] as $event)
                             @php
-                                $genderClass = match($subCategory->gender->value) {
-                                    'M' => 'bg-blue-100 text-blue-700',
-                                    'F' => 'bg-pink-100 text-pink-700',
-                                    default => 'bg-purple-100 text-purple-700',
-                                };
-                                $genderLabel = match($subCategory->gender->value) {
-                                    'M' => 'Putra',
-                                    'F' => 'Putri',
-                                    default => 'Campuran',
-                                };
+                                $isClosed = !$event->is_open;
+                                $statusLabel = $statusLabels[$event->id] ?? '';
                             @endphp
-                            <span class="px-2 py-1 text-xs font-bold rounded {{ $genderClass }}">
-                                {{ $genderLabel }}
-                            </span>
+                            <div class="col-md-6">
+                                <div class="card card-flush shadow-sm h-100 {{ $isClosed ? 'opacity-50' : 'hover-elevate-up' }}">
+                                    <div class="card-body p-6 d-flex flex-column h-100">
+                                        <div class="mb-5">
+                                            <div class="d-flex flex-stack mb-3">
+                                                @if($isClosed)
+                                                    <span class="badge badge-light-danger fw-bolder">{{ $statusLabel }}</span>
+                                                @else
+                                                    <span class="badge badge-light-success fw-bolder">{{ $statusLabel }}</span>
+                                                @endif
+                                            </div>
+                                            <span class="text-dark fw-bolder fs-4">{{ $event->name }}</span>
+                                            <div class="text-muted fw-bold mt-2">
+                                                <i class="fas fa-calendar-alt me-2 text-muted"></i> {{ $event->event_date->translatedFormat('d F Y') }}
+                                            </div>
+                                        </div>
+                                        <div class="mt-auto">
+                                            <button
+                                                wire:click="selectEvent({{ $event->id }})"
+                                                {{ $isClosed ? 'disabled' : '' }}
+                                                class="btn w-100 {{ $isClosed ? 'btn-light' : 'btn-primary' }}">
+                                                {{ $isClosed ? 'Pendaftaran Ditutup' : 'Pilih Event' }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-12">
+                                <div class="notice d-flex bg-light-warning rounded border-warning border border-dashed p-6">
+                                    <i class="fas fa-info-circle fs-2tx text-warning me-4"></i>
+                                    <div class="d-flex flex-stack flex-grow-1">
+                                        <div class="fw-semibold">
+                                            <h4 class="text-gray-900 fw-bold">Perhatian</h4>
+                                            <div class="fs-6 text-gray-700">Belum ada event pendaftaran yang dibuka saat ini.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+                @endif
+
+                <!-- Step 2: Pilih Kategori -->
+                @if($currentStep === 2)
+                    <div class="mb-7">
+                        <h2 class="fw-bolder text-dark">Kategori Event: <span class="text-primary">{{ $selectedEventName }}</span></h2>
+                        <div class="text-muted fw-bold fs-6 mt-2">Silakan pilih kategori yang ingin diikuti.</div>
+                    </div>
+
+                    @forelse($categoriesGrouped ?? [] as $type => $categories)
+                        <div class="mb-10">
+                            <h3 class="text-gray-700 fw-bolder fs-4 mb-7 border-bottom border-2 border-gray-200 pb-4">Tipe: {{ $type }}</h3>
+                            <div class="row g-6">
+                                @foreach($categories as $category)
+                                    <div class="col-md-6">
+                                        <div class="card shadow-sm border border-dashed hover-elevate-up h-100">
+                                            <div class="card-body p-6">
+                                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                                    <h4 class="fw-bolder text-dark fs-5">{{ $category->class_name }}</h4>
+                                                    <span class="badge {{ $type === 'Open' ? 'badge-light-success' : 'badge-light-primary' }} fw-bolder">
+                                                        {{ $type }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex align-items-center mb-4 text-muted fw-bold fs-6">
+                                                    <i class="fas fa-child me-2 text-primary"></i> {{ $category->readableBirthRange() }}
+                                                </div>
+                                                <div class="d-flex align-items-center mb-6 text-muted fw-bold fs-6">
+                                                    <i class="fas fa-layer-group me-2 text-info"></i> {{ $category->subCategories->count() }} sub-kategori tersedia
+                                                </div>
+                                                <button 
+                                                    wire:click="selectCategory({{ $category->id }})" 
+                                                    class="btn btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary w-100 fw-bolder">
+                                                    Lihat Sub-Kategori
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                        
-                        <div class="mb-5 flex-grow">
-                            <p class="text-xl font-bold text-gray-900 mb-3">
-                                Rp {{ number_format($subCategory->price, 0, ',', '.') }}
-                            </p>
-                            @if($subCategory->isTeam())
-                                <span class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">
-                                    <i class="fas fa-users mr-1"></i> Beregu (min {{ $subCategory->min_participants }}, max {{ $subCategory->max_participants }})
+                    @empty
+                        <div class="notice d-flex bg-light-info rounded border-info border border-dashed p-6">
+                            <i class="fas fa-folder-open fs-2tx text-info me-4"></i>
+                            <div class="fw-semibold">
+                                <h4 class="text-gray-900 fw-bold">Kosong</h4>
+                                <div class="fs-6 text-gray-700">Tidak ada kategori untuk event ini.</div>
+                            </div>
+                        </div>
+                    @endforelse
+                @endif
+
+                <!-- Step 3: Pilih Sub Kategori -->
+                @if($currentStep === 3)
+                    <div class="mb-7">
+                        <h2 class="fw-bolder text-dark">Sub-Kategori: <span class="text-primary">{{ $selectedCategoryName }}</span></h2>
+                        <div class="text-muted fw-bold fs-6 mt-2">Pilih sub-kategori pertandingan untuk lanjut ke pengisian data peserta.</div>
+                    </div>
+
+                    <div class="card shadow-sm mb-7">
+                        <div class="card-body d-flex flex-wrap flex-column flex-md-row justify-content-between align-items-start gap-4">
+                            <div>
+                                <h3 class="fw-bolder text-dark mb-2">
+                                    <i class="fas fa-user-tie text-primary me-2"></i>
+                                    Pendaftaran Pelatih
+                                </h3>
+                                <div class="text-muted fw-bold fs-7">
+                                    Pelatih didaftarkan untuk event (opsional), tidak per kelas.
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3">
+                                <span class="badge badge-light-primary fw-bolder align-self-center">
+                                    {{ $selectedCoachCount }} pelatih terpilih
                                 </span>
+                                <a href="{{ $selectedEventId ? route('registration.invoice', ['event' => $selectedEventId]) : '#' }}"
+                                    class="btn btn-primary fw-bolder {{ $selectedEventId ? '' : 'disabled' }}">
+                                    Lanjut ke Invoice
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0">
+                            @if(($coaches ?? collect())->count() === 0)
+                                <div class="text-center py-6 bg-light rounded border border-dashed">
+                                    <i class="fas fa-user-slash fs-2x text-muted mb-2"></i>
+                                    <div class="text-muted fw-bold">Belum ada pelatih di bank peserta.</div>
+                                </div>
                             @else
-                                <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded">
-                                    <i class="fas fa-user mr-1"></i> Individu
-                                </span>
+                                <div class="row g-4">
+                                    @foreach(($coaches ?? collect()) as $coach)
+                                        @php
+                                            $isRegistered = in_array($coach->id, $registeredCoachIds ?? [], true);
+                                            $isSelected = in_array($coach->id, $draftCoachIds ?? [], true);
+                                        @endphp
+                                        <div class="col-md-6">
+                                            <label wire:key="coach-{{ $coach->id }}"
+                                                class="d-flex flex-stack p-4 rounded border border-dashed {{ $isRegistered ? 'bg-light-danger' : 'bg-hover-light' }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="symbol symbol-40px me-4">
+                                                        <img src="{{ $coach->photo_url }}" alt="{{ $coach->name }}" class="coach-photo">
+                                                    </div>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fw-bolder text-gray-800">{{ $coach->name }}</span>
+                                                        @if($isRegistered)
+                                                            <span class="text-danger fw-bold fs-7">Sudah terdaftar di event ini</span>
+                                                        @else
+                                                            <span class="text-muted fw-bold fs-7">Pelatih</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="form-check form-check-solid form-check-custom form-check-primary">
+                                                    <input class="form-check-input" type="checkbox" value="{{ $coach->id }}"
+                                                        wire:model.live="selectedCoachIds" id="coach_{{ $coach->id }}"
+                                                        {{ $isRegistered ? 'disabled' : '' }}>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
+                    </div>
 
-                        <button class="w-full py-2 bg-blue-50 border border-transparent text-blue-700 hover:bg-blue-600 hover:text-white font-semibold rounded transition text-sm">
-                            Daftar Kelas Ini
-                        </button>
+                    @if(($draftSelections ?? collect())->count() > 0)
+                        <div class="card shadow-sm mb-7">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bolder">
+                                    <i class="fas fa-list-check text-success me-2"></i>
+                                    Ringkasan Draft Atlet
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex flex-column gap-4">
+                                    @foreach($draftSelections as $draft)
+                                        <div class="d-flex flex-stack">
+                                            <div>
+                                                <div class="fw-bolder">{{ $draft['subCategory']->name }}</div>
+                                                <div class="text-muted fs-7">{{ $draft['subCategory']->eventCategory->class_name }}</div>
+                                            </div>
+                                            <span class="badge badge-light-success fw-bolder">{{ $draft['athlete_count'] }} atlet</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="row g-6">
+                        @forelse($subCategories ?? [] as $subCategory)
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card shadow-sm border border-hover-primary h-100 cursor-pointer" wire:click="selectSubCategory({{ $subCategory->id }})">
+                                    <div class="card-body p-6 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-4">
+                                            <h4 class="fw-bolder text-dark fs-5">{{ $subCategory->name }}</h4>
+                                            @php
+                                                $genderClass = match($subCategory->gender->value) {
+                                                    'M' => 'badge-light-primary',
+                                                    'F' => 'badge-light-danger',
+                                                    default => 'badge-light-info',
+                                                };
+                                                $genderLabel = match($subCategory->gender->value) {
+                                                    'M' => 'Putra',
+                                                    'F' => 'Putri',
+                                                    default => 'Campuran',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $genderClass }} fw-bolder">{{ $genderLabel }}</span>
+                                        </div>
+                                        
+                                        <div class="flex-grow-1 mb-5">
+                                            <div class="fs-2 fw-bolder text-gray-900 mb-3">
+                                                Rp {{ number_format($subCategory->price, 0, ',', '.') }}
+                                            </div>
+                                            @if($subCategory->isTeam())
+                                                <div class="d-flex align-items-center text-warning fw-bold fs-7">
+                                                    <i class="fas fa-users me-2 text-warning"></i> Beregu ({{ $subCategory->min_participants }} - {{ $subCategory->max_participants }} org)
+                                                </div>
+                                            @else
+                                                <div class="d-flex align-items-center text-gray-600 fw-bold fs-7">
+                                                    <i class="fas fa-user me-2 text-gray-600"></i> Individu
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <button class="btn btn-light-primary w-100 fw-bolder text-hover-white">
+                                            Daftar Kelas Ini
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="col-12">
+                                <div class="notice d-flex bg-light-secondary rounded border-gray-300 border border-dashed p-6">
+                                    <i class="fas fa-layer-group fs-2tx text-gray-500 me-4"></i>
+                                    <div class="fw-semibold">
+                                        <h4 class="text-gray-900 fw-bold">Kosong</h4>
+                                        <div class="fs-6 text-gray-700">Tidak ada sub-kategori yang tersedia.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforelse
                     </div>
-                @empty
-                    <div class="col-span-full p-8 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <p class="text-gray-500">Tidak ada sub-kategori yang tersedia.</p>
-                    </div>
-                @endforelse
+                @endif
             </div>
-        @endif
+        </div>
     </div>
 </div>

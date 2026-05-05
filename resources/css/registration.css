@@ -1,0 +1,108 @@
+/* Registration module styles */
+
+/* Custom Timeline Stepper */
+.custom-stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: relative;
+}
+
+.custom-stepper::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 40px;
+    width: 2px;
+    background: #e4e6ef;
+}
+
+.custom-stepper-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+}
+
+.custom-stepper-circle {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f5f8fa;
+    border: 2px solid #e4e6ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #7e8299;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.custom-stepper-item.completed .custom-stepper-circle {
+    background: #009ef7;
+    border-color: #009ef7;
+    color: #ffffff;
+}
+
+.custom-stepper-item.active .custom-stepper-circle {
+    background: #009ef7;
+    border-color: #009ef7;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(0, 158, 247, 0.2);
+}
+
+.custom-stepper-content {
+    padding-top: 6px;
+}
+
+.custom-stepper-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #181c32;
+    margin-bottom: 0.25rem;
+}
+
+.custom-stepper-item.active .custom-stepper-title {
+    color: #009ef7;
+}
+
+.custom-stepper-desc {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #7e8299;
+    margin-bottom: 0;
+}
+
+.custom-stepper-item.active .custom-stepper-desc {
+    color: #5e6278;
+}
+
+/* Athlete Photos */
+.athlete-photo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.athlete-photo-ineligible {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+.coach-photo {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.sticky-summary {
+    position: sticky;
+    top: calc(var(--kt-header-height, 65px) + var(--kt-toolbar-height, 0px) + 16px);
+}

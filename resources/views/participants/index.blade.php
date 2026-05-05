@@ -74,7 +74,7 @@
                                     <div class="symbol symbol-circle symbol-50px overflow-hidden me-3"
                                         style="width:50px;height:50px">
                                         @if ($participant->photo)
-                                            <img src="{{ Storage::url($participant->photo) }}"
+                                            <img src="{{ $participant->photo_url }}"
                                                 alt="{{ $participant->name }}"
                                                 style="width:50px;height:50px;object-fit:cover" />
                                         @else
@@ -350,7 +350,7 @@
                             <div
                                 class="p-card-av {{ $participant->type === \App\Enums\ParticipantType::Coach ? 'bg-light-success text-success' : ($participant->type === \App\Enums\ParticipantType::Official ? 'bg-light-info text-info' : 'bg-light-warning text-warning') }}">
                                 @if ($participant->photo)
-                                    <img src="{{ Storage::url($participant->photo) }}"
+                                    <img src="{{ $participant->photo_url }}"
                                         alt="{{ $participant->name }}" />
                                 @else
                                     {{ strtoupper(substr($participant->name, 0, 1)) }}
