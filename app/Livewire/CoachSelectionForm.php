@@ -29,10 +29,18 @@ class CoachSelectionForm extends Component
     }
 
     // Actions
-    public function updatedSelectedEventId(int $value): void
+    public function updatedSelectedEventId(string|int|null $value): void
     {
         $this->errorMessage = '';
-        $this->selectedEventId = $value;
+
+        // Handle empty/invalid values
+        if (empty($value) || !is_numeric($value)) {
+            $this->selectedEventId = null;
+            $this->selectedCoachIds = [];
+            return;
+        }
+
+        $this->selectedEventId = (int) $value;
 
         if (! $this->selectedEventId) {
             $this->selectedCoachIds = [];
@@ -105,30 +113,51 @@ class CoachSelectionForm extends Component
         // Coaches to delete (unselected)
         $toDelete = array_diff($registeredCoachIds, $this->selectedCoachIds);
 
-        // Insert new registrations
-        foreach ($toInsert as $coachId) {
-            Registration::create([
-                'participant_id' => $coachId,
-                'payment_id' => null,
-                'sub_category_id' => null,
-                'status_berkas' => 'pending',
+        // Insert new registrations - need to find or create payment first
+        $payment = \App\Models\Payment::firstOrCreate(
+            [
+                'contingent_id' => $contingent->id,
+                'event_id' => $this->selectedEventId,
+                'status' => 'draft',
+            ],
+            [
+                'total_amount' => 0,
+                'transfer_proof' => null,
                 'verified_at' => null,
                 'verified_by' => null,
-            ]);
+                'rejection_reason' => null,
+            ]
+        );
+
+        foreach ($toInsert as $coachId) {
+            // Check if already exists to prevent duplicates
+            $exists = \App\Models\Registration::query()
+                ->where('participant_id', $coachId)
+                ->where('payment_id', $payment->id)
+                ->whereNull('sub_category_id')
+                ->exists();
+
+            if (! $exists) {
+                \App\Models\Registration::create([
+                    'participant_id' => $coachId,
+                    'payment_id' => $payment->id,
+                    'sub_category_id' => null,
+                    'status_berkas' => 'pending',
+                    'verified_at' => null,
+                    'verified_by' => null,
+                ]);
+            }
         }
 
         // Delete unselected registrations
         if (count($toDelete) > 0) {
-            Registration::query()
+            \App\Models\Registration::query()
                 ->whereHas('participant', function ($query) use ($contingent) {
                     $query->where('contingent_id', $contingent->id);
                 })
                 ->whereNull('sub_category_id')
-                ->whereHas('payment', function ($query) {
-                    $query->where('event_id', $this->selectedEventId);
-                })
+                ->where('payment_id', $payment->id)
                 ->whereIn('participant_id', $toDelete)
-                ->whereNull('payment_id') // Only delete if not linked to payment
                 ->delete();
         }
     }
