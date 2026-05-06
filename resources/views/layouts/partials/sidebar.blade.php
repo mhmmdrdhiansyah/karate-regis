@@ -251,6 +251,25 @@
                         </a>
                     </div>
                 @endcan
+
+                @can('verify documents')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('admin.documents.*') ? 'active' : '' }}"
+                            href="{{ route('admin.documents.index') }}">
+                            <span class="menu-icon"><i class="bi bi-file-earmark-person fs-3"></i></span>
+                            <span class="menu-title">Verifikasi Berkas</span>
+                            
+                            @php
+                                $pendingDocsCount = \App\Models\Participant::where('type', \App\Enums\ParticipantType::Athlete)
+                                    ->where('is_verified', false)
+                                    ->count();
+                            @endphp
+                            @if($pendingDocsCount > 0)
+                                <span class="badge badge-circle badge-danger ms-2">{{ $pendingDocsCount }}</span>
+                            @endif
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
     </div>

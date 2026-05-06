@@ -205,10 +205,35 @@
                                                     </span>
                                                 </button>
                                             </div>
+                                        @elseif($currentPayment->status === \App\Enums\PaymentStatus::Verified)
+                                            <div class="separator separator-dashed my-5"></div>
+                                            
+                                            <div class="mb-5">
+                                                <label class="form-label fw-bold text-danger">Alasan Revoke (Wajib)</label>
+                                                <textarea wire:model="rejectionReason" class="form-control form-control-solid @error('rejectionReason') is-invalid @enderror" rows="3" placeholder="Alasan mencabut verifikasi..."></textarea>
+                                                @error('rejectionReason')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="d-grid">
+                                                <button wire:click="revoke" wire:loading.attr="disabled" class="btn btn-outline btn-outline-danger btn-active-light-danger">
+                                                    <span wire:loading.remove wire:target="revoke">
+                                                        <i class="bi bi-arrow-counterclockwise me-1"></i> Revoke Approval
+                                                    </span>
+                                                    <span wire:loading wire:target="revoke">
+                                                        <span class="spinner-border spinner-border-sm me-1"></span> Memproses...
+                                                    </span>
+                                                </button>
+                                                <div class="form-text text-danger mt-2 fs-8 italic">
+                                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                                    Tindakan ini akan mengembalikan status ke Pending dan membatalkan status berkas atlet yang belum diverifikasi admin.
+                                                </div>
+                                            </div>
                                         @else
                                             <div class="alert alert-info d-flex align-items-center p-5">
                                                 <i class="bi bi-info-circle-fill fs-2x text-info me-3"></i>
-                                                <span class="fs-7">Pembayaran ini sudah dalam status <strong>{{ $currentPayment->status }}</strong>. Tidak ada aksi yang diperlukan.</span>
+                                                <span class="fs-7">Pembayaran ini sudah dalam status <strong>{{ ucfirst($currentPayment->status->value) }}</strong>. Tidak ada aksi yang diperlukan.</span>
                                             </div>
                                         @endif
                                     </div>
