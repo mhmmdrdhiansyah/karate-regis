@@ -158,12 +158,33 @@
                 @endrole
 
                 @can('create registrations')
-                    <div class="menu-item">
-                        <a class="menu-link {{ request()->routeIs('registration.*') ? 'active' : '' }}"
-                            href="{{ route('registration.index') }}">
+                    <div data-kt-menu-trigger="click"
+                        class="menu-item menu-accordion {{ request()->routeIs('registration.*') ? 'hover show' : '' }}">
+                        <span class="menu-link">
                             <span class="menu-icon"><i class="bi bi-journal-text fs-3"></i></span>
-                            <span class="menu-title">Pendaftaran Event</span>
-                        </a>
+                            <span class="menu-title">Pendaftaran</span>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('registration.index') || request()->routeIs('registration.create') ? 'active' : '' }}"
+                                    href="{{ route('registration.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Pendaftaran Atlet</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('registration.coaches') ? 'active' : '' }}"
+                                    href="{{ route('registration.coaches') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Pendaftaran Pelatih</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 @endcan
 

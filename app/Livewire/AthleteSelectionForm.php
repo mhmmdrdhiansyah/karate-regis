@@ -5,8 +5,11 @@ namespace App\Livewire;
 use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\Participant;
+use App\Models\RegistrationDraft;
+use App\Models\RegistrationDraftItem;
 use App\Models\SubCategory;
 use App\Enums\SubCategoryGender;
+use App\Services\RegistrationService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -39,8 +42,7 @@ class AthleteSelectionForm extends Component
     // Toggle untuk menampilkan atlet tidak memenuhi syarat
     public bool $showIneligible = false;
 
-    // Confirmation modal state
-    public bool $showConfirmation = false;
+    public bool $showSavedIndicator = false;
 
     // ===== Lifecycle =====
 
@@ -49,6 +51,11 @@ class AthleteSelectionForm extends Component
         $this->eventId = $event;
         $this->categoryId = $category;
         $this->subCategoryId = $sub_category;
+
+        $contingent = auth()->user()->contingent;
+        if (! $contingent) {
+            abort(403, 'Anda belum memiliki data kontingen.');
+        }
 
         // Validasi: pastikan sub_category milik category, dan category milik event
         $subCategory = SubCategory::findOrFail($sub_category);
@@ -61,10 +68,17 @@ class AthleteSelectionForm extends Component
             abort(403, 'Kategori tidak valid untuk event ini.');
         }
 
-        // Pastikan user punya contingent
-        if (!auth()->user()->contingent) {
-            abort(403, 'Anda belum memiliki data kontingen.');
-        }
+        $draft = RegistrationDraft::firstOrCreate([
+            'contingent_id' => $contingent->id,
+            'event_id' => $this->eventId,
+            'status' => 'draft',
+        ]);
+
+        $this->selectedAthleteIds = RegistrationDraftItem::query()
+            ->where('registration_draft_id', $draft->id)
+            ->where('sub_category_id', $this->subCategoryId)
+            ->pluck('participant_id')
+            ->toArray();
     }
 
     // ===== Computed Properties =====
@@ -104,51 +118,82 @@ class AthleteSelectionForm extends Component
 
     // ===== Actions =====
 
-    public function confirmSubmit(): void
-    {
-        $this->errorMessage = '';
-        $this->showConfirmation = true;
-    }
-
-    public function cancelConfirmation(): void
-    {
-        $this->showConfirmation = false;
-    }
-
     public function toggleIneligible(): void
     {
         $this->showIneligible = !$this->showIneligible;
     }
 
-    public function submit(): void
+    public function updatedSelectedAthleteIds(): void
     {
-        // Validasi jumlah atlet yang dipilih (BR-15)
-        $sub = $this->subCategory;
-        $count = count($this->selectedAthleteIds);
+        $this->showSavedIndicator = false;
+        $this->selectedAthleteIds = array_values(array_unique(array_map('intval', $this->selectedAthleteIds)));
+        $draft = RegistrationDraft::where('contingent_id', auth()->user()->contingent->id)
+            ->where('event_id', $this->eventId)
+            ->where('status', 'draft')
+            ->first();
 
-        if ($count < $sub->min_participants || $count > $sub->max_participants) {
-            $this->errorMessage = "{$sub->name} membutuhkan minimal {$sub->min_participants} dan maksimal {$sub->max_participants} atlet.";
+        if (! $draft) {
             return;
         }
 
-        // Validasi ulang: semua atlet yang dipilih harus eligible
-        $eligibleIds = $this->eligibleAthletes->pluck('id')->toArray();
-        foreach ($this->selectedAthleteIds as $id) {
-            if (!in_array($id, $eligibleIds)) {
-                $this->errorMessage = 'Salah satu atlet yang dipilih tidak memenuhi syarat.';
-                return;
-            }
+        $registrationService = app(RegistrationService::class);
+        $event = $this->subCategory->eventCategory->event;
+        if (! $registrationService->isRegistrationOpen($event)) {
+            $this->errorMessage = 'Pendaftaran event sudah ditutup.';
+            return;
         }
 
-        // Simpan ke session atau dispatch event untuk diproses di tahap berikutnya
-        session()->put('registration_draft.event_id', $this->eventId);
-        session()->put('registration_draft.sub_category_id', $this->subCategoryId);
-        session()->put('registration_draft.athlete_ids', $this->selectedAthleteIds);
+        if (count($this->selectedAthleteIds) > $this->subCategory->max_participants) {
+            $this->errorMessage = "{$this->subCategory->name} maksimal {$this->subCategory->max_participants} atlet.";
+            $this->selectedAthleteIds = array_slice($this->selectedAthleteIds, 0, $this->subCategory->max_participants);
+        }
 
-        // Redirect ke halaman konfirmasi/invoice (akan dibuat di Step 4.5)
-        session()->flash('success', 'Atlet berhasil dipilih. Lanjutkan ke konfirmasi.');
-        $this->redirect(route('registration.index'), navigate: true);
+        $existingIds = RegistrationDraftItem::query()
+            ->where('registration_draft_id', $draft->id)
+            ->where('sub_category_id', $this->subCategoryId)
+            ->pluck('participant_id')
+            ->toArray();
+
+        $eligibleIds = $this->eligibleAthletes->pluck('id')->toArray();
+        $toInsert = array_diff($this->selectedAthleteIds, $existingIds);
+        $toInsert = array_values(array_intersect($toInsert, $eligibleIds));
+        $toDelete = array_diff($existingIds, $this->selectedAthleteIds);
+
+        if (count($toInsert) > 0) {
+            $rows = collect($toInsert)->map(fn ($id) => [
+                'registration_draft_id' => $draft->id,
+                'participant_id' => $id,
+                'sub_category_id' => $this->subCategoryId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])->all();
+            RegistrationDraftItem::insert($rows);
+        }
+
+        if (count($toDelete) > 0) {
+            RegistrationDraftItem::query()
+                ->where('registration_draft_id', $draft->id)
+                ->where('sub_category_id', $this->subCategoryId)
+                ->whereIn('participant_id', $toDelete)
+                ->delete();
+        }
+
+        $ineligibleSelection = array_diff($this->selectedAthleteIds, $eligibleIds);
+        if (count($ineligibleSelection) > 0) {
+            $this->errorMessage = 'Salah satu atlet yang dipilih tidak memenuhi syarat.';
+            $this->selectedAthleteIds = array_values(array_intersect($this->selectedAthleteIds, $eligibleIds));
+
+            RegistrationDraftItem::query()
+                ->where('registration_draft_id', $draft->id)
+                ->where('sub_category_id', $this->subCategoryId)
+                ->whereNotIn('participant_id', $this->selectedAthleteIds)
+                ->delete();
+        }
+
+        $this->showSavedIndicator = true;
     }
+
+
 
     // ===== Helper Methods (Private) =====
 

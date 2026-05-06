@@ -46,7 +46,7 @@
                 <div class="me-7 mb-4">
                     <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
                         @if ($participant->photo)
-                            <img src="{{ Storage::url($participant->photo) }}" alt="{{ $participant->name }}"
+                            <img src="{{ $participant->photo_url }}" alt="{{ $participant->name }}"
                                 class="w-100 h-100 object-fit-cover" />
                         @else
                             <div
@@ -197,7 +197,6 @@
                                     <td class="text-gray-600 fw-bold">Institusi</td>
                                     <td class="text-gray-800">{{ $participant->institusi ?? '-' }}</td>
                                 </tr>
-                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -270,15 +269,17 @@
     </div>
 
     @push('scripts')
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
-        new bootstrap.Tooltip(el);
-        });
+        <script>
+            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+                new bootstrap.Tooltip(el);
+            });
 
-        @if (session('success'))
-            toastr.success("{{ session('success') }}");
-        @endif
-        @if ($errors->has('delete'))
-            toastr.error("{{ $errors->first('delete') }}");
-        @endif
+            @if (session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+            @if ($errors->has('delete'))
+                toastr.error("{{ $errors->first('delete') }}");
+            @endif
+        </script>
     @endpush
 </x-app-layout>

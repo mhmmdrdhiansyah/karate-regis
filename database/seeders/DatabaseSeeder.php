@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RolesAndPermissionsSeeder::class,
-            // Seeder lain (misal produk, kategori) bisa ditaruh di bawah sini
+            ParticipantSeeder::class,
+            EventSeeder::class,
         ]);
     }
 }

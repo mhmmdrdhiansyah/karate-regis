@@ -1,15 +1,14 @@
 <x-app-layout>
     @section('title', 'Edit Peserta - ' . $participant->name)
 
-    @php$__puser = auth()->user();
-                $canEditView =
-                    $__puser &&
-                    ($__puser->can('edit participants') ||
-                        $__puser->can('manage participants') ||
-                        ($__puser->can('manage own participants') &&
-                            $participant->contingent_id === $__puser->contingent?->id))
-        ;
-    @endphp ?>
+    @php
+        $__puser = auth()->user();
+        $canEditView = $__puser && (
+            $__puser->can('edit participants') || 
+            $__puser->can('manage participants') || 
+            ($__puser->can('manage own participants') && $participant->contingent_id === $__puser->contingent?->id)
+        );
+    @endphp
 
     @if (!$canEditView)
         <div class="card">
@@ -119,7 +118,7 @@
                                 @if ($participant->photo)
                                     <div class="mb-3">
                                         <div class="symbol symbol-circle symbol-100px overflow-hidden">
-                                            <img src="{{ Storage::url($participant->photo) }}"
+                                            <img src="{{ $participant->photo_url }}"
                                                 alt="{{ $participant->name }}" class="w-100 h-100 object-fit-cover" />
                                         </div>
                                     </div>

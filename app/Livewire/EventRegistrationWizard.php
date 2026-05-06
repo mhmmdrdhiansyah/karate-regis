@@ -2,9 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Enums\PaymentStatus;
 use App\Models\Event;
 use App\Models\EventCategory;
+use App\Models\Participant;
+use App\Models\Registration;
+use App\Models\RegistrationDraft;
+use App\Models\RegistrationDraftItem;
+use App\Models\SubCategory;
 use App\Services\RegistrationService;
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class EventRegistrationWizard extends Component
@@ -20,7 +27,6 @@ class EventRegistrationWizard extends Component
 
     public function mount(): void
     {
-        // Inisialisasi awal. Data daftar event akan diload di render()
     }
 
     public function selectEvent(int $eventId, RegistrationService $registrationService): void
@@ -46,6 +52,8 @@ class EventRegistrationWizard extends Component
         }
 
         $this->selectedEventId = $eventId;
+        $this->ensureDraft($eventId, $contingent->id);
+
         $this->selectedEventName = $event->name;
         $this->currentStep = 2;
     }
@@ -104,17 +112,82 @@ class EventRegistrationWizard extends Component
 
         $data = match ($this->currentStep) {
             1 => [
-                'events' => $registrationService->getOpenEvents()
+                'events' => $registrationService->getOpenEvents(),
+                'statusLabels' => $registrationService->getOpenEvents()->mapWithKeys(
+                    fn ($event) => [$event->id => $registrationService->getRegistrationStatusLabel($event)]
+                ),
             ],
             2 => [
                 'categoriesGrouped' => $registrationService->getCategoriesForEvent($this->selectedEventId)
             ],
             3 => [
-                'subCategories' => EventCategory::find($this->selectedCategoryId)?->subCategories ?? collect()
+                'subCategories' => EventCategory::find($this->selectedCategoryId)?->subCategories ?? collect(),
             ],
             default => [],
         };
 
         return view('livewire.event-registration-wizard', $data);
+    }
+
+
+    private function getDraftSelections(): Collection
+    {
+        $draft = $this->getActiveDraft();
+        if (! $draft) {
+            return collect();
+        }
+
+        $athleteCounts = RegistrationDraftItem::query()
+            ->selectRaw('sub_category_id, COUNT(*) as total')
+            ->where('registration_draft_id', $draft->id)
+            ->whereNotNull('sub_category_id')
+            ->groupBy('sub_category_id')
+            ->get();
+
+        if ($athleteCounts->count() === 0) {
+            return collect();
+        }
+
+        $subCategories = SubCategory::whereIn('id', $athleteCounts->pluck('sub_category_id'))
+            ->with('eventCategory')
+            ->get()
+            ->keyBy('id');
+
+        return $athleteCounts
+            ->map(function ($item) use ($subCategories) {
+                $subCategory = $subCategories->get($item->sub_category_id);
+                if (! $subCategory) {
+                    return null;
+                }
+
+                return [
+                    'subCategory' => $subCategory,
+                    'athlete_count' => (int) $item->total,
+                ];
+            })
+            ->filter()
+            ->values();
+    }
+
+    private function ensureDraft(int $eventId, int $contingentId): RegistrationDraft
+    {
+        return RegistrationDraft::firstOrCreate([
+            'contingent_id' => $contingentId,
+            'event_id' => $eventId,
+            'status' => 'draft',
+        ]);
+    }
+
+    private function getActiveDraft(): ?RegistrationDraft
+    {
+        $contingent = auth()->user()->contingent;
+        if (! $contingent || ! $this->selectedEventId) {
+            return null;
+        }
+
+        return RegistrationDraft::where('contingent_id', $contingent->id)
+            ->where('event_id', $this->selectedEventId)
+            ->where('status', 'draft')
+            ->first();
     }
 }

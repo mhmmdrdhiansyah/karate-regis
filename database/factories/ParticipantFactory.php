@@ -22,8 +22,8 @@ class ParticipantFactory extends Factory
             'gender' => fake()->randomElement([ParticipantGender::Male, ParticipantGender::Female]),
             'provinsi' => fake()->state(),
             'institusi' => fake()->company(),
-            'photo' => null,
-            'document' => null,
+            'photo' => 'assets/media/avatars/blank.png',
+            'document' => 'assets/media/documents/dummy.pdf',
             'is_verified' => false,
         ];
     }
