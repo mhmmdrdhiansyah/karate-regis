@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
             Route::get('documents', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'index'])->name('documents.index');
             Route::post('documents/{participant}/approve', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'approve'])->name('documents.approve');
             Route::post('documents/{participant}/reject', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'reject'])->name('documents.reject');
+            Route::post('documents/{participant}/revoke', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'revoke'])->name('documents.revoke');
         });
     });
 

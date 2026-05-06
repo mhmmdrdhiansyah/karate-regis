@@ -133,4 +133,46 @@ class DocumentVerificationController extends Controller
             return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
+    public function revoke(Request $request, Participant $participant)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|min:5',
+        ]);
+
+        if (!$participant->is_verified) {
+            return response()->json(['message' => 'Hanya peserta yang sudah terverifikasi yang bisa di-revoke.'], 400);
+        }
+
+        try {
+            DB::transaction(function () use ($request, $participant) {
+                // 1. Reset Participant status
+                $participant->update([
+                    'is_verified' => false,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                ]);
+
+                // 2. Log Activity
+                ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'participant.revoked',
+                    'subject_type' => 'Participant',
+                    'subject_id' => $participant->id,
+                    'description' => "Admin me-revoke verifikasi atlet: {$participant->name}. Alasan: {$request->rejection_reason}",
+                    'properties' => [
+                        'participant_id' => $participant->id,
+                        'reason' => $request->rejection_reason,
+                    ],
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verifikasi atlet berhasil dicabut.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
 }

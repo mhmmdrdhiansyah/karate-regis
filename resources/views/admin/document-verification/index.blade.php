@@ -92,6 +92,10 @@
                                             data-id="{{ $participant->id }}"
                                             data-name="{{ $participant->name }}"
                                             data-contingent="{{ $participant->contingent->name }}"
+                                            data-nik="{{ $participant->nik }}"
+                                            data-birth-date="{{ $participant->birth_date->format('d M Y') }}"
+                                            data-gender="{{ $participant->gender->value === 'M' ? 'Laki-laki' : 'Perempuan' }}"
+                                            data-institusi="{{ $participant->institusi ?? '-' }}"
                                             data-doc-url="{{ $participant->document ? Storage::url($participant->document) : '' }}"
                                             data-is-verified="{{ $participant->is_verified ? '1' : '0' }}">
                                         <i class="bi bi-eye-fill fs-3"></i>
@@ -145,7 +149,27 @@
                                 
                                 <div class="d-flex flex-stack mb-5">
                                     <span class="text-muted fw-bold">Kontingen</span>
-                                    <span class="text-gray-800 fw-bolder" id="modalContingent">Nama Kontingen</span>
+                                    <span class="text-gray-800 fw-bolder text-end" id="modalContingent">Nama Kontingen</span>
+                                </div>
+
+                                <div class="d-flex flex-stack mb-5">
+                                    <span class="text-muted fw-bold">NIK</span>
+                                    <span class="text-gray-800 fw-bolder text-end" id="modalNIK">-</span>
+                                </div>
+
+                                <div class="d-flex flex-stack mb-5">
+                                    <span class="text-muted fw-bold">Tgl Lahir</span>
+                                    <span class="text-gray-800 fw-bolder text-end" id="modalBirthDate">-</span>
+                                </div>
+
+                                <div class="d-flex flex-stack mb-5">
+                                    <span class="text-muted fw-bold">Gender</span>
+                                    <span class="text-gray-800 fw-bolder text-end" id="modalGender">-</span>
+                                </div>
+
+                                <div class="d-flex flex-stack mb-5">
+                                    <span class="text-muted fw-bold">Institusi</span>
+                                    <span class="text-gray-800 fw-bolder text-end" id="modalInstitusi">-</span>
                                 </div>
                                 
                                 <div class="separator separator-dashed my-5"></div>
@@ -180,11 +204,30 @@
                                 </div>
 
                                 <div id="infoArea" class="d-none">
-                                    <div class="alert alert-success d-flex align-items-center p-5">
+                                    <div class="alert alert-success d-flex align-items-center p-5 mb-5">
                                         <i class="bi bi-check-circle-fill fs-2x text-success me-3"></i>
                                         <div class="d-flex flex-column">
                                             <h4 class="mb-1 text-success">Verified</h4>
                                             <span>Dokumen atlet ini telah diperiksa dan dinyatakan sah.</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="button" class="btn btn-light-danger btn-sm" id="btnShowRevokeForm">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i> Revoke Verifikasi
+                                        </button>
+                                    </div>
+
+                                    {{-- Revoke Form (Hidden by default) --}}
+                                    <div id="revokeFormContainer" class="d-none mt-5 p-5 bg-light-danger rounded border border-danger border-dashed">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-danger">Alasan Pencabutan (Wajib)</label>
+                                            <textarea id="revokeReason" class="form-control" rows="3" placeholder="Jelaskan mengapa verifikasi dicabut..."></textarea>
+                                            <div class="invalid-feedback" id="revokeError"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-sm btn-light" id="btnCancelRevoke">Batal</button>
+                                            <button type="button" class="btn btn-sm btn-danger" id="btnSubmitRevoke">Konfirmasi Revoke</button>
                                         </div>
                                     </div>
                                 </div>
@@ -214,12 +257,18 @@
         const rejectFormContainer = document.getElementById('rejectFormContainer');
         const rejectionReasonInput = document.getElementById('rejectionReason');
         const rejectError = document.getElementById('rejectError');
+        const revokeFormContainer = document.getElementById('revokeFormContainer');
+        const revokeReasonInput = document.getElementById('revokeReason');
+        const revokeError = document.getElementById('revokeError');
 
         // Buttons
         const btnApprove = document.getElementById('btnApprove');
         const btnShowRejectForm = document.getElementById('btnShowRejectForm');
         const btnCancelReject = document.getElementById('btnCancelReject');
         const btnSubmitReject = document.getElementById('btnSubmitReject');
+        const btnShowRevokeForm = document.getElementById('btnShowRevokeForm');
+        const btnCancelRevoke = document.getElementById('btnCancelRevoke');
+        const btnSubmitRevoke = document.getElementById('btnSubmitRevoke');
 
         // Setup CSRF token for fetch
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -230,6 +279,10 @@
                 const id = this.getAttribute('data-id');
                 const name = this.getAttribute('data-name');
                 const contingent = this.getAttribute('data-contingent');
+                const nik = this.getAttribute('data-nik');
+                const birthDate = this.getAttribute('data-birth-date');
+                const gender = this.getAttribute('data-gender');
+                const institusi = this.getAttribute('data-institusi');
                 const docUrl = this.getAttribute('data-doc-url');
                 const isVerified = this.getAttribute('data-is-verified') === '1';
 
@@ -238,14 +291,24 @@
                 // Set details
                 document.getElementById('modalAthleteName').textContent = name;
                 document.getElementById('modalContingent').textContent = contingent;
+                document.getElementById('modalNIK').textContent = nik;
+                document.getElementById('modalBirthDate').textContent = birthDate;
+                document.getElementById('modalGender').textContent = gender;
+                document.getElementById('modalInstitusi').textContent = institusi;
 
                 // Reset states
                 docPreviewContainer.innerHTML = '';
                 docPreviewContainer.appendChild(docLoading);
                 docLoading.classList.remove('d-none');
                 rejectFormContainer.classList.add('d-none');
+                revokeFormContainer.classList.add('d-none');
                 rejectionReasonInput.value = '';
                 rejectionReasonInput.classList.remove('is-invalid');
+                revokeReasonInput.value = '';
+                revokeReasonInput.classList.remove('is-invalid');
+                btnApprove.classList.remove('d-none');
+                btnShowRejectForm.classList.remove('d-none');
+                btnShowRevokeForm.classList.remove('d-none');
 
                 // Toggle Action vs Info area
                 if (!isVerified) {
@@ -298,6 +361,17 @@
             btnShowRejectForm.classList.remove('d-none');
         });
 
+        // Toggle Revoke Form
+        btnShowRevokeForm.addEventListener('click', () => {
+            revokeFormContainer.classList.remove('d-none');
+            btnShowRevokeForm.classList.add('d-none');
+        });
+
+        btnCancelRevoke.addEventListener('click', () => {
+            revokeFormContainer.classList.add('d-none');
+            btnShowRevokeForm.classList.remove('d-none');
+        });
+
         // Approve Action
         btnApprove.addEventListener('click', function() {
             // Confirm Dialog
@@ -331,6 +405,18 @@
             processAction('reject', reason);
         });
 
+        // Revoke Action
+        btnSubmitRevoke.addEventListener('click', function() {
+            const reason = revokeReasonInput.value.trim();
+            if (reason.length < 5) {
+                revokeReasonInput.classList.add('is-invalid');
+                revokeError.textContent = 'Alasan pencabutan wajib diisi (min. 5 karakter).';
+                return;
+            }
+            revokeReasonInput.classList.remove('is-invalid');
+            processAction('revoke', reason);
+        });
+
         // AJAX Process
         function processAction(action, reason = '') {
             Swal.fire({
@@ -340,7 +426,7 @@
             });
 
             const url = `/admin/documents/${currentParticipantId}/${action}`;
-            const data = action === 'reject' ? { rejection_reason: reason } : {};
+            const data = (action === 'reject' || action === 'revoke') ? { rejection_reason: reason } : {};
 
             fetch(url, {
                 method: 'POST',
