@@ -121,53 +121,32 @@ class EventRegistrationInvoice extends Component
     #[Computed]
     public function athleteSelections(): Collection
     {
-        if (count($this->selectedSubCategories) === 0) {
+        $draftItems = RegistrationDraftItem::query()
+            ->where('registration_draft_id', $this->draftId)
+            ->whereNotNull('sub_category_id')
+            ->with(['participant', 'subCategory.eventCategory'])
+            ->get();
+
+        if ($draftItems->isEmpty()) {
             return collect();
         }
 
-        $subCategories = SubCategory::whereIn('id', array_keys($this->selectedSubCategories))
-            ->with('eventCategory')
-            ->get()
-            ->keyBy('id');
-
-        $allAthleteIds = collect($this->selectedSubCategories)->flatten()->unique()->values()->all();
-        $athletes = Participant::athletes()
-            ->where('contingent_id', auth()->user()->contingent->id)
-            ->whereIn('id', $allAthleteIds)
-            ->orderBy('name')
-            ->get()
-            ->keyBy('id');
-
-        return collect($this->selectedSubCategories)
-            ->map(function (array $athleteIds, int $subCategoryId) use ($subCategories, $athletes) {
-                $subCategory = $subCategories->get($subCategoryId);
-                if (! $subCategory) {
-                    return null;
-                }
-
-                $list = collect($athleteIds)
-                    ->map(function ($athleteId) use ($athletes, $subCategoryId) {
-                        $athlete = $athletes->get($athleteId);
-                        if (!$athlete) return null;
-
-                        // Get team_group_id from draft items for this athlete in this sub-category
-                        $draftItem = RegistrationDraftItem::where('registration_draft_id', $this->draftId)
-                            ->where('sub_category_id', $subCategoryId)
-                            ->where('participant_id', $athleteId)
-                            ->first();
-
-                        $athlete->pivot_team_group_id = $draftItem ? $draftItem->team_group_id : null;
-                        return $athlete;
-                    })
-                    ->filter()
-                    ->values();
+        return $draftItems->groupBy('sub_category_id')
+            ->map(function (Collection $items, int $subCategoryId) {
+                $subCategory = $items->first()->subCategory;
+                
+                $athletes = $items->map(function ($item) {
+                    return [
+                        'participant' => $item->participant,
+                        'team_group_id' => $item->team_group_id,
+                    ];
+                });
 
                 return [
                     'subCategory' => $subCategory,
-                    'athletes' => $list,
+                    'athletes' => $athletes,
                 ];
             })
-            ->filter()
             ->values();
     }
 
@@ -182,7 +161,7 @@ class EventRegistrationInvoice extends Component
             if ($selection['subCategory']->isTeam()) {
                 // Hitung jumlah tim unik dari atlet
                 $teamCount = collect($selection['athletes'])
-                    ->pluck('pivot_team_group_id')
+                    ->pluck('team_group_id')
                     ->filter()
                     ->unique()
                     ->count();
@@ -193,7 +172,7 @@ class EventRegistrationInvoice extends Component
                 return (float) $selection['subCategory']->price * $teamCount;
             }
             // Biaya Individu dikali jumlah atlet
-            return (float) $selection['subCategory']->price * $selection['athletes']->count();
+            return (float) $selection['subCategory']->price * count($selection['athletes']);
         });
     }
 
@@ -248,11 +227,11 @@ class EventRegistrationInvoice extends Component
         if (count($this->selectedSubCategories) > 0) {
             foreach ($this->athleteSelections as $selection) {
                 $subCategory = $selection['subCategory'];
-                $athletes = $selection['athletes'];
+                $athletes = collect($selection['athletes']);
 
                 if ($subCategory->isTeam()) {
                     // Validasi per tim
-                    $teams = $athletes->groupBy('pivot_team_group_id');
+                    $teams = $athletes->groupBy('team_group_id');
                     
                     if ($teams->isEmpty()) {
                         $this->errorMessage = "Sub-kategori {$subCategory->name} harus memiliki minimal 1 tim.";
@@ -260,6 +239,11 @@ class EventRegistrationInvoice extends Component
                     }
 
                     foreach ($teams as $teamId => $teamAthletes) {
+                        if (empty($teamId)) {
+                            $this->errorMessage = "Terdapat atlet yang belum dimasukkan ke dalam tim pada {$subCategory->name}.";
+                            return;
+                        }
+
                         $count = $teamAthletes->count();
                         if ($count < $subCategory->min_participants || $count > $subCategory->max_participants) {
                             $this->errorMessage = "Tim pada {$subCategory->name} harus berisi {$subCategory->min_participants}-{$subCategory->max_participants} atlet.";
@@ -276,7 +260,7 @@ class EventRegistrationInvoice extends Component
                 }
 
                 // Cek eligibility
-                $athleteIds = $athletes->pluck('id')->toArray();
+                $athleteIds = $athletes->pluck('participant.id')->toArray();
                 $eligibleIds = Participant::eligibleFor($subCategory)
                     ->whereIn('id', $athleteIds)
                     ->pluck('id')
@@ -315,57 +299,67 @@ class EventRegistrationInvoice extends Component
             return;
         }
 
-        DB::transaction(function () use ($contingent, $event) {
-            $payment = Payment::create([
-                'contingent_id' => $contingent->id,
-                'event_id' => $event->id,
-                'total_amount' => $this->totalAmount,
-                'status' => PaymentStatus::Pending->value,
-            ]);
+        try {
+            DB::transaction(function () use ($contingent, $event) {
+                $payment = Payment::create([
+                    'contingent_id' => $contingent->id,
+                    'event_id' => $event->id,
+                    'total_amount' => $this->totalAmount,
+                    'status' => PaymentStatus::Pending->value,
+                ]);
 
-            $athleteRegistrations = [];
+                $athleteRegistrations = [];
             foreach ($this->athleteSelections as $selection) {
-                foreach ($selection['athletes'] as $athlete) {
+                foreach ($selection['athletes'] as $athleteData) {
+                    $athlete = $athleteData['participant'];
                     $athleteRegistrations[] = [
                         'participant_id' => $athlete->id,
                         'payment_id' => $payment->id,
                         'sub_category_id' => $selection['subCategory']->id,
-                        'team_group_id' => $athlete->pivot_team_group_id ?? null,
+                        'team_group_id' => $athleteData['team_group_id'] ?? null,
                         'status_berkas' => RegistrationStatus::Unsubmitted->value,
+                        'verified_at' => null,
+                        'verified_by' => null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
                 }
             }
 
-            $coachRegistrations = $this->coaches->map(fn ($coach) => [
-                'participant_id' => $coach->id,
-                'payment_id' => $payment->id,
-                'sub_category_id' => null,
-                'status_berkas' => RegistrationStatus::Verified->value,
-                'verified_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])->all();
+                $coachRegistrations = $this->coaches->map(fn ($coach) => [
+                    'participant_id' => $coach->id,
+                    'payment_id' => $payment->id,
+                    'sub_category_id' => null,
+                    'team_group_id' => null,
+                    'status_berkas' => RegistrationStatus::Verified->value,
+                    'verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])->all();
 
-            $payload = array_merge($athleteRegistrations, $coachRegistrations);
-            if (count($payload) > 0) {
-                Registration::insert($payload);
-            }
+                $payload = array_merge($athleteRegistrations, $coachRegistrations);
+                if (count($payload) > 0) {
+                    Registration::insert($payload);
+                }
 
-            if ($this->draftId) {
-                RegistrationDraftItem::query()
-                    ->where('registration_draft_id', $this->draftId)
-                    ->delete();
+                if ($this->draftId) {
+                    RegistrationDraftItem::query()
+                        ->where('registration_draft_id', $this->draftId)
+                        ->delete();
 
-                RegistrationDraft::query()
-                    ->where('id', $this->draftId)
-                    ->update(['status' => 'converted']);
-            }
-        });
+                    RegistrationDraft::query()
+                        ->where('id', $this->draftId)
+                        ->update(['status' => 'converted']);
+                }
+            });
 
-        session()->flash('success', 'Invoice berhasil dibuat. Silakan lanjutkan pembayaran.');
-        $this->redirect(route('registration.index'), navigate: true);
+            session()->flash('success', 'Invoice berhasil dibuat. Silakan lanjutkan pembayaran.');
+            $this->redirect(route('registration.index'), navigate: true);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error creating invoice: ' . $e->getMessage());
+            $this->errorMessage = 'Terjadi kesalahan sistem saat membuat invoice: ' . $e->getMessage();
+        }
     }
 
     public function render()

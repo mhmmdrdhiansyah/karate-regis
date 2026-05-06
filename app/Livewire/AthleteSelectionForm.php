@@ -86,6 +86,12 @@ class AthleteSelectionForm extends Component
 
         // Jika beregu, load tim-tim yang sudah dibuat
         if ($subCategory->isTeam()) {
+            // Cleanup: Hapus item draf di kategori ini yang tidak punya team_group_id (data rusak)
+            RegistrationDraftItem::where('registration_draft_id', $draft->id)
+                ->where('sub_category_id', $this->subCategoryId)
+                ->whereNull('team_group_id')
+                ->delete();
+
             $this->loadTeams();
         }
     }
@@ -184,6 +190,28 @@ class AthleteSelectionForm extends Component
             return;
         }
         $this->activeTeamId = $teamGroupId;
+    }
+
+    public function updateTeamName(int $teamGroupId, string $name): void
+    {
+        $this->errorMessage = '';
+        $name = trim($name);
+
+        if (empty($name)) {
+            // Jika kosong, kembalikan ke default (Tim A, Tim B, dst)
+            $team = \App\Models\TeamGroup::find($teamGroupId);
+            if ($team) {
+                $name = "Tim " . chr(64 + $team->team_number);
+                $team->update(['team_name' => $name]);
+            }
+        } else {
+            \App\Models\TeamGroup::where('id', $teamGroupId)
+                ->where('contingent_id', auth()->user()->contingent->id)
+                ->update(['team_name' => $name]);
+        }
+
+        $this->loadTeams();
+        $this->showSavedIndicator = true;
     }
 
     public function toggleTeamMember(int $athleteId): void
@@ -301,6 +329,11 @@ class AthleteSelectionForm extends Component
         $event = $this->subCategory->eventCategory->event;
         if (! $registrationService->isRegistrationOpen($event)) {
             $this->errorMessage = 'Pendaftaran event sudah ditutup.';
+            return;
+        }
+
+        // Keamanan: Jika kategori ini beregu, jangan proses via metode individu
+        if ($this->subCategory->isTeam()) {
             return;
         }
 

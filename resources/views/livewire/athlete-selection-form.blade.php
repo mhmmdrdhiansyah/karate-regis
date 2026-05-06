@@ -85,7 +85,16 @@
                                         {{ $team['number'] }}
                                     </span>
                                 </span>
-                                <h3 class="fw-bolder mb-0">{{ $team['name'] }}</h3>
+                                <div class="d-flex align-items-center" onclick="event.stopPropagation();">
+                                    <input type="text" 
+                                        class="form-control form-control-flush fw-bolder fs-4 p-0 w-auto min-w-150px" 
+                                        value="{{ $team['name'] }}"
+                                        onkeydown="if(event.key === 'Enter') { this.blur(); }"
+                                        onblur="@this.updateTeamName({{ $team['id'] }}, this.value)"
+                                        placeholder="Nama Tim..."
+                                    >
+                                    <i class="fas fa-edit ms-2 text-gray-400 fs-9"></i>
+                                </div>
                             </div>
                             <div class="card-toolbar">
                                 <span
