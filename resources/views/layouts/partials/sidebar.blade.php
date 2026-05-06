@@ -184,6 +184,15 @@
                                     <span class="menu-title">Pendaftaran Pelatih</span>
                                 </a>
                             </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('payments.*') ? 'active' : '' }}"
+                                    href="{{ route('payments.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Pembayaran</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endcan
@@ -220,6 +229,28 @@
                         </a>
                     </div>
                 @endcanany
+
+                @can('verify payments')
+                    <div class="menu-item">
+                        <div class="menu-content pt-8 pb-2">
+                            <span class="menu-section text-muted text-uppercase fs-8 ls-1">Keuangan</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}"
+                            href="{{ route('admin.payments.index') }}">
+                            <span class="menu-icon"><i class="bi bi-credit-card fs-3"></i></span>
+                            <span class="menu-title">Verifikasi Pembayaran</span>
+                            
+                            @php
+                                $pendingPaymentsCount = \App\Models\Payment::where('status', \App\Enums\PaymentStatus::Pending)->count();
+                            @endphp
+                            @if($pendingPaymentsCount > 0)
+                                <span class="badge badge-circle badge-danger ms-2">{{ $pendingPaymentsCount }}</span>
+                            @endif
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
     </div>

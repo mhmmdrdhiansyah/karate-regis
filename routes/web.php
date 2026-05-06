@@ -77,6 +77,10 @@ Route::middleware('auth')->group(function () {
             Route::put('sub-categories/{subCategory}', [SubCategoryController::class, 'update'])->name('sub-categories.update');
             Route::delete('sub-categories/{subCategory}', [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy');
         });
+
+        Route::middleware(['permission:verify payments'])->group(function () {
+            Route::get('payments', \App\Livewire\Admin\PaymentManagement::class)->name('payments.index');
+        });
     });
 
     // Laporan (Reports) - simple index page
@@ -97,6 +101,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('registration/invoice/{event}', \App\Livewire\EventRegistrationInvoice::class)
             ->name('registration.invoice');
+
+        Route::get('payments', \App\Livewire\PaymentList::class)
+            ->name('payments.index');
     });
 });
 
