@@ -44,6 +44,10 @@ class AthleteSelectionForm extends Component
 
     public bool $showSavedIndicator = false;
 
+    // Untuk mode beregu
+    public array $teams = [];           // Array of team data: [{id, name, number, memberIds}]
+    public ?int $activeTeamId = null;   // Tim yang sedang diedit
+
     // ===== Lifecycle =====
 
     public function mount(int $event, int $category, int $sub_category): void
@@ -79,6 +83,11 @@ class AthleteSelectionForm extends Component
             ->where('sub_category_id', $this->subCategoryId)
             ->pluck('participant_id')
             ->toArray();
+
+        // Jika beregu, load tim-tim yang sudah dibuat
+        if ($subCategory->isTeam()) {
+            $this->loadTeams();
+        }
     }
 
     // ===== Computed Properties =====
@@ -93,6 +102,7 @@ class AthleteSelectionForm extends Component
     public function eligibleAthletes()
     {
         return Participant::eligibleFor($this->subCategory)
+            ->with(['registrations.subCategory', 'draftItems.subCategory'])
             ->when($this->search !== '', fn($q) => $q->where('name', 'like', "%{$this->search}%"))
             ->orderBy('name')
             ->get();
@@ -104,6 +114,7 @@ class AthleteSelectionForm extends Component
         // Ambil SEMUA atlet milik kontingen
         $allAthletes = Participant::athletes()
             ->where('contingent_id', auth()->user()->contingent->id)
+            ->with(['registrations.subCategory', 'draftItems.subCategory'])
             ->get();
 
         // Filter yang TIDAK eligible + tentukan alasan
@@ -121,6 +132,156 @@ class AthleteSelectionForm extends Component
     public function toggleIneligible(): void
     {
         $this->showIneligible = !$this->showIneligible;
+    }
+
+    public function createTeam(): void
+    {
+        $sub = $this->subCategory();
+        if (count($this->teams) >= $sub->max_teams) {
+            $this->errorMessage = "Maksimal {$sub->max_teams} tim untuk sub-kategori ini.";
+            return;
+        }
+
+        $contingent = auth()->user()->contingent;
+        $teamNumber = count($this->teams) + 1;
+
+        $team = \App\Models\TeamGroup::create([
+            'contingent_id' => $contingent->id,
+            'sub_category_id' => $this->subCategoryId,
+            'team_name' => "Tim " . chr(64 + $teamNumber), // Tim A, Tim B, dst
+            'team_number' => $teamNumber,
+        ]);
+
+        $this->loadTeams();
+        $this->activeTeamId = $team->id;
+        $this->showSavedIndicator = true;
+    }
+
+    public function deleteTeam(int $teamGroupId): void
+    {
+        $team = \App\Models\TeamGroup::where('id', $teamGroupId)
+            ->where('contingent_id', auth()->user()->contingent->id)
+            ->first();
+
+        if ($team) {
+            // Hapus anggota tim dari draf
+            RegistrationDraftItem::where('team_group_id', $team->id)->delete();
+            $team->delete();
+
+            if ($this->activeTeamId === $teamGroupId) {
+                $this->activeTeamId = null;
+            }
+
+            $this->loadTeams();
+            $this->showSavedIndicator = true;
+        }
+    }
+
+    public function selectTeam(int $teamGroupId): void
+    {
+        if ($this->activeTeamId === $teamGroupId) {
+            $this->activeTeamId = null; // Toggle off if already selected
+            return;
+        }
+        $this->activeTeamId = $teamGroupId;
+    }
+
+    public function toggleTeamMember(int $athleteId): void
+    {
+        if (!$this->activeTeamId) {
+            $this->errorMessage = 'Pilih tim terlebih dahulu.';
+            return;
+        }
+
+        $this->errorMessage = '';
+        $this->showSavedIndicator = false;
+
+        $contingent = auth()->user()->contingent;
+        $draft = RegistrationDraft::where('contingent_id', $contingent->id)
+            ->where('event_id', $this->eventId)
+            ->where('status', 'draft')
+            ->first();
+
+        if (!$draft) return;
+
+        $registrationService = app(RegistrationService::class);
+        if (!$registrationService->isRegistrationOpen($this->subCategory->eventCategory->event)) {
+            $this->errorMessage = 'Pendaftaran event sudah ditutup.';
+            return;
+        }
+
+        // Cek apakah sudah ada di tim ini
+        $existing = RegistrationDraftItem::where('registration_draft_id', $draft->id)
+            ->where('sub_category_id', $this->subCategoryId)
+            ->where('participant_id', $athleteId)
+            ->where('team_group_id', $this->activeTeamId)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+        } else {
+            // Cek apakah sudah ada di tim LAIN pada sub-kategori yang sama
+            $inOtherTeam = RegistrationDraftItem::where('registration_draft_id', $draft->id)
+                ->where('sub_category_id', $this->subCategoryId)
+                ->where('participant_id', $athleteId)
+                ->exists();
+
+            if ($inOtherTeam) {
+                $this->errorMessage = 'Atlet sudah terdaftar di tim lain pada kategori ini.';
+                return;
+            }
+
+            // Cek kuota anggota tim
+            $currentMemberCount = RegistrationDraftItem::where('team_group_id', $this->activeTeamId)->count();
+            if ($currentMemberCount >= $this->subCategory->max_participants) {
+                $this->errorMessage = "Tim sudah penuh (maksimal {$this->subCategory->max_participants} atlet).";
+                return;
+            }
+
+            // Cek eligibility
+            $isEligible = Participant::eligibleFor($this->subCategory)->where('participants.id', $athleteId)->exists();
+            if (!$isEligible) {
+                $this->errorMessage = 'Atlet tidak memenuhi syarat untuk kategori ini.';
+                return;
+            }
+
+            RegistrationDraftItem::create([
+                'registration_draft_id' => $draft->id,
+                'participant_id' => $athleteId,
+                'sub_category_id' => $this->subCategoryId,
+                'team_group_id' => $this->activeTeamId,
+            ]);
+        }
+
+        $this->loadTeams();
+        $this->showSavedIndicator = true;
+    }
+
+    public function loadTeams(): void
+    {
+        $contingent = auth()->user()->contingent;
+        $teamGroups = \App\Models\TeamGroup::where('contingent_id', $contingent->id)
+            ->where('sub_category_id', $this->subCategoryId)
+            ->with('draftItems')
+            ->orderBy('team_number')
+            ->get();
+
+        $this->teams = $teamGroups->map(fn($tg) => [
+            'id' => $tg->id,
+            'name' => $tg->team_name,
+            'number' => $tg->team_number,
+            'memberIds' => $tg->draftItems->pluck('participant_id')->toArray(),
+        ])->toArray();
+    }
+
+    public function isAthleteInAnyTeam(int $athleteId): bool
+    {
+        foreach ($this->teams as $team) {
+            if (in_array($athleteId, $team['memberIds'])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function updatedSelectedAthleteIds(): void
@@ -191,6 +352,25 @@ class AthleteSelectionForm extends Component
         }
 
         $this->showSavedIndicator = true;
+    }
+
+    public function clearDraft(): void
+    {
+        $contingent = auth()->user()->contingent;
+        if (! $contingent) {
+            return;
+        }
+
+        $draft = RegistrationDraft::where('contingent_id', $contingent->id)
+            ->where('event_id', $this->eventId)
+            ->where('status', 'draft')
+            ->first();
+
+        if ($draft) {
+            RegistrationDraftItem::where('registration_draft_id', $draft->id)->delete();
+            $this->selectedAthleteIds = [];
+            $this->showSavedIndicator = true;
+        }
     }
 
 

@@ -151,6 +151,29 @@ class CoachSelectionForm extends Component
         $this->showSavedIndicator = true;
     }
 
+    public function clearDraft(): void
+    {
+        if (! $this->selectedEventId) {
+            return;
+        }
+
+        $contingent = auth()->user()->contingent;
+        if (! $contingent) {
+            return;
+        }
+
+        $draft = \App\Models\RegistrationDraft::where('contingent_id', $contingent->id)
+            ->where('event_id', $this->selectedEventId)
+            ->where('status', 'draft')
+            ->first();
+
+        if ($draft) {
+            \App\Models\RegistrationDraftItem::where('registration_draft_id', $draft->id)->delete();
+            $this->selectedCoachIds = $this->getConfirmedCoachIds(); // Keep confirmed ones
+            $this->showSavedIndicator = true;
+        }
+    }
+
     // Computed Properties
     #[Computed]
     public function events(): Collection

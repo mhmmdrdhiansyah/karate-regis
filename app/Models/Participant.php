@@ -56,6 +56,25 @@ class Participant extends Model
         return $this->hasMany(Registration::class);
     }
 
+    public function registrationsForEvent(int $eventId): HasMany
+    {
+        return $this->registrations()->whereHas('payment', function($q) use ($eventId) {
+            $q->where('event_id', $eventId)->where('status', '!=', \App\Enums\PaymentStatus::Cancelled);
+        });
+    }
+
+    public function draftItems(): HasMany
+    {
+        return $this->hasMany(RegistrationDraftItem::class);
+    }
+
+    public function draftItemsForEvent(int $eventId): HasMany
+    {
+        return $this->draftItems()->whereHas('draft', function($q) use ($eventId) {
+            $q->where('event_id', $eventId)->where('status', 'draft');
+        });
+    }
+
     public function scopeAthletes($query)
     {
         return $query->where('type', ParticipantType::Athlete);

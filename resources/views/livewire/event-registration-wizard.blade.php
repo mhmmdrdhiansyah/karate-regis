@@ -204,7 +204,13 @@
                                                 <div class="fw-bolder">{{ $draft['subCategory']->name }}</div>
                                                 <div class="text-muted fs-7">{{ $draft['subCategory']->eventCategory->class_name }}</div>
                                             </div>
-                                            <span class="badge badge-light-success fw-bolder">{{ $draft['athlete_count'] }} atlet</span>
+                                            <span class="badge badge-light-success fw-bolder">
+                                                @if (isset($draft['team_count']))
+                                                    {{ $draft['team_count'] }} Tim ({{ $draft['athlete_count'] }} Atlet)
+                                                @else
+                                                    {{ $draft['athlete_count'] }} Atlet
+                                                @endif
+                                            </span>
                                         </div>
                                     @endforeach
                                 </div>
@@ -248,6 +254,21 @@
                                                 </div>
                                             @endif
                                         </div>
+
+                                        {{-- Preview Atlet di draf --}}
+                                        @php
+                                            $currentDraft = collect($draftSelections)->firstWhere('subCategory.id', $subCategory->id);
+                                        @endphp
+                                        @if($currentDraft)
+                                            <div class="mb-4 bg-light-success p-3 rounded border border-success border-dashed">
+                                                <div class="fw-bold text-success fs-8 mb-1">DRAF TERPILIH:</div>
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach($currentDraft['athlete_names'] as $name)
+                                                        <span class="badge badge-success fs-9 px-2 py-1">{{ $name }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         <button class="btn btn-light-primary w-100 fw-bolder text-hover-white">
                                             Daftar Kelas Ini

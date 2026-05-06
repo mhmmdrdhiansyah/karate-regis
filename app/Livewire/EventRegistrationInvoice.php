@@ -146,7 +146,19 @@ class EventRegistrationInvoice extends Component
                 }
 
                 $list = collect($athleteIds)
-                    ->map(fn ($athleteId) => $athletes->get($athleteId))
+                    ->map(function ($athleteId) use ($athletes, $subCategoryId) {
+                        $athlete = $athletes->get($athleteId);
+                        if (!$athlete) return null;
+
+                        // Get team_group_id from draft items for this athlete in this sub-category
+                        $draftItem = RegistrationDraftItem::where('registration_draft_id', $this->draftId)
+                            ->where('sub_category_id', $subCategoryId)
+                            ->where('participant_id', $athleteId)
+                            ->first();
+
+                        $athlete->pivot_team_group_id = $draftItem ? $draftItem->team_group_id : null;
+                        return $athlete;
+                    })
                     ->filter()
                     ->values();
 
@@ -166,13 +178,23 @@ class EventRegistrationInvoice extends Component
             return 0;
         }
 
-        if ($this->athleteSelections->count() > 0) {
-            return $this->athleteSelections->sum(function (array $selection) {
-                return (float) $selection['subCategory']->price * $selection['athletes']->count();
-            });
-        }
+        return $this->athleteSelections->sum(function (array $selection) {
+            if ($selection['subCategory']->isTeam()) {
+                // Hitung jumlah tim unik dari atlet
+                $teamCount = collect($selection['athletes'])
+                    ->pluck('pivot_team_group_id')
+                    ->filter()
+                    ->unique()
+                    ->count();
 
-        return 0;
+                // Minimal 1 jika ada atlet tapi belum ada team_group_id (backward compat)
+                $teamCount = max($teamCount, 1);
+
+                return (float) $selection['subCategory']->price * $teamCount;
+            }
+            // Biaya Individu dikali jumlah atlet
+            return (float) $selection['subCategory']->price * $selection['athletes']->count();
+        });
     }
 
     #[Computed]
@@ -224,26 +246,44 @@ class EventRegistrationInvoice extends Component
         }
 
         if (count($this->selectedSubCategories) > 0) {
-            foreach ($this->selectedSubCategories as $subCategoryId => $athleteIds) {
-                $subCategory = SubCategory::with('eventCategory')->find($subCategoryId);
-                if (! $subCategory || $subCategory->eventCategory->event_id !== $event->id) {
-                    $this->errorMessage = 'Sub-kategori tidak valid untuk event ini.';
-                    return;
+            foreach ($this->athleteSelections as $selection) {
+                $subCategory = $selection['subCategory'];
+                $athletes = $selection['athletes'];
+
+                if ($subCategory->isTeam()) {
+                    // Validasi per tim
+                    $teams = $athletes->groupBy('pivot_team_group_id');
+                    
+                    if ($teams->isEmpty()) {
+                        $this->errorMessage = "Sub-kategori {$subCategory->name} harus memiliki minimal 1 tim.";
+                        return;
+                    }
+
+                    foreach ($teams as $teamId => $teamAthletes) {
+                        $count = $teamAthletes->count();
+                        if ($count < $subCategory->min_participants || $count > $subCategory->max_participants) {
+                            $this->errorMessage = "Tim pada {$subCategory->name} harus berisi {$subCategory->min_participants}-{$subCategory->max_participants} atlet.";
+                            return;
+                        }
+                    }
+                } else {
+                    // Validasi individu
+                    $athleteCount = $athletes->count();
+                    if ($athleteCount < $subCategory->min_participants || $athleteCount > $subCategory->max_participants) {
+                        $this->errorMessage = "Jumlah atlet pada {$subCategory->name} tidak sesuai ketentuan.";
+                        return;
+                    }
                 }
 
-                $athleteCount = count($athleteIds);
-                if ($athleteCount < $subCategory->min_participants || $athleteCount > $subCategory->max_participants) {
-                    $this->errorMessage = 'Jumlah atlet tidak sesuai dengan ketentuan sub-kategori.';
-                    return;
-                }
-
+                // Cek eligibility
+                $athleteIds = $athletes->pluck('id')->toArray();
                 $eligibleIds = Participant::eligibleFor($subCategory)
                     ->whereIn('id', $athleteIds)
                     ->pluck('id')
                     ->toArray();
 
-                if (count($eligibleIds) !== $athleteCount) {
-                    $this->errorMessage = 'Terdapat atlet yang tidak memenuhi syarat.';
+                if (count($eligibleIds) !== count($athleteIds)) {
+                    $this->errorMessage = "Terdapat atlet pada {$subCategory->name} yang tidak memenuhi syarat.";
                     return;
                 }
             }
@@ -290,6 +330,7 @@ class EventRegistrationInvoice extends Component
                         'participant_id' => $athlete->id,
                         'payment_id' => $payment->id,
                         'sub_category_id' => $selection['subCategory']->id,
+                        'team_group_id' => $athlete->pivot_team_group_id ?? null,
                         'status_berkas' => RegistrationStatus::Unsubmitted->value,
                         'created_at' => now(),
                         'updated_at' => now(),

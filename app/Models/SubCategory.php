@@ -15,10 +15,12 @@ class SubCategory extends Model
     protected $fillable = [
         'event_category_id',
         'name',
+        'category_type',
         'gender',
         'price',
         'min_participants',
         'max_participants',
+        'max_teams',
     ];
 
     protected function casts(): array
@@ -28,6 +30,7 @@ class SubCategory extends Model
             'price' => 'decimal:2',
             'min_participants' => 'integer',
             'max_participants' => 'integer',
+            'max_teams' => 'integer',
         ];
     }
 
@@ -41,9 +44,14 @@ class SubCategory extends Model
         return $this->hasMany(Registration::class);
     }
 
+    public function teamGroups(): HasMany
+    {
+        return $this->hasMany(TeamGroup::class);
+    }
+
     public function isTeam(): bool
     {
-        return $this->max_participants > 1;
+        return $this->category_type === 'beregu';
     }
 
     public function hasActiveRegistrations(): bool

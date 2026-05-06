@@ -21,6 +21,7 @@ class Registration extends Model
         'rejection_reason',
         'verified_at',
         'verified_by',
+        'team_group_id',
     ];
 
     protected function casts(): array
@@ -44,6 +45,11 @@ class Registration extends Model
     public function subCategory(): BelongsTo
     {
         return $this->belongsTo(SubCategory::class);
+    }
+
+    public function teamGroup(): BelongsTo
+    {
+        return $this->belongsTo(TeamGroup::class);
     }
 
     public function verifiedBy(): BelongsTo

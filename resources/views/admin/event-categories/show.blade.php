@@ -164,7 +164,7 @@
             <form action="{{ route('admin.event-categories.sub-categories.store', $eventCategory) }}" method="POST"
                 class="row g-4 mb-6">
                 @csrf
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="required form-label">Name</label>
                     <input type="text" name="name" class="form-control form-control-solid"
                         value="{{ old('name') }}" placeholder="Kumite -55kg">
@@ -173,6 +173,16 @@
                     @enderror
                 </div>
                 <div class="col-md-2">
+                    <label class="required form-label">Type</label>
+                    <select name="category_type" class="form-select form-select-solid">
+                        <option value="individu">Individu</option>
+                        <option value="beregu">Beregu</option>
+                    </select>
+                    @error('category_type')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-md-1">
                     <label class="required form-label">Gender</label>
                     <select name="gender" class="form-select form-select-solid">
                         <option value="M">M</option>
@@ -191,23 +201,31 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-2">
-                    <label class="required form-label">Min Participants</label>
+                <div class="col-md-1">
+                    <label class="required form-label">Min</label>
                     <input type="number" name="min_participants" class="form-control form-control-solid"
                         value="{{ old('min_participants', 1) }}" min="1">
                     @error('min_participants')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-2">
-                    <label class="required form-label">Max Participants</label>
+                <div class="col-md-1">
+                    <label class="required form-label">Max</label>
                     <input type="number" name="max_participants" class="form-control form-control-solid"
                         value="{{ old('max_participants', 1) }}" min="1">
                     @error('max_participants')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-1 d-flex align-items-end">
+                <div class="col-md-1">
+                    <label class="required form-label">Max Tim</label>
+                    <input type="number" name="max_teams" class="form-control form-control-solid"
+                        value="{{ old('max_teams', 1) }}" min="1">
+                    @error('max_teams')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">Tambah</button>
                 </div>
             </form>
@@ -220,6 +238,7 @@
                             <th>Gender</th>
                             <th>Price</th>
                             <th>Peserta</th>
+                            <th>Max Tim</th>
                             <th>Label</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -231,6 +250,7 @@
                                 <td>{{ $subCategory->gender->value }}</td>
                                 <td>{{ number_format($subCategory->price, 2, ',', '.') }}</td>
                                 <td>{{ $subCategory->min_participants }} - {{ $subCategory->max_participants }}</td>
+                                <td>{{ $subCategory->max_teams }}</td>
                                 <td><span
                                         class="badge {{ $subCategory->isTeam() ? 'badge-light-primary' : 'badge-light-secondary' }}">{{ $subCategory->labelType() }}</span>
                                 </td>
@@ -276,6 +296,8 @@
                                 <div class="k-card-row"><span class="k-card-lbl">Peserta</span><span
                                         class="k-card-val">{{ $subCategory->min_participants }} -
                                         {{ $subCategory->max_participants }}</span></div>
+                                <div class="k-card-row"><span class="k-card-lbl">Max Tim</span><span
+                                        class="k-card-val">{{ $subCategory->max_teams }}</span></div>
                             </div>
                             <div class="k-card-acts">
                                 <a href="{{ route('admin.sub-categories.edit', $subCategory) }}"

@@ -122,6 +122,7 @@ class EventRegistrationWizard extends Component
             ],
             3 => [
                 'subCategories' => EventCategory::find($this->selectedCategoryId)?->subCategories ?? collect(),
+                'draftSelections' => $this->getDraftSelections(),
             ],
             default => [],
         };
@@ -137,35 +138,28 @@ class EventRegistrationWizard extends Component
             return collect();
         }
 
-        $athleteCounts = RegistrationDraftItem::query()
-            ->selectRaw('sub_category_id, COUNT(*) as total')
+        return RegistrationDraftItem::query()
             ->where('registration_draft_id', $draft->id)
             ->whereNotNull('sub_category_id')
-            ->groupBy('sub_category_id')
-            ->get();
-
-        if ($athleteCounts->count() === 0) {
-            return collect();
-        }
-
-        $subCategories = SubCategory::whereIn('id', $athleteCounts->pluck('sub_category_id'))
-            ->with('eventCategory')
+            ->with(['participant', 'subCategory.eventCategory'])
             ->get()
-            ->keyBy('id');
+            ->groupBy('sub_category_id')
+            ->map(function ($items, $subCategoryId) {
+                $first = $items->first();
+                $subCategory = $first->subCategory;
+                
+                $data = [
+                    'subCategory' => $subCategory,
+                    'athlete_count' => $items->count(),
+                    'athlete_names' => $items->pluck('participant.name')->toArray(),
+                ];
 
-        return $athleteCounts
-            ->map(function ($item) use ($subCategories) {
-                $subCategory = $subCategories->get($item->sub_category_id);
-                if (! $subCategory) {
-                    return null;
+                if ($subCategory->isTeam()) {
+                    $data['team_count'] = $items->pluck('team_group_id')->filter()->unique()->count();
                 }
 
-                return [
-                    'subCategory' => $subCategory,
-                    'athlete_count' => (int) $item->total,
-                ];
+                return $data;
             })
-            ->filter()
             ->values();
     }
 

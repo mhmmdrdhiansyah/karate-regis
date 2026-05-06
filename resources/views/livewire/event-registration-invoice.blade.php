@@ -39,20 +39,65 @@
                         <div class="fw-bolder mb-2">Atlet</div>
                         @if($this->athleteSelections->count() > 0)
                             <div class="d-flex flex-column gap-4">
-                                @foreach($this->athleteSelections as $selection)
+                                @foreach ($this->athleteSelections as $selection)
                                     <div>
                                         <div class="text-muted fs-7 mb-2">Sub-kategori: {{ $selection['subCategory']->name }}</div>
-                                        <div class="d-flex flex-column gap-2">
-                                            @foreach($selection['athletes'] as $athlete)
-                                                <div class="d-flex flex-stack">
-                                                    <span class="text-gray-700">{{ $athlete->name }}</span>
-                                                    <span class="text-gray-600">Rp {{ number_format($selection['subCategory']->price, 0, ',', '.') }}</span>
+                                        @if ($selection['subCategory']->isTeam())
+                                            @php
+                                                $teams = $selection['athletes']->groupBy('pivot_team_group_id');
+                                            @endphp
+                                            @foreach ($teams as $teamId => $teamAthletes)
+                                                @php
+                                                    $teamName = \App\Models\TeamGroup::find($teamId)?->team_name ?? 'Tim';
+                                                @endphp
+                                                <div class="mb-3 ps-4 border-start border-2 border-primary">
+                                                    <div class="fw-bolder fs-7 text-dark mb-1">{{ $teamName }}</div>
+                                                    <div class="d-flex flex-column gap-1">
+                                                        @foreach ($teamAthletes as $athlete)
+                                                            <div class="d-flex flex-stack fs-8">
+                                                                <span class="text-gray-600">
+                                                                    <i class="fas fa-check text-success me-2 fs-9"></i>
+                                                                    {{ $athlete->name }}
+                                                                </span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="d-flex flex-stack mt-2">
+                                                        <span class="text-muted fs-9 italic">Biaya Flat (Tim)</span>
+                                                        <span class="fw-bold fs-8 text-gray-800">Rp {{ number_format($selection['subCategory']->price, 0, ',', '.') }}</span>
+                                                    </div>
                                                 </div>
                                             @endforeach
-                                        </div>
-                                        <div class="d-flex flex-stack mt-3">
-                                            <span class="fw-bold text-gray-700">Subtotal Atlet</span>
-                                            <span class="fw-bolder">Rp {{ number_format($selection['subCategory']->price * $selection['athletes']->count(), 0, ',', '.') }}</span>
+                                        @else
+                                            <div class="d-flex flex-column gap-2">
+                                                @foreach ($selection['athletes'] as $athlete)
+                                                    <div class="d-flex flex-stack">
+                                                        <span class="text-gray-700">
+                                                            <i class="fas fa-user-check me-2 text-primary"></i>
+                                                            {{ $athlete->name }}
+                                                        </span>
+                                                        <span class="text-gray-600">
+                                                            Rp {{ number_format($selection['subCategory']->price, 0, ',', '.') }}
+                                                        </span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
+                                        <div class="d-flex flex-stack mt-3 pt-3 border-top border-gray-200 border-dashed">
+                                            <span class="fw-bold text-gray-700">Subtotal {{ $selection['subCategory']->isTeam() ? 'Beregu' : 'Individu' }}</span>
+                                            <span class="fw-bolder">
+                                                @php
+                                                    if ($selection['subCategory']->isTeam()) {
+                                                        $teamCount = $selection['athletes']->pluck('pivot_team_group_id')->filter()->unique()->count();
+                                                        $teamCount = max($teamCount, 1);
+                                                        $subtotal = $selection['subCategory']->price * $teamCount;
+                                                    } else {
+                                                        $subtotal = $selection['subCategory']->price * $selection['athletes']->count();
+                                                    }
+                                                @endphp
+                                                Rp {{ number_format($subtotal, 0, ',', '.') }}
+                                            </span>
                                         </div>
                                     </div>
                                 @endforeach
