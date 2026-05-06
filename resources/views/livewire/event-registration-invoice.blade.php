@@ -44,7 +44,7 @@
                                         <div class="text-muted fs-7 mb-2">Sub-kategori: {{ $selection['subCategory']->name }}</div>
                                         @if ($selection['subCategory']->isTeam())
                                             @php
-                                                $teams = $selection['athletes']->groupBy('pivot_team_group_id');
+                                                $teams = collect($selection['athletes'])->groupBy('team_group_id');
                                             @endphp
                                             @foreach ($teams as $teamId => $teamAthletes)
                                                 @php
@@ -57,7 +57,7 @@
                                                             <div class="d-flex flex-stack fs-8">
                                                                 <span class="text-gray-600">
                                                                     <i class="fas fa-check text-success me-2 fs-9"></i>
-                                                                    {{ $athlete->name }}
+                                                                    {{ $athlete['participant']->name }}
                                                                 </span>
                                                             </div>
                                                         @endforeach
@@ -74,7 +74,7 @@
                                                     <div class="d-flex flex-stack">
                                                         <span class="text-gray-700">
                                                             <i class="fas fa-user-check me-2 text-primary"></i>
-                                                            {{ $athlete->name }}
+                                                            {{ $athlete['participant']->name }}
                                                         </span>
                                                         <span class="text-gray-600">
                                                             Rp {{ number_format($selection['subCategory']->price, 0, ',', '.') }}
@@ -89,11 +89,11 @@
                                             <span class="fw-bolder">
                                                 @php
                                                     if ($selection['subCategory']->isTeam()) {
-                                                        $teamCount = $selection['athletes']->pluck('pivot_team_group_id')->filter()->unique()->count();
+                                                        $teamCount = collect($selection['athletes'])->pluck('team_group_id')->filter()->unique()->count();
                                                         $teamCount = max($teamCount, 1);
                                                         $subtotal = $selection['subCategory']->price * $teamCount;
                                                     } else {
-                                                        $subtotal = $selection['subCategory']->price * $selection['athletes']->count();
+                                                        $subtotal = $selection['subCategory']->price * count($selection['athletes']);
                                                     }
                                                 @endphp
                                                 Rp {{ number_format($subtotal, 0, ',', '.') }}
@@ -182,6 +182,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    @if ($errorMessage)
+                        <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
+                            <i class="fas fa-exclamation-triangle text-danger fs-2hx me-4"></i>
+                            <div class="d-flex flex-column">
+                                <h4 class="mb-1 text-danger">Gagal Membuat Invoice</h4>
+                                <span>{{ $errorMessage }}</span>
+                            </div>
+                        </div>
+                    @endif
+
                     <p class="text-muted mb-4">Pastikan data atlet dan pelatih sudah sesuai sebelum membuat invoice.</p>
                     <div class="d-flex flex-stack">
                         <span class="fw-bold">Total yang harus dibayar</span>
@@ -190,8 +200,16 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light fw-bold" wire:click="cancelConfirmation">Kembali</button>
-                    <button type="button" class="btn btn-primary fw-bolder" wire:click="submit">
-                        <i class="fas fa-check me-2"></i> Buat Invoice
+                    <button type="button" class="btn btn-primary fw-bolder" 
+                        wire:click="submit" 
+                        wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="submit">
+                            <i class="fas fa-check me-2"></i> Buat Invoice
+                        </span>
+                        <span wire:loading wire:target="submit">
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Memproses...
+                        </span>
                     </button>
                 </div>
             </div>
