@@ -13,7 +13,7 @@
             </div>
             <div class="card-body py-5">
                 <div class="row g-4">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="required form-label">Name</label>
                         <input type="text" name="name" class="form-control form-control-solid"
                             value="{{ old('name', $subCategory->name) }}">
@@ -22,6 +22,16 @@
                         @enderror
                     </div>
                     <div class="col-md-2">
+                        <label class="required form-label">Type</label>
+                        <select name="category_type" class="form-select form-select-solid">
+                            <option value="individu" @selected(old('category_type', $subCategory->category_type) === 'individu')>Individu</option>
+                            <option value="beregu" @selected(old('category_type', $subCategory->category_type) === 'beregu')>Beregu</option>
+                        </select>
+                        @error('category_type')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="col-md-1">
                         <label class="required form-label">Gender</label>
                         <select name="gender" class="form-select form-select-solid">
                             <option value="M" @selected(old('gender', $subCategory->gender->value) === 'M')>M</option>
@@ -44,19 +54,27 @@
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="col-md-2">
-                        <label class="required form-label">Min Participants</label>
+                    <div class="col-md-1">
+                        <label class="required form-label">Min</label>
                         <input type="number" name="min_participants" class="form-control form-control-solid"
                             value="{{ old('min_participants', $subCategory->min_participants) }}" min="1">
                         @error('min_participants')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="col-md-2">
-                        <label class="required form-label">Max Participants</label>
+                    <div class="col-md-1">
+                        <label class="required form-label">Max</label>
                         <input type="number" name="max_participants" class="form-control form-control-solid"
                             value="{{ old('max_participants', $subCategory->max_participants) }}" min="1">
                         @error('max_participants')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="col-md-1">
+                        <label class="required form-label">Max Tim</label>
+                        <input type="number" name="max_teams" class="form-control form-control-solid"
+                            value="{{ old('max_teams', $subCategory->max_teams) }}" min="1">
+                        @error('max_teams')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
                     </div>

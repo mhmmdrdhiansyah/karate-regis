@@ -14,6 +14,7 @@ class RegistrationDraftItem extends Model
         'registration_draft_id',
         'participant_id',
         'sub_category_id',
+        'team_group_id',
     ];
 
     public function draft(): BelongsTo
@@ -29,5 +30,10 @@ class RegistrationDraftItem extends Model
     public function subCategory(): BelongsTo
     {
         return $this->belongsTo(SubCategory::class);
+    }
+
+    public function teamGroup(): BelongsTo
+    {
+        return $this->belongsTo(TeamGroup::class);
     }
 }

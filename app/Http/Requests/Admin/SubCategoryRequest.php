@@ -12,10 +12,12 @@ class SubCategoryRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'category_type' => ['required', Rule::in(['individu', 'beregu'])],
             'gender' => ['required', Rule::enum(SubCategoryGender::class)],
             'price' => ['required', 'numeric', 'min:0'],
             'min_participants' => ['required', 'integer', 'min:1'],
             'max_participants' => ['required', 'integer', 'gte:min_participants'],
+            'max_teams' => ['required', 'integer', 'min:1', 'max:10'],
         ];
     }
 }

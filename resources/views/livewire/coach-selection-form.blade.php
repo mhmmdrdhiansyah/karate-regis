@@ -172,6 +172,12 @@
                                 class="btn btn-light-primary w-100 fw-bolder">
                                 Lanjut ke Invoice
                             </a>
+                            
+                            <button type="button" wire:click="clearDraft" 
+                                wire:confirm="Apakah Anda yakin ingin menghapus semua pilihan (atlet & pelatih) di draf untuk event ini?"
+                                class="btn btn-light-danger w-100 fw-bolder mt-2">
+                                <i class="bi bi-trash3 me-2"></i> Kosongkan Draf
+                            </button>
                         </div>
                     </div>
                 </div>
