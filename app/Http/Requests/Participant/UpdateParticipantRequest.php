@@ -9,7 +9,6 @@ use Illuminate\Validation\Validator;
 
 class UpdateParticipantRequest extends FormRequest
 {
-    private ?Participant $participant;
 
     public function __construct(
         private ParticipantService $participantService
@@ -39,7 +38,8 @@ class UpdateParticipantRequest extends FormRequest
 
     public function rules(): array
     {
-        $participantId = $this->participant?->id;
+        $participant = $this->route('participant');
+        $participantId = $participant instanceof Participant ? $participant->id : $participant;
 
         return [
             'type' => 'required|in:athlete,coach,official',

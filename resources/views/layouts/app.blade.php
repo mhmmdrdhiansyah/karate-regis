@@ -51,7 +51,7 @@
 
                     <div class="post d-flex flex-column-fluid" id="kt_post">
                         <div id="kt_content_container" class="container-fluid">
-                            {{ $slot }}
+                            @yield('content', $slot ?? '')
                         </div>
                     </div>
                 </div>
