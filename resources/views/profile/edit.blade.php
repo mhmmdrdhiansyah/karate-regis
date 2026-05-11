@@ -99,6 +99,32 @@
                     </div>
 
                     <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Provinsi</label>
+                        <div class="col-lg-8 fv-row">
+                            <select id="profile-province-select" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih provinsi...">
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="province" id="profile-province-hidden" value="{{ old('province', $contingent->province) }}" />
+                            @error('province')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Kabupaten/Kota</label>
+                        <div class="col-lg-8 fv-row">
+                            <select id="profile-regency-select" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih kabupaten/kota..." disabled>
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="regency" id="profile-regency-hidden" value="{{ old('regency', $contingent->regency) }}" />
+                            @error('regency')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">Nomor Telepon</label>
                         <div class="col-lg-8 fv-row">
                             <input type="tel" name="phone" class="form-control form-control-lg form-control-solid"
@@ -157,6 +183,17 @@
                 @method('patch')
 
                 <div class="card-body border-top p-9">
+                    @if($user->isKontingen())
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label fw-bold fs-6">Username</label>
+                        <div class="col-lg-8 fv-row">
+                            <input type="text" class="form-control form-control-lg form-control-solid"
+                                value="{{ $user->username }}" readonly />
+                            <span class="form-text text-muted mt-2">Username tidak dapat diubah.</span>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label required fw-bold fs-6">Nama Lengkap</label>
                         <div class="col-lg-8 fv-row">
@@ -299,6 +336,81 @@
                     trigger.setAttribute('aria-expanded', 'false');
                 });
             });
+
+            @if($user->isKontingen() && $contingent)
+            var pSelect = $('#profile-province-select');
+            var rSelect = $('#profile-regency-select');
+            var pH = $('#profile-province-hidden');
+            var rH = $('#profile-regency-hidden');
+            var sP = pH.val();
+            var sR = rH.val();
+
+            pSelect.on('select2:select', function (e) {
+                pH.val(e.params.data.text);
+                rSelect.prop('disabled', false);
+                rSelect.val(null).trigger('change');
+                rH.val('');
+                $.get('/api/wilayah/regencies/' + e.params.data.id, function (res) {
+                    rSelect.empty().append('<option></option>');
+                    (res.data || []).forEach(function (item) {
+                        rSelect.append(new Option(item.name, item.code, false, false));
+                    });
+                    rSelect.trigger('change');
+                });
+            });
+
+            rSelect.on('select2:select', function (e) {
+                rH.val(e.params.data.text);
+            });
+
+            $.get('/api/wilayah/provinces', function (res) {
+                (res.data || []).forEach(function (item) {
+                    pSelect.append(new Option(item.name, item.code, false, false));
+                });
+                pSelect.trigger('change');
+                if (sP) {
+                    pSelect.find('option').each(function () {
+                        if ($(this).text() === sP) {
+                            pSelect.val($(this).val()).trigger('change');
+                            pH.val(sP);
+                            return false;
+                        }
+                    });
+                }
+            });
+
+            if (sP) {
+                $(document).ajaxComplete(function handler(e, xhr, settings) {
+                    if (settings.url && settings.url.indexOf('/provinces') !== -1 && !rSelect.data('loaded-for')) {
+                        pSelect.find('option').each(function () {
+                            if ($(this).text() === sP) {
+                                var code = $(this).val();
+                                $.get('/api/wilayah/regencies/' + code, function (res) {
+                                    rSelect.prop('disabled', false);
+                                    rSelect.empty().append('<option></option>');
+                                    (res.data || []).forEach(function (item) {
+                                        rSelect.append(new Option(item.name, item.code, false, false));
+                                    });
+                                    rSelect.trigger('change');
+                                    if (sR) {
+                                        rSelect.find('option').each(function () {
+                                            if ($(this).text() === sR) {
+                                                rSelect.val($(this).val()).trigger('change');
+                                                rH.val(sR);
+                                                return false;
+                                            }
+                                        });
+                                    }
+                                    rSelect.data('loaded-for', code);
+                                });
+                                $(document).off('ajaxComplete', handler);
+                                return false;
+                            }
+                        });
+                    }
+                });
+            }
+            @endif
         </script>
     @endpush
 

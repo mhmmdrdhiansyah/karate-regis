@@ -21,6 +21,15 @@
                 @endif
 
                 <div class="mb-10">
+                    <label class="form-label required">Username</label>
+                    <input type="text" name="username" class="form-control form-control-solid"
+                        placeholder="Masukkan username" value="{{ old('username', $user->username ?? '') }}" />
+                    @error('username')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="mb-10">
                     <label class="form-label required">Nama Lengkap</label>
                     <input type="text" name="name" class="form-control form-control-solid"
                         placeholder="Masukkan nama" value="{{ old('name', $user->name ?? '') }}" />

@@ -5,22 +5,45 @@
         <div class="card-header border-0 pt-6">
             <div class="card-title">
                 <form action="{{ route('auth.users.index') }}" method="GET"
-                    class="d-flex align-items-center position-relative my-1">
+                    class="d-flex align-items-center gap-3 position-relative my-1">
 
-                    <span class="svg-icon svg-icon-1 position-absolute ms-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none">
-                            <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1"
-                                transform="rotate(45 17.0365 15.1223)" fill="black" />
-                            <path
-                                d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
-                                fill="black" />
-                        </svg>
-                    </span>
+                    <div class="position-relative">
+                        <span class="svg-icon svg-icon-1 position-absolute ms-6 top-50 translate-middle-y">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none">
+                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1"
+                                    transform="rotate(45 17.0365 15.1223)" fill="black" />
+                                <path
+                                    d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
+                                    fill="black" />
+                            </svg>
+                        </span>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="form-control form-control-solid w-200px ps-14" placeholder="Cari user..." />
+                    </div>
 
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        class="form-control form-control-solid w-250px w-lg-250px ps-14" placeholder="Cari user (Enter)..." />
+                    <select name="role" class="form-select form-select-solid w-150px" onchange="this.form.submit()">
+                        <option value="">Semua Role</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role }}" {{ request('role') == $role ? 'selected' : '' }}>
+                                {{ ucfirst($role) }}
+                            </option>
+                        @endforeach
+                    </select>
 
+                    <select name="per_page" class="form-select form-select-solid w-100px" onchange="this.form.submit()">
+                        @foreach ([10, 25, 50, 100] as $option)
+                            <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                {{ $option }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @if(request()->hasAny(['search', 'role', 'per_page']))
+                        <a href="{{ route('auth.users.index') }}" class="btn btn-sm btn-light-danger" title="Reset Filter">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
                 </form>
             </div>
             <div class="card-toolbar">
@@ -47,6 +70,7 @@
                 <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_table_users">
                     <thead>
                         <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                            <th class="w-50px">No</th>
                             <th class="min-w-125px">User</th>
                             <th class="min-w-125px">Role</th>
                             <th class="min-w-125px">Last Login</th>
@@ -57,6 +81,7 @@
                     <tbody class="text-gray-600 fw-bold">
                         @foreach ($users as $user)
                             <tr>
+                                <td class="text-gray-600">{{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}</td>
                                 <td class="d-flex align-items-center">
                                     <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
                                         <a href="{{ route('auth.users.show', $user->id) }}">
@@ -68,6 +93,7 @@
                                     <div class="d-flex flex-column">
                                         <a href="{{ route('auth.users.show', $user->id) }}"
                                             class="text-gray-800 text-hover-primary mb-1">{{ $user->name }}</a>
+                                        <span class="text-muted fs-7">{{ $user->username }}</span>
                                         <span>{{ $user->email }}</span>
                                     </div>
                                 </td>
@@ -197,6 +223,10 @@
 
                         <div class="u-card-bd" onclick="event.stopPropagation()">
                             <div class="u-card-dt">
+                                <div class="u-card-row">
+                                    <span class="u-card-lbl">Username</span>
+                                    <span class="u-card-val">{{ $user->username }}</span>
+                                </div>
                                 <div class="u-card-row">
                                     <span class="u-card-lbl">Last Login</span>
                                     <span class="u-card-val">Yesterday</span>

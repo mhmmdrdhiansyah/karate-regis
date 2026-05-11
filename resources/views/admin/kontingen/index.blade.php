@@ -4,7 +4,38 @@
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
-                <h3 class="card-label fw-bold text-dark">Daftar Kontingen</h3>
+                <form action="{{ route('kontingen.index') }}" method="GET"
+                    class="d-flex align-items-center gap-3 position-relative my-1">
+
+                    <div class="position-relative">
+                        <span class="svg-icon svg-icon-1 position-absolute ms-6 top-50 translate-middle-y">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none">
+                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1"
+                                    transform="rotate(45 17.0365 15.1223)" fill="black" />
+                                <path
+                                    d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z"
+                                    fill="black" />
+                            </svg>
+                        </span>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="form-control form-control-solid w-200px ps-14" placeholder="Cari kontingen..." />
+                    </div>
+
+                    <select name="per_page" class="form-select form-select-solid w-100px" onchange="this.form.submit()">
+                        @foreach ([10, 25, 50, 100] as $option)
+                            <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                {{ $option }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @if(request()->hasAny(['search', 'per_page']))
+                        <a href="{{ route('kontingen.index') }}" class="btn btn-sm btn-light-danger" title="Reset Filter">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
+                </form>
             </div>
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end flex-wrap gap-2">
@@ -30,6 +61,7 @@
                 <table class="table align-middle table-row-dashed fs-6 gy-5">
                     <thead>
                         <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                            <th class="w-50px">No</th>
                             <th class="min-w-150px">Kontingen</th>
                             <th class="min-w-125px">Official</th>
                             <th class="min-w-125px">Username</th>
@@ -41,6 +73,7 @@
                     <tbody class="text-gray-600 fw-bold">
                         @forelse ($contingents as $contingent)
                             <tr>
+                                <td class="text-gray-600">{{ ($contingents->currentPage() - 1) * $contingents->perPage() + $loop->iteration }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
@@ -120,7 +153,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-10">
+                                <td colspan="7" class="text-center text-muted py-10">
                                     <div class="d-flex flex-column align-items-center">
                                         <span class="svg-icon svg-icon-4x mb-3">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

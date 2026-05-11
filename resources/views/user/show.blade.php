@@ -42,6 +42,9 @@
                             <div class="fw-bolder mt-5">Account ID</div>
                             <div class="text-gray-600">ID-{{ $user->id }}</div>
 
+                            <div class="fw-bolder mt-5">Username</div>
+                            <div class="text-gray-600">{{ $user->username }}</div>
+
                             <div class="fw-bolder mt-5">Email</div>
                             <div class="text-gray-600">
                                 <a href="#" class="text-gray-600 text-hover-primary">{{ $user->email }}</a>
@@ -73,6 +76,13 @@
                         <label class="col-lg-4 fw-bold text-muted">Full Name</label>
                         <div class="col-lg-8">
                             <span class="fw-bolder fs-6 text-gray-800">{{ $user->name }}</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-7">
+                        <label class="col-lg-4 fw-bold text-muted">Username</label>
+                        <div class="col-lg-8">
+                            <span class="fw-bolder fs-6 text-gray-800">{{ $user->username }}</span>
                         </div>
                     </div>
 

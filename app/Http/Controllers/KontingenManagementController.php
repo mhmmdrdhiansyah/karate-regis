@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateKontingenRequest;
 use App\Models\Contingent;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -20,9 +21,28 @@ class KontingenManagementController extends Controller
         $this->middleware('permission:delete kontingen')->only(['destroy']);
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $contingents = Contingent::with('user')->latest()->paginate(10);
+        $perPage = $request->input('per_page', 10);
+
+        $contingents = Contingent::with('user')
+            ->when($request->input('search'), function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('official_name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('province', 'like', "%{$search}%")
+                        ->orWhere('regency', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($uq) use ($search) {
+                            $uq->where('name', 'like', "%{$search}%")
+                                ->orWhere('username', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('admin.kontingen.index', compact('contingents'));
     }
@@ -50,6 +70,8 @@ class KontingenManagementController extends Controller
                 'official_name' => $request->official_name,
                 'phone' => $request->phone,
                 'address' => $request->address,
+                'province' => $request->province,
+                'regency' => $request->regency,
             ]);
         });
 
@@ -73,7 +95,14 @@ class KontingenManagementController extends Controller
 
     public function update(UpdateKontingenRequest $request, Contingent $kontingen): RedirectResponse
     {
-        $kontingen->update($request->only('name', 'official_name', 'phone', 'address'));
+        $kontingen->update([
+            'name' => $request->contingent_name,
+            'official_name' => $request->official_name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'province' => $request->province,
+            'regency' => $request->regency,
+        ]);
 
         $kontingen->user->update($request->only('name', 'username', 'email'));
 

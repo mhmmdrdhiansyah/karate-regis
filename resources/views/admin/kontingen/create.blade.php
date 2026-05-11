@@ -100,6 +100,33 @@
                 <div class="row mb-7">
                     <div class="col-md-6">
                         <div class="fv-row">
+                            <label class="required form-label">Provinsi</label>
+                            <select class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih provinsi..." id="province-select">
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="province" id="province-hidden" value="{{ old('province') }}" />
+                            @error('province')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fv-row">
+                            <label class="required form-label">Kabupaten/Kota</label>
+                            <select class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih kabupaten/kota..." id="regency-select" disabled>
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="regency" id="regency-hidden" value="{{ old('regency') }}" />
+                            @error('regency')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-7">
+                    <div class="col-md-6">
+                        <div class="fv-row">
                             <label class="form-label">Nomor Telepon</label>
                             <input type="tel" name="phone" class="form-control form-control-solid"
                                 placeholder="+62 xxx xxxx xxxx" value="{{ old('phone') }}" />
@@ -137,6 +164,42 @@
 
     @push('scripts')
         <script>
+            var provinceSelect = $('#province-select');
+            var regencySelect = $('#regency-select');
+            var provinceHidden = $('#province-hidden');
+            var regencyHidden = $('#regency-hidden');
+
+            provinceSelect.on('select2:select', function (e) {
+                var data = e.params.data;
+                provinceHidden.val(data.text);
+                provinceSelect.val(data.id).trigger('change');
+
+                regencySelect.prop('disabled', false);
+                regencySelect.val(null).trigger('change');
+                regencyHidden.val('');
+
+                $.get('/api/wilayah/regencies/' + data.id, function (res) {
+                    regencySelect.empty().append('<option></option>');
+                    (res.data || []).forEach(function (item) {
+                        var opt = new Option(item.name, item.code, false, false);
+                        regencySelect.append(opt);
+                    });
+                    regencySelect.trigger('change');
+                });
+            });
+
+            regencySelect.on('select2:select', function (e) {
+                regencyHidden.val(e.params.data.text);
+            });
+
+            $.get('/api/wilayah/provinces', function (res) {
+                (res.data || []).forEach(function (item) {
+                    var opt = new Option(item.name, item.code, false, false);
+                    provinceSelect.append(opt);
+                });
+                provinceSelect.trigger('change');
+            });
+
             $('#kt_kontingen_form').on('submit', function () {
                 var btn = $('#kt_btn_submit');
                 btn.attr('data-kt-indicator', 'on');

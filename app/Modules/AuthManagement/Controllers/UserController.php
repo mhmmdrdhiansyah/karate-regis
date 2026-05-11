@@ -5,7 +5,7 @@ namespace App\Modules\AuthManagement\Controllers;
 use App\Http\Controllers\Controller as BaseController;
 use App\Modules\AuthManagement\Requests\StoreUserRequest;
 use App\Modules\AuthManagement\Requests\UpdateUserRequest;
-use App\Modules\AuthManagement\Models\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
@@ -22,18 +22,26 @@ class UserController extends BaseController
 
     public function index(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
+
         $users = User::with('roles')
             ->when($request->input('search'), function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%");
                 });
             })
+            ->when($request->input('role'), function ($query, $role) {
+                $query->whereHas('roles', fn($q) => $q->where('name', $role));
+            })
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
-        return view('user.index', compact('users'));
+        $roles = Role::pluck('name', 'name')->all();
+
+        return view('user.index', compact('users', 'roles'));
     }
 
     public function create()
@@ -47,6 +55,7 @@ class UserController extends BaseController
     {
         $user = User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
@@ -74,6 +83,7 @@ class UserController extends BaseController
     {
         $user->update([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
         ]);
 

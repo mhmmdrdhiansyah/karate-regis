@@ -1,38 +1,38 @@
 <x-app-layout>
     @section('title', 'Edit Kontingen - ' . $kontingen->name)
 
-    <div class="card mb-5 mb-xl-10">
-        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
-            data-bs-target="#kt_kontingen_data" aria-expanded="true" aria-controls="kt_kontingen_data">
-            <div class="card-title m-0">
-                <h3 class="fw-bolder m-0">Data Kontingen</h3>
-            </div>
-            <div class="card-toolbar">
-                <span class="svg-icon svg-icon-1 toggle-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M11 4.5C11 4.22386 11.2239 4 11.5 4H12.5C12.7761 4 13 4.22386 13 4.5V19.5C13 19.7761 12.7761 20 12.5 20H11.5C11.2239 20 11 19.7761 11 19.5V4.5Z" fill="currentColor"/>
-                        <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20 11.2239 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
-                    </svg>
-                </span>
-                <span class="svg-icon svg-icon-1 toggle-off d-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20 11.2239 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
-                    </svg>
-                </span>
-            </div>
-        </div>
-        <div id="kt_kontingen_data" class="collapse show">
-            <form class="form" method="POST" action="{{ route('kontingen.update', $kontingen) }}">
-                @csrf
-                @method('put')
+    <form method="POST" action="{{ route('kontingen.update', $kontingen) }}">
+        @csrf
+        @method('put')
 
+        <div class="card mb-5 mb-xl-10">
+            <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
+                data-bs-target="#kt_kontingen_data" aria-expanded="true" aria-controls="kt_kontingen_data">
+                <div class="card-title m-0">
+                    <h3 class="fw-bolder m-0">Data Kontingen</h3>
+                </div>
+                <div class="card-toolbar">
+                    <span class="svg-icon svg-icon-1 toggle-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M11 4.5C11 4.22386 11.2239 4 11.5 4H12.5C12.7761 4 13 4.22386 13 4.5V19.5C13 19.7761 12.7761 20 12.5 20H11.5C11.2239 20 11 19.7761 11 19.5V4.5Z" fill="currentColor"/>
+                            <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20.2239 11 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="svg-icon svg-icon-1 toggle-off d-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20.2239 11 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div id="kt_kontingen_data" class="collapse show">
                 <div class="card-body border-top p-9">
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label required fw-bold fs-6">Nama Kontingen</label>
                         <div class="col-lg-8 fv-row">
-                            <input type="text" name="name" class="form-control form-control-lg form-control-solid"
-                                value="{{ old('name', $kontingen->name) }}" />
-                            @error('name')
+                            <input type="text" name="contingent_name" class="form-control form-control-lg form-control-solid"
+                                value="{{ old('contingent_name', $kontingen->name) }}" />
+                            @error('contingent_name')
                                 <div class="text-danger mt-2 small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -43,6 +43,30 @@
                             <input type="text" name="official_name" class="form-control form-control-lg form-control-solid"
                                 value="{{ old('official_name', $kontingen->official_name) }}" />
                             @error('official_name')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Provinsi</label>
+                        <div class="col-lg-8 fv-row">
+                            <select id="province-select" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih provinsi...">
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="province" id="province-hidden" value="{{ old('province', $kontingen->province) }}" />
+                            @error('province')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label required fw-bold fs-6">Kabupaten/Kota</label>
+                        <div class="col-lg-8 fv-row">
+                            <select id="regency-select" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih kabupaten/kota..." disabled>
+                                <option></option>
+                            </select>
+                            <input type="hidden" name="regency" id="regency-hidden" value="{{ old('regency', $kontingen->regency) }}" />
+                            @error('regency')
                                 <div class="text-danger mt-2 small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -67,44 +91,30 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-end py-6 px-9">
-                    <a href="{{ route('kontingen.show', $kontingen) }}" class="btn btn-light btn-active-light-primary me-2">Batal</a>
-                    <button type="submit" class="btn btn-primary" id="kt_btn_submit">
-                        <span class="indicator-label">Simpan</span>
-                        <span class="indicator-progress">
-                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                        </span>
-                    </button>
+            </div>
+        </div>
+
+        <div class="card mb-5 mb-xl-10">
+            <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
+                data-bs-target="#kt_account_data" aria-expanded="true" aria-controls="kt_account_data">
+                <div class="card-title m-0">
+                    <h3 class="fw-bolder m-0">Data Akun</h3>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card mb-5 mb-xl-10">
-        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
-            data-bs-target="#kt_account_data" aria-expanded="true" aria-controls="kt_account_data">
-            <div class="card-title m-0">
-                <h3 class="fw-bolder m-0">Data Akun</h3>
+                <div class="card-toolbar">
+                    <span class="svg-icon svg-icon-1 toggle-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M11 4.5C11 4.22386 11.2239 4 11.5 4H12.5C12.7761 4 13 4.22386 13 4.5V19.5C13 19.7761 12.7761 20 12.5 20H11.5C11.2239 20 11 19.7761 11 19.5V4.5Z" fill="currentColor"/>
+                            <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20.2239 11 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    <span class="svg-icon svg-icon-1 toggle-off d-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20.2239 11 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                </div>
             </div>
-            <div class="card-toolbar">
-                <span class="svg-icon svg-icon-1 toggle-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M11 4.5C11 4.22386 11.2239 4 11.5 4H12.5C12.7761 4 13 4.22386 13 4.5V19.5C13 19.7761 12.7761 20 12.5 20H11.5C11.2239 20 11 19.7761 11 19.5V4.5Z" fill="currentColor"/>
-                        <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20 11.2239 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
-                    </svg>
-                </span>
-                <span class="svg-icon svg-icon-1 toggle-off d-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M4.5 11C4.22386 11 4 11.2239 4 11.5V12.5C4 12.7761 4.22386 13 4.5 13H19.5C19.7761 13 20 12.7761 20 12.5V11.5C20 11.2239 19.7761 11 19.5 11H4.5Z" fill="currentColor"/>
-                    </svg>
-                </span>
-            </div>
-        </div>
-        <div id="kt_account_data" class="collapse show">
-            <form class="form" method="POST" action="{{ route('kontingen.update', $kontingen) }}">
-                @csrf
-                @method('put')
-
+            <div id="kt_account_data" class="collapse show">
                 <div class="card-body border-top p-9">
                     <div class="alert alert-dismissible bg-light-warning border border-warning border-dashed p-5 mb-5">
                         <div class="d-flex flex-column">
@@ -143,21 +153,80 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-end py-6 px-9">
-                    <a href="{{ route('kontingen.show', $kontingen) }}" class="btn btn-light btn-active-light-primary me-2">Batal</a>
-                    <button type="submit" class="btn btn-primary" id="kt_btn_submit_account">
-                        <span class="indicator-label">Simpan</span>
-                        <span class="indicator-progress">
-                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                        </span>
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
+
+        <div class="d-flex justify-content-end mb-10">
+            <a href="{{ route('kontingen.show', $kontingen) }}" class="btn btn-light btn-active-light-primary me-2">Batal</a>
+            <button type="submit" class="btn btn-primary" id="kt_btn_submit">
+                <span class="indicator-label">Simpan</span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+    </form>
 
     @push('scripts')
         <script>
+            var provinceSelect = $('#province-select');
+            var regencySelect = $('#regency-select');
+            var provinceHidden = $('#province-hidden');
+            var regencyHidden = $('#regency-hidden');
+            var savedProvince = provinceHidden.val();
+            var savedRegency = regencyHidden.val();
+
+            provinceSelect.on('select2:select', function (e) {
+                var data = e.params.data;
+                provinceHidden.val(data.text);
+
+                regencySelect.prop('disabled', false);
+                regencySelect.val(null).trigger('change');
+                regencyHidden.val('');
+
+                $.get('/api/wilayah/regencies/' + data.id, function (res) {
+                    regencySelect.empty().append('<option></option>');
+                    (res.data || []).forEach(function (item) {
+                        var opt = new Option(item.name, item.code, false, false);
+                        regencySelect.append(opt);
+                    });
+                    regencySelect.trigger('change');
+
+                    if (savedRegency) {
+                        regencySelect.find('option').each(function () {
+                            if ($(this).text() === savedRegency) {
+                                regencySelect.val($(this).val()).trigger('change');
+                                regencyHidden.val(savedRegency);
+                                savedRegency = null;
+                                return false;
+                            }
+                        });
+                    }
+                });
+            });
+
+            regencySelect.on('select2:select', function (e) {
+                regencyHidden.val(e.params.data.text);
+            });
+
+            $.get('/api/wilayah/provinces', function (res) {
+                (res.data || []).forEach(function (item) {
+                    var opt = new Option(item.name, item.code, false, false);
+                    provinceSelect.append(opt);
+                });
+                provinceSelect.trigger('change');
+
+                if (savedProvince) {
+                    provinceSelect.find('option').each(function () {
+                        if ($(this).text() === savedProvince) {
+                            provinceSelect.val($(this).val()).trigger('change');
+                            provinceHidden.val(savedProvince);
+                            return false;
+                        }
+                    });
+                }
+            });
+
             document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function (trigger) {
                 var target = document.querySelector(trigger.getAttribute('data-bs-target'));
                 if (!target) return;
@@ -170,12 +239,14 @@
                     trigger.querySelector('.toggle-off').classList.remove('d-none');
                 });
             });
-            $('#kt_btn_submit, #kt_btn_submit_account').on('click', function () {
-                $(this).attr('data-kt-indicator', 'on').attr('disabled', true);
+            $('form').on('submit', function() {
+                var btn = $('#kt_btn_submit');
+                btn.attr('data-kt-indicator', 'on');
+                btn.attr('disabled', true);
             });
             @if (session('success'))
                 toastr.success("{{ session('success') }}");
             @endif
         </script>
-    @endpush
+    @endpush>
 </x-app-layout>
