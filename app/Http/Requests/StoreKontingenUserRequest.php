@@ -23,6 +23,8 @@ class StoreKontingenUserRequest extends FormRequest
             'official_name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
+            'province' => ['required', 'string', 'max:255'],
+            'regency' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -44,6 +46,8 @@ class StoreKontingenUserRequest extends FormRequest
             'official_name.required' => 'Nama official wajib diisi',
             'official_name.max' => 'Nama official maksimal 255 karakter',
             'phone.max' => 'Nomor telepon maksimal 20 karakter',
+            'province.required' => 'Provinsi wajib dipilih',
+            'regency.required' => 'Kabupaten/Kota wajib dipilih',
         ];
     }
 }

@@ -17,6 +17,8 @@ class Contingent extends Model
         'official_name',
         'phone',
         'address',
+        'province',
+        'regency',
     ];
 
     public function user(): BelongsTo

@@ -68,6 +68,14 @@
                                     <td class="text-gray-800">{{ $kontingen->phone ?? '-' }}</td>
                                 </tr>
                                 <tr>
+                                    <td class="text-gray-600 fw-bold">Provinsi</td>
+                                    <td class="text-gray-800">{{ $kontingen->province ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-gray-600 fw-bold">Kabupaten/Kota</td>
+                                    <td class="text-gray-800">{{ $kontingen->regency ?? '-' }}</td>
+                                </tr>
+                                <tr>
                                     <td class="text-gray-600 fw-bold">Alamat</td>
                                     <td class="text-gray-800">{{ $kontingen->address ?? '-' }}</td>
                                 </tr>
