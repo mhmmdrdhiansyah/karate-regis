@@ -112,7 +112,10 @@ class KontingenManagementController extends Controller
 
     public function destroy(Contingent $kontingen): RedirectResponse
     {
-        $kontingen->user()->delete();
+        DB::transaction(function () use ($kontingen) {
+            $kontingen->delete();
+            $kontingen->user->delete();
+        });
 
         return redirect()->route('kontingen.index')
             ->with('success', 'Kontingen berhasil dihapus');

@@ -133,7 +133,7 @@
 
     @push('scripts')
         @if (session('success'))
-            <script>toastr.success("{{ session('success') }}");</script>
+            <script>toastr.success(@js(session('success')));</script>
         @endif
     @endpush
 </x-app-layout>
