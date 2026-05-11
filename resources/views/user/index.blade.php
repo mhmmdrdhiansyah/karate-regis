@@ -317,19 +317,15 @@
                     }
                 })
             }
+
+            @if(session('success'))
+                toastr.success(@js(session('success')));
+            @endif
+
+            @if(session('error'))
+                toastr.error(@js(session('error')));
+            @endif
         </script>
-
-        @if (session('success'))
-            <script>
-                toastr.success("{{ session('success') }}");
-            </script>
-        @endif
-
-        @if (session('error'))
-            <script>
-                toastr.error("{{ session('error') }}");
-            </script>
-        @endif
     @endpush
 
 </x-app-layout>

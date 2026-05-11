@@ -314,7 +314,7 @@
     @elseif (session('error'))
         @push('scripts')
             <script>
-                toastr.error("{{ session('error') }}");
+                toastr.error(@js(session('error')));
             </script>
         @endpush
     @endif

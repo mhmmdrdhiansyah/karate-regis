@@ -1,8 +1,8 @@
 <?php
 
-use App\Modules\AuthManagement\Models\User;
-use App\Modules\AuthManagement\Models\Role;
-use App\Modules\AuthManagement\Models\Permission;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -88,6 +88,7 @@ test('authenticated user with create permission can store a new user', function 
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',
@@ -154,6 +155,7 @@ test('authenticated user with edit permission can update a user', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'updated@example.com',
+        'username' => 'updateduser',
         'role' => 'user',
     ];
 
@@ -201,6 +203,7 @@ test('store user fails validation when name is missing', function () {
 
     $userData = [
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',
@@ -220,6 +223,7 @@ test('store user fails validation when email is invalid', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'invalid-email',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',
@@ -242,6 +246,7 @@ test('store user fails validation when email is not unique', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'existing@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',
@@ -261,6 +266,7 @@ test('store user fails validation when password is missing', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'role' => 'user',
     ];
 
@@ -278,6 +284,7 @@ test('store user fails validation when password confirmation does not match', fu
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'DifferentPassword!',
         'role' => 'user',
@@ -315,6 +322,7 @@ test('store user fails validation when role does not exist', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'non-existent-role',
@@ -356,6 +364,7 @@ test('update user fails validation when email is invalid', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'invalid-email',
+        'username' => 'updateduser',
         'role' => 'user',
     ];
 
@@ -379,6 +388,7 @@ test('update user fails validation when email is not unique (excluding current u
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'existing@example.com',
+        'username' => 'updateduser',
         'role' => 'user',
     ];
 
@@ -399,6 +409,7 @@ test('update user allows same email for current user', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'same@example.com',
+        'username' => $targetUser->username,
         'role' => 'user',
     ];
 
@@ -486,6 +497,7 @@ test('user without edit permission cannot update a user', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'updated@example.com',
+        'username' => 'updateduser',
         'role' => 'user',
     ];
 
@@ -581,6 +593,7 @@ test('unauthenticated user cannot update a user', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'updated@example.com',
+        'username' => 'updateduser',
         'role' => 'user',
     ];
 
@@ -617,6 +630,7 @@ test('user can be updated with a different role', function () {
     $updateData = [
         'name' => 'Updated Name',
         'email' => 'updated@example.com',
+        'username' => 'updateduser',
         'role' => 'super-admin',
     ];
 
@@ -638,6 +652,7 @@ test('password is hashed when storing new user', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',
@@ -661,6 +676,7 @@ test('user email is case-insensitive for uniqueness', function () {
     $userData = [
         'name' => 'Test User',
         'email' => 'EXISTING@EXAMPLE.COM', // Uppercase version
+        'username' => 'testuser',
         'password' => 'Password123!',
         'password_confirmation' => 'Password123!',
         'role' => 'user',

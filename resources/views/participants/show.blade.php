@@ -275,10 +275,10 @@
             });
 
             @if (session('success'))
-                toastr.success("{{ session('success') }}");
+                toastr.success(@js(session('success')));
             @endif
             @if ($errors->has('delete'))
-                toastr.error("{{ $errors->first('delete') }}");
+                toastr.error(@js($errors->first('delete')));
             @endif
         </script>
     @endpush

@@ -308,11 +308,11 @@
             }
 
             @if (session('success'))
-                toastr.success("{{ session('success') }}");
+                toastr.success(@js(session('success')));
             @endif
 
             @if (session('error'))
-                toastr.error("{{ session('error') }}");
+                toastr.error(@js(session('error')));
             @endif
         </script>
     @endpush

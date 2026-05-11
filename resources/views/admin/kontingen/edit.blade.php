@@ -245,8 +245,8 @@
                 btn.attr('disabled', true);
             });
             @if (session('success'))
-                toastr.success("{{ session('success') }}");
+                toastr.success(@js(session('success')));
             @endif
         </script>
-    @endpush>
+    @endpush
 </x-app-layout>
