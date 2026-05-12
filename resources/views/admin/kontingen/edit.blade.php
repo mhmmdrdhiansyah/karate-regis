@@ -152,6 +152,23 @@
                             @enderror
                         </div>
                     </div>
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label fw-bold fs-6">Password Baru</label>
+                        <div class="col-lg-8 fv-row">
+                            <input type="password" name="password" class="form-control form-control-lg form-control-solid"
+                                placeholder="Kosongkan jika tidak ingin ganti password" />
+                            @error('password')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label fw-bold fs-6">Konfirmasi Password</label>
+                        <div class="col-lg-8 fv-row">
+                            <input type="password" name="password_confirmation" class="form-control form-control-lg form-control-solid"
+                                placeholder="Ulangi password baru" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -169,63 +186,10 @@
 
     @push('scripts')
         <script>
-            var provinceSelect = $('#province-select');
-            var regencySelect = $('#regency-select');
-            var provinceHidden = $('#province-hidden');
-            var regencyHidden = $('#regency-hidden');
-            var savedProvince = provinceHidden.val();
-            var savedRegency = regencyHidden.val();
-
-            provinceSelect.on('select2:select', function (e) {
-                var data = e.params.data;
-                provinceHidden.val(data.text);
-
-                regencySelect.prop('disabled', false);
-                regencySelect.val(null).trigger('change');
-                regencyHidden.val('');
-
-                $.get('/api/wilayah/regencies/' + data.id, function (res) {
-                    regencySelect.empty().append('<option></option>');
-                    (res.data || []).forEach(function (item) {
-                        var opt = new Option(item.name, item.code, false, false);
-                        regencySelect.append(opt);
-                    });
-                    regencySelect.trigger('change');
-
-                    if (savedRegency) {
-                        regencySelect.find('option').each(function () {
-                            if ($(this).text() === savedRegency) {
-                                regencySelect.val($(this).val()).trigger('change');
-                                regencyHidden.val(savedRegency);
-                                savedRegency = null;
-                                return false;
-                            }
-                        });
-                    }
-                });
-            });
-
-            regencySelect.on('select2:select', function (e) {
-                regencyHidden.val(e.params.data.text);
-            });
-
-            $.get('/api/wilayah/provinces', function (res) {
-                (res.data || []).forEach(function (item) {
-                    var opt = new Option(item.name, item.code, false, false);
-                    provinceSelect.append(opt);
-                });
-                provinceSelect.trigger('change');
-
-                if (savedProvince) {
-                    provinceSelect.find('option').each(function () {
-                        if ($(this).text() === savedProvince) {
-                            provinceSelect.val($(this).val()).trigger('change');
-                            provinceHidden.val(savedProvince);
-                            return false;
-                        }
-                    });
-                }
-            });
+            @include('partials.wilayah-select-js', [
+                'savedProvince' => old('province', $kontingen->province),
+                'savedRegency' => old('regency', $kontingen->regency)
+            ])
 
             document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function (trigger) {
                 var target = document.querySelector(trigger.getAttribute('data-bs-target'));

@@ -50,8 +50,6 @@
                                 <a href="#" class="text-gray-600 text-hover-primary">{{ $user->email }}</a>
                             </div>
 
-                            <div class="fw-bolder mt-5">Last Login</div>
-                            <div class="text-gray-600">Yesterday (Dummy)</div>
                         </div>
                     </div>
                 </div>

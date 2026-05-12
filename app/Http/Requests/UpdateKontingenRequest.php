@@ -23,6 +23,7 @@ class UpdateKontingenRequest extends FormRequest
             'address' => ['nullable', 'string'],
             'province' => ['required', 'string', 'max:255'],
             'regency' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ];
     }
 
@@ -41,6 +42,7 @@ class UpdateKontingenRequest extends FormRequest
             'official_name.required' => 'Nama official wajib diisi',
             'province.required' => 'Provinsi wajib dipilih',
             'regency.required' => 'Kabupaten/Kota wajib dipilih',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
         ];
     }
 }

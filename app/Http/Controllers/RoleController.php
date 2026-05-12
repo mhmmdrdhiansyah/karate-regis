@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Modules\AuthManagement\Controllers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller as BaseController;
-use App\Modules\AuthManagement\Requests\StoreRoleRequest;
-use App\Modules\AuthManagement\Requests\UpdateRoleRequest;
-use App\Modules\AuthManagement\Models\Role;
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
 
-class RoleController extends BaseController
+class RoleController extends Controller
 {
     public function __construct()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\AuthManagement\Requests;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,6 +18,7 @@ class UpdateUserRequest extends FormRequest
             'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $this->route('user')->id],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->route('user')->id],
             'role' => ['required', 'exists:roles,name,guard_name,web'],
+            'password' => ['sometimes', 'nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ];
     }
 
@@ -34,6 +35,8 @@ class UpdateUserRequest extends FormRequest
             'email.unique' => 'Email sudah terdaftar',
             'role.required' => 'Role wajib dipilih',
             'role.exists' => 'Role tidak valid',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'password.min' => 'Password minimal :min karakter',
         ];
     }
 }
