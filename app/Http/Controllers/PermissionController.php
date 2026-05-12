@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Modules\AuthManagement\Controllers;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller as BaseController;
-use App\Modules\AuthManagement\Requests\StorePermissionRequest;
-use App\Modules\AuthManagement\Requests\UpdatePermissionRequest;
-use App\Modules\AuthManagement\Models\Permission;
+use App\Http\Requests\StorePermissionRequest;
+use App\Http\Requests\UpdatePermissionRequest;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 
-class PermissionController extends BaseController
+class PermissionController extends Controller
 {
     public function __construct()
     {

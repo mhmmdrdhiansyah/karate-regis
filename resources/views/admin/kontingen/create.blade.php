@@ -164,41 +164,10 @@
 
     @push('scripts')
         <script>
-            var provinceSelect = $('#province-select');
-            var regencySelect = $('#regency-select');
-            var provinceHidden = $('#province-hidden');
-            var regencyHidden = $('#regency-hidden');
-
-            provinceSelect.on('select2:select', function (e) {
-                var data = e.params.data;
-                provinceHidden.val(data.text);
-                provinceSelect.val(data.id).trigger('change');
-
-                regencySelect.prop('disabled', false);
-                regencySelect.val(null).trigger('change');
-                regencyHidden.val('');
-
-                $.get('/api/wilayah/regencies/' + data.id, function (res) {
-                    regencySelect.empty().append('<option></option>');
-                    (res.data || []).forEach(function (item) {
-                        var opt = new Option(item.name, item.code, false, false);
-                        regencySelect.append(opt);
-                    });
-                    regencySelect.trigger('change');
-                });
-            });
-
-            regencySelect.on('select2:select', function (e) {
-                regencyHidden.val(e.params.data.text);
-            });
-
-            $.get('/api/wilayah/provinces', function (res) {
-                (res.data || []).forEach(function (item) {
-                    var opt = new Option(item.name, item.code, false, false);
-                    provinceSelect.append(opt);
-                });
-                provinceSelect.trigger('change');
-            });
+            @include('partials.wilayah-select-js', [
+                'savedProvince' => old('province'),
+                'savedRegency' => old('regency')
+            ])
 
             $('#kt_kontingen_form').on('submit', function () {
                 var btn = $('#kt_btn_submit');

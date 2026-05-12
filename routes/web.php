@@ -6,9 +6,9 @@ use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Modules\AuthManagement\Controllers\UserController;
-use App\Modules\AuthManagement\Controllers\RoleController;
-use App\Modules\AuthManagement\Controllers\PermissionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventCategoryController;
@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     // Auth Management
     Route::prefix('auth')->name('auth.')->group(function () {
         // Users - Panitia bisa akses (punya permission)
+        Route::post('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::delete('users/{user}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
         Route::resource('users', UserController::class);
 
         // Roles & Permissions - Hanya super-admin
@@ -46,10 +48,9 @@ Route::middleware('auth')->group(function () {
 
     // Kontingen Management
     Route::middleware(['permission:view kontingen|create kontingen|edit kontingen'])->group(function () {
-        Route::resource('kontingen', KontingenManagementController::class)->except(['destroy']);
-    });
-    Route::middleware(['permission:delete kontingen'])->group(function () {
-        Route::delete('kontingen/{kontingen}', [KontingenManagementController::class, 'destroy'])->name('kontingen.destroy');
+        Route::post('kontingen/{kontingen}/restore', [KontingenManagementController::class, 'restore'])->name('kontingen.restore');
+        Route::delete('kontingen/{kontingen}/force-delete', [KontingenManagementController::class, 'forceDelete'])->name('kontingen.forceDelete');
+        Route::resource('kontingen', KontingenManagementController::class);
     });
 
     // Peserta / Bank Peserta (Role Kontingen)

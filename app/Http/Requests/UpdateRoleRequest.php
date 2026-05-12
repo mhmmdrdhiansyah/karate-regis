@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Modules\AuthManagement\Requests;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRoleRequest extends FormRequest
+class UpdateRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('create roles');
+        return $this->user()->can('edit roles');
     }
 
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+            'name' => ['required', 'string', 'max:255', 'unique:roles,name,' . $this->role->id],
             'permissions' => ['required', 'array', 'min:1'],
             'permissions.*' => ['exists:permissions,name,guard_name,web'],
         ];

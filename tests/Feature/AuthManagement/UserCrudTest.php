@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\assertSoftDeleted;
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 use function Pest\Laravel\put;
@@ -189,7 +190,7 @@ test('authenticated user with delete permission can delete a user', function () 
     $response->assertRedirect(route('auth.users.index'));
     $response->assertSessionHas('success', 'User berhasil dihapus');
 
-    assertDatabaseMissing('users', [
+    assertSoftDeleted('users', [
         'id' => $targetUser->id,
     ]);
 });
