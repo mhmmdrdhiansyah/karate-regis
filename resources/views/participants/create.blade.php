@@ -95,8 +95,11 @@
                                 <label class="required form-label">NIK</label>
                                 <input type="text" name="nik" class="form-control form-control-solid"
                                     placeholder="Masukkan 16 digit NIK" value="{{ old('nik') }}" maxlength="16"
-                                    inputmode="numeric" />
+                                    inputmode="numeric" id="nik_input" />
                                 <span class="text-muted fs-7">Masukkan 16 digit NIK</span>
+                                <div id="nik_feedback" class="mt-1" style="display: none;">
+                                    <span id="nik_badge" class="badge"></span>
+                                </div>
                                 @error('nik')
                                     <span class="text-danger small">{{ $message }}</span>
                                 @enderror
@@ -260,6 +263,52 @@
 
             // Run on load
             toggleRequiredFields();
+
+            // === NIK Real-time Validation ===
+            const nikInput = document.getElementById('nik_input');
+            const nikFeedback = document.getElementById('nik_feedback');
+            const nikBadge = document.getElementById('nik_badge');
+            let nikDebounceTimer = null;
+
+            function checkNikAvailability(nik, excludeId) {
+                let url = '/api/check-nik?nik=' + encodeURIComponent(nik);
+                if (excludeId) {
+                    url += '&exclude_id=' + encodeURIComponent(excludeId);
+                }
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        nikFeedback.style.display = 'block';
+                        if (data.exists) {
+                            nikBadge.className = 'badge badge-light-danger';
+                            nikBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i> NIK sudah terdaftar';
+                        } else {
+                            nikBadge.className = 'badge badge-light-success';
+                            nikBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i> NIK tersedia';
+                        }
+                    })
+                    .catch(() => {
+                        nikFeedback.style.display = 'none';
+                    });
+            }
+
+            if (nikInput) {
+                nikInput.addEventListener('input', function() {
+                    clearTimeout(nikDebounceTimer);
+                    const nik = this.value.replace(/\D/g, ''); // Hanya angka
+                    this.value = nik; // Force numeric only
+
+                    if (nik.length < 16) {
+                        nikFeedback.style.display = 'none';
+                        return;
+                    }
+
+                    nikDebounceTimer = setTimeout(function() {
+                        checkNikAvailability(nik, null); // null = tidak ada exclude (create form)
+                    }, 500);
+                });
+            }
         </script>
     @endpush
 </x-app-layout>
