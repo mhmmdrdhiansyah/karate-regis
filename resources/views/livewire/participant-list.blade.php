@@ -13,6 +13,13 @@
             </div>
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end align-items-center gap-3">
+                    <div class="w-100px">
+                        <select wire:model.live="perPage" class="form-select form-select-solid">
+                            @foreach ([10, 15, 25, 50, 100] as $option)
+                                <option value="{{ $option }}">{{ $option }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="w-150px">
                         <select wire:model.live="type" class="form-select form-select-solid">
                             <option value="all">Semua Jenis</option>
@@ -221,9 +228,17 @@
                 @endforelse
             </div>
 
-            @if ($participants->hasPages())
-                <div class="mt-4">
-                    {{ $participants->links() }}
+            @if ($participants->count() > 0)
+                <div class="row">
+                    <div class="col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start">
+                        <div class="dataTables_info">
+                            Menampilkan {{ $participants->firstItem() }} sampai {{ $participants->lastItem() }}
+                            dari {{ $participants->total() }} data
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end">
+                        {{ $participants->links() }}
+                    </div>
                 </div>
             @endif
         </div>

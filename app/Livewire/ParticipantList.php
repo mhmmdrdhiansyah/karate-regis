@@ -13,12 +13,14 @@ class ParticipantList extends Component
 
     public $search = '';
     public $type = 'all';
+    public $perPage = 15;
     public $sortField = 'name';
     public $sortDirection = 'asc';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'type' => ['except' => 'all'],
+        'perPage' => ['except' => 15],
         'sortField' => ['except' => 'name'],
         'sortDirection' => ['except' => 'asc'],
     ];
@@ -29,6 +31,11 @@ class ParticipantList extends Component
     }
 
     public function updatingType()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPerPage()
     {
         $this->resetPage();
     }
@@ -72,7 +79,7 @@ class ParticipantList extends Component
             $query->orderBy($this->sortField, $this->sortDirection);
         }
 
-        $participants = $query->paginate(15);
+        $participants = $query->paginate($this->perPage);
 
         return view('livewire.participant-list', [
             'participants' => $participants,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contingent;
+use App\Models\Participant;
 use App\Models\User;
 use Illuminate\View\View;
 
@@ -32,6 +33,10 @@ class DashboardController extends Controller
             'role' => 'kontingen',
             'user' => $user,
             'contingent' => $user->contingent,
+            'totalAthletes' => $user->contingent?->participants()->athletes()->count() ?? 0,
+            'totalCoaches' => $user->contingent?->participants()->coaches()->count() ?? 0,
+            'totalOfficials' => $user->contingent?->participants()->where('type', 'official')->count() ?? 0,
+            'totalVerified' => $user->contingent?->participants()->where('is_verified', true)->count() ?? 0,
         ]);
     }
 }
