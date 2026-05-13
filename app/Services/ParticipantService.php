@@ -33,7 +33,7 @@ class ParticipantService
     public function getLockedFields(Participant $participant): array
     {
         if ($participant->is_verified) {
-            return ['name', 'type', 'nik', 'birth_date', 'gender', 'provinsi', 'institusi', 'document'];
+            return ['name', 'type', 'nik', 'birth_date', 'gender', 'institusi', 'document'];
         }
 
         if ($this->hasActiveRegistration($participant)) {
@@ -69,7 +69,7 @@ class ParticipantService
         return null;
     }
 
-    private function hasActiveRegistration(Participant $participant): bool
+    public function hasActiveRegistration(Participant $participant): bool
     {
         return $participant->registrations()->whereNull('deleted_at')->exists();
     }
@@ -90,5 +90,16 @@ class ParticipantService
         }
 
         return $file->store('participants/documents', 'public');
+    }
+
+    public function deleteFiles(Participant $participant): void
+    {
+        if ($participant->photo) {
+            Storage::disk('public')->delete($participant->photo);
+        }
+
+        if ($participant->document) {
+            Storage::disk('public')->delete($participant->document);
+        }
     }
 }

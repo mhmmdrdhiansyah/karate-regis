@@ -21,7 +21,7 @@ class Participant extends Model
         'name',
         'birth_date',
         'gender',
-        'provinsi',
+
         'institusi',
         'photo',
         'document',
@@ -105,7 +105,7 @@ class Participant extends Model
             });
     }
 
-    protected $appends = ['photo_url'];
+
 
     public function getPhotoUrlAttribute(): string
     {
@@ -118,5 +118,21 @@ class Participant extends Model
         }
 
         return \Illuminate\Support\Facades\Storage::url($this->photo);
+    }
+
+    public function canBeEditedBy($user): bool
+    {
+        if (!$user) return false;
+        return $user->can('edit participants') || 
+               $user->can('manage participants') || 
+               ($user->can('manage own participants') && $this->contingent_id === $user->contingent?->id);
+    }
+
+    public function canBeDeletedBy($user): bool
+    {
+        if (!$user) return false;
+        return $user->can('delete participants') || 
+               $user->can('manage participants') || 
+               ($user->can('manage own participants') && $this->contingent_id === $user->contingent?->id);
     }
 }

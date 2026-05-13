@@ -5,12 +5,7 @@
         <div
             class="alert alert-dismissible bg-light-warning border border-warning border-dashed d-flex align-items-center p-5 mb-5">
             <span class="svg-icon svg-icon-2 me-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path opacity="0.3"
-                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                        fill="currentColor" />
-                    <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
-                </svg>
+                <x-icon name="info" class="svg-icon-2 me-4" />
             </span>
             <div class="d-flex flex-column">
                 <h5 class="mb-1 text-warning">Peserta terdaftar di event</h5>
@@ -23,13 +18,7 @@
         <div
             class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
             <span class="svg-icon svg-icon-2 me-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                    fill="none">
-                    <path opacity="0.3"
-                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                        fill="currentColor" />
-                    <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
-                </svg>
+                <x-icon name="info" class="svg-icon-2 me-4" />
             </span>
             <div class="d-flex flex-column">
                 <h5 class="mb-1 text-danger">Data sudah terverifikasi</h5>
@@ -92,30 +81,16 @@
                             </span>
                         </div>
                         <div class="d-flex flex-wrap">
-                            @php
-                                $__puser = auth()->user();
-                                $canEditBtn =
-                                    $__puser &&
-                                    ($__puser->can('edit participants') ||
-                                        $__puser->can('manage participants') ||
-                                        ($__puser->can('manage own participants') &&
-                                            $participant->contingent_id === $__puser->contingent?->id));
-                                $canDeleteBtn =
-                                    $__puser &&
-                                    ($__puser->can('delete participants') ||
-                                        $__puser->can('manage participants') ||
-                                        ($__puser->can('manage own participants') &&
-                                            $participant->contingent_id === $__puser->contingent?->id));
-                            @endphp
 
-                            @if ($canEditBtn)
+
+                            @if ($hasEditPermission)
                                 <a href="{{ route('participants.edit', $participant) }}"
                                     class="btn btn-light-primary btn-sm me-2">
                                     <i class="bi bi-pencil me-1"></i> Edit
                                 </a>
                             @endif
 
-                            @if ($canDeleteBtn && $canDelete)
+                            @if ($hasDeletePermission && $canDelete)
                                 <form action="{{ route('participants.destroy', $participant) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin ingin menghapus peserta ini?')">
                                     @csrf
@@ -124,7 +99,7 @@
                                         <i class="bi bi-trash me-1"></i> Hapus
                                     </button>
                                 </form>
-                            @elseif(!$canDeleteBtn)
+                            @elseif(!$hasDeletePermission)
                                 <span class="btn btn-light-danger btn-sm me-2 opacity-50 cursor-default"
                                     data-bs-toggle="tooltip" data-bs-placement="bottom"
                                     title="{{ $deleteReason ?? 'Peserta tidak dapat dihapus' }}"
@@ -189,10 +164,6 @@
                                         </td>
                                     </tr>
                                 @endif
-                                <tr>
-                                    <td class="text-gray-600 fw-bold">Provinsi</td>
-                                    <td class="text-gray-800">{{ $participant->provinsi ?? '-' }}</td>
-                                </tr>
                                 <tr>
                                     <td class="text-gray-600 fw-bold">Institusi</td>
                                     <td class="text-gray-800">{{ $participant->institusi ?? '-' }}</td>

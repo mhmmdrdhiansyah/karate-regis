@@ -26,7 +26,7 @@ class StoreParticipantRequest extends FormRequest
             'nik' => ['required', 'digits:16', 'unique:participants,nik'],
             'birth_date' => ['required', 'date', 'before:today'],
             'gender' => ['required', 'in:M,F'],
-            'provinsi' => 'nullable|string|max:255',
+
             'institusi' => 'nullable|string|max:255',
             'photo' => 'required|image|max:2048',
             'document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],

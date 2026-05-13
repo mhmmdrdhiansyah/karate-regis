@@ -55,7 +55,7 @@ class ParticipantSeeder extends Seeder
                     'name' => $athlete['name'],
                     'birth_date' => $athlete['birth_date'],
                     'gender' => $athlete['gender'],
-                    'provinsi' => 'Jawa Barat',
+
                     'institusi' => 'Dojo Karate Hebat',
                     'photo' => $athlete['photo'],
                     'is_verified' => true,
