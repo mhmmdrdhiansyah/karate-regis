@@ -20,7 +20,7 @@ class ParticipantFactory extends Factory
             'name' => fake()->name(),
             'birth_date' => fake()->date(),
             'gender' => fake()->randomElement([ParticipantGender::Male, ParticipantGender::Female]),
-            'provinsi' => fake()->state(),
+
             'institusi' => fake()->company(),
             'photo' => 'assets/media/avatars/blank.png',
             'document' => 'assets/media/documents/dummy.pdf',

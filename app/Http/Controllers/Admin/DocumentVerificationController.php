@@ -10,6 +10,8 @@ use App\Models\Participant;
 use App\Models\Registration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Admin\RejectDocumentRequest;
 
 class DocumentVerificationController extends Controller
 {
@@ -89,15 +91,16 @@ class DocumentVerificationController extends Controller
                 'message' => 'Dokumen atlet berhasil diverifikasi.'
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error("Error approving participant {$participant->id}: " . $e->getMessage(), [
+                'exception' => $e,
+                'admin_id' => auth()->id()
+            ]);
+            return response()->json(['message' => 'Terjadi kesalahan sistem saat memverifikasi dokumen.'], 500);
         }
     }
 
-    public function reject(Request $request, Participant $participant)
+    public function reject(RejectDocumentRequest $request, Participant $participant)
     {
-        $request->validate([
-            'rejection_reason' => 'required|string|min:5',
-        ]);
 
         try {
             DB::transaction(function () use ($request, $participant) {
@@ -130,15 +133,16 @@ class DocumentVerificationController extends Controller
                 'message' => 'Dokumen atlet berhasil ditolak.'
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error("Error rejecting participant {$participant->id}: " . $e->getMessage(), [
+                'exception' => $e,
+                'admin_id' => auth()->id()
+            ]);
+            return response()->json(['message' => 'Terjadi kesalahan sistem saat menolak dokumen.'], 500);
         }
     }
 
-    public function revoke(Request $request, Participant $participant)
+    public function revoke(RejectDocumentRequest $request, Participant $participant)
     {
-        $request->validate([
-            'rejection_reason' => 'required|string|min:5',
-        ]);
 
         if (!$participant->is_verified) {
             return response()->json(['message' => 'Hanya peserta yang sudah terverifikasi yang bisa di-revoke.'], 400);
@@ -172,7 +176,11 @@ class DocumentVerificationController extends Controller
                 'message' => 'Verifikasi atlet berhasil dicabut.'
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error("Error revoking participant {$participant->id}: " . $e->getMessage(), [
+                'exception' => $e,
+                'admin_id' => auth()->id()
+            ]);
+            return response()->json(['message' => 'Terjadi kesalahan sistem saat me-revoke verifikasi.'], 500);
         }
     }
 }

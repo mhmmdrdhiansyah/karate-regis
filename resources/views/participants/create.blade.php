@@ -1,14 +1,6 @@
 <x-app-layout>
     @section('title', 'Tambah Peserta')
-    @php $__puser = auth()->user(); @endphp
-
-    @if (
-        !(
-            $__puser &&
-            ($__puser->can('create participants') ||
-                $__puser->can('manage participants') ||
-                $__puser->can('manage own participants'))
-        ))
+    @if (!$canCreate)
         <div class="card">
             <div class="card-body">
                 <div class="alert alert-danger">Akses ditolak: Anda tidak memiliki izin untuk menambah peserta.</div>
@@ -140,15 +132,6 @@
                             </div>
 
                             <div class="fv-row mb-7">
-                                <label class="form-label">Provinsi</label>
-                                <input type="text" name="provinsi" class="form-control form-control-solid"
-                                    placeholder="Masukkan provinsi" value="{{ old('provinsi') }}" />
-                                @error('provinsi')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="fv-row mb-7">
                                 <label class="form-label">Institusi</label>
                                 <input type="text" name="institusi" class="form-control form-control-solid"
                                     placeholder="Masukkan institusi" value="{{ old('institusi') }}" />
@@ -237,10 +220,10 @@
                 document.getElementById('document_info').style.display = 'block';
             });
 
-            $('#kt_participant_form').on('submit', function() {
-                var btn = $('#kt_btn_submit');
-                btn.attr('data-kt-indicator', 'on');
-                btn.attr('disabled', true);
+            document.getElementById('kt_participant_form').addEventListener('submit', function() {
+                var btn = document.getElementById('kt_btn_submit');
+                btn.setAttribute('data-kt-indicator', 'on');
+                btn.disabled = true;
             });
         </script>
     @endpush

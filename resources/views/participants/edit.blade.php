@@ -1,16 +1,7 @@
 <x-app-layout>
     @section('title', 'Edit Peserta - ' . $participant->name)
 
-    @php
-        $__puser = auth()->user();
-        $canEditView = $__puser && (
-            $__puser->can('edit participants') || 
-            $__puser->can('manage participants') || 
-            ($__puser->can('manage own participants') && $participant->contingent_id === $__puser->contingent?->id)
-        );
-    @endphp
-
-    @if (!$canEditView)
+    @if (!$hasEditPermission)
         <div class="card">
             <div class="card-body">
                 <div class="alert alert-danger">Akses ditolak: Anda tidak memiliki izin untuk mengubah peserta ini.</div>
@@ -21,15 +12,7 @@
         @if ($participant->is_verified)
             <div
                 class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
-                <span class="svg-icon svg-icon-2 me-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none">
-                        <path opacity="0.3"
-                            d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
-                            fill="currentColor" />
-                        <path d="M13 7H11V13H17V11H13V7Z" fill="currentColor" />
-                    </svg>
-                </span>
+                <x-icon name="info" class="svg-icon-2 me-4" />
                 <div class="d-flex flex-column">
                     <h5 class="mb-1 text-danger">Data sudah terverifikasi</h5>
                     <span class="text-gray-600">
@@ -221,27 +204,6 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="fv-row">
-                                <label class="form-label">
-                                    Provinsi
-                                    @if (in_array('provinsi', $lockedFields))
-                                        <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
-                                            data-bs-placement="right"
-                                            title="{{ $lockReasons['provinsi'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
-                                    @endif
-                                </label>
-                                <input type="text" name="provinsi" class="form-control form-control-solid"
-                                    value="{{ old('provinsi', $participant->provinsi) }}"
-                                    {{ in_array('provinsi', $lockedFields) ? 'disabled' : '' }} />
-                                @if (in_array('provinsi', $lockedFields))
-                                    <input type="hidden" name="provinsi" value="{{ $participant->provinsi }}" />
-                                @endif
-                                @error('provinsi')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row mb-7">
@@ -361,10 +323,10 @@
                     });
                 @endif
 
-                $('#kt_participant_form').on('submit', function() {
-                    var btn = $('#kt_btn_submit');
-                    btn.attr('data-kt-indicator', 'on');
-                    btn.attr('disabled', true);
+                document.getElementById('kt_participant_form').addEventListener('submit', function() {
+                    var btn = document.getElementById('kt_btn_submit');
+                    btn.setAttribute('data-kt-indicator', 'on');
+                    btn.disabled = true;
                 });
             </script>
         @endpush

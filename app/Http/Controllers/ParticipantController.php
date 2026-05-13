@@ -35,7 +35,10 @@ class ParticipantController extends Controller
             $query->where('type', $type);
         }
 
-        $participants = $query->orderBy('name')->paginate(15)->withQueryString();
+        $participants = $query->withCount(['registrations' => fn($q) => $q->whereNull('deleted_at')])
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('participants.index', compact('participants'));
     }
@@ -72,7 +75,7 @@ class ParticipantController extends Controller
 
         $canDelete = $this->participantService->canDelete($participant);
         $deleteReason = $this->participantService->getDeleteReason($participant);
-        $hasActiveRegistration = $participant->registrations()->whereNull('deleted_at')->exists();
+        $hasActiveRegistration = $this->participantService->hasActiveRegistration($participant);
 
         return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration'));
     }
@@ -145,13 +148,7 @@ class ParticipantController extends Controller
             ]);
         }
 
-        if ($participant->photo) {
-            Storage::disk('public')->delete($participant->photo);
-        }
-
-        if ($participant->document) {
-            Storage::disk('public')->delete($participant->document);
-        }
+        $this->participantService->deleteFiles($participant);
 
         $participant->delete();
 
