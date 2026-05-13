@@ -22,25 +22,7 @@ class ParticipantController extends Controller
 
     public function index(Request $request)
     {
-        $contingent = $request->user()->contingent;
-
-        if (!$contingent) {
-            abort(403, 'Akun Anda tidak terkait dengan kontingen.');
-        }
-
-        $query = $contingent->participants();
-
-        $type = $request->get('type', 'all');
-        if ($type !== 'all') {
-            $query->where('type', $type);
-        }
-
-        $participants = $query->withCount(['registrations' => fn($q) => $q->whereNull('deleted_at')])
-            ->orderBy('name')
-            ->paginate(15)
-            ->withQueryString();
-
-        return view('participants.index', compact('participants'));
+        return view('participants.index');
     }
 
     public function create()
