@@ -225,6 +225,41 @@
                 btn.setAttribute('data-kt-indicator', 'on');
                 btn.disabled = true;
             });
+
+            // Toggle required fields based on type
+            const typeInputs = document.querySelectorAll('input[name="type"]');
+            const requiredFields = {
+                nik: document.getElementById('field_nik'),
+                birth_date: document.getElementById('field_birth_date'),
+                gender: document.getElementById('field_gender'),
+                document: document.getElementById('field_document')
+            };
+
+            function toggleRequiredFields() {
+                const selectedType = document.querySelector('input[name="type"]:checked').value;
+                const isAthlete = selectedType === 'athlete';
+
+                Object.keys(requiredFields).forEach(key => {
+                    const field = requiredFields[key];
+                    const label = field.querySelector('label');
+                    const inputs = field.querySelectorAll('input');
+
+                    if (isAthlete) {
+                        label.classList.add('required');
+                        inputs.forEach(input => input.setAttribute('required', 'required'));
+                    } else {
+                        label.classList.remove('required');
+                        inputs.forEach(input => input.removeAttribute('required'));
+                    }
+                });
+            }
+
+            typeInputs.forEach(input => {
+                input.addEventListener('change', toggleRequiredFields);
+            });
+
+            // Run on load
+            toggleRequiredFields();
         </script>
     @endpush
 </x-app-layout>
