@@ -56,11 +56,22 @@ class ParticipantController extends Controller
     {
         $this->authorizeParticipant($participant);
 
+        $participant->load([
+            'registrations' => function ($query) {
+                $query->with([
+                    'payment.event',
+                    'subCategory.eventCategory',
+                ])->latest();
+            },
+        ]);
+
         $canDelete = $this->participantService->canDelete($participant);
         $deleteReason = $this->participantService->getDeleteReason($participant);
         $hasActiveRegistration = $this->participantService->hasActiveRegistration($participant);
 
-        return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration'));
+        $registrations = $participant->registrations;
+
+        return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration', 'registrations'));
     }
 
     public function edit(Participant $participant)

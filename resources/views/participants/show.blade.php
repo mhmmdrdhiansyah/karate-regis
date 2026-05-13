@@ -239,6 +239,129 @@
         </div>
     </div>
 
+    {{-- ============================================================ --}}
+    {{-- SECTION: Riwayat Pendaftaran Event                           --}}
+    {{-- Menampilkan semua event yang pernah diikuti peserta ini.     --}}
+    {{-- ============================================================ --}}
+    <div class="card mt-5">
+        <div class="card-header pt-7">
+            <h3 class="card-label fw-bold text-dark">
+                <i class="bi bi-clipboard-check me-2"></i>Riwayat Pendaftaran Event
+            </h3>
+            <div class="card-toolbar">
+                <span class="badge badge-light-primary fw-bold">
+                    {{ $registrations->count() }} pendaftaran
+                </span>
+            </div>
+        </div>
+        <div class="card-body pt-3">
+
+            @if ($registrations->isEmpty())
+                <div class="text-center text-muted py-10">
+                    <i class="bi bi-clipboard-x fs-2x d-block mb-3 text-gray-400"></i>
+                    <p class="fw-semibold text-gray-500 mb-0">
+                        Peserta ini belum pernah terdaftar di event manapun.
+                    </p>
+                </div>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-300 align-middle gs-2 gy-3">
+                        <thead>
+                            <tr class="fw-bold text-muted fs-7 text-uppercase">
+                                <th class="min-w-150px">Nama Event</th>
+                                <th class="min-w-120px">Tanggal Event</th>
+                                <th class="min-w-130px">Kategori / Kelas</th>
+                                <th class="min-w-130px">Sub-Kategori</th>
+                                <th class="min-w-120px">Status Berkas</th>
+                                <th class="min-w-120px">Status Pembayaran</th>
+                                <th class="min-w-110px">Tanggal Daftar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($registrations as $registration)
+                                <tr>
+                                    <td class="text-gray-800 fw-bold">
+                                        {{ $registration->payment->event->name ?? '-' }}
+                                    </td>
+                                    <td class="text-gray-600">
+                                        {{ $registration->payment->event->event_date?->format('d M Y') ?? '-' }}
+                                    </td>
+                                    <td class="text-gray-600">
+                                        {{ $registration->subCategory->eventCategory->class_name ?? '-' }}
+                                    </td>
+                                    <td class="text-gray-600">
+                                        @if ($registration->subCategory)
+                                            {{ $registration->subCategory->name }}
+                                        @else
+                                            <span class="text-muted fst-italic">Pelatih</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @switch($registration->status_berkas->value)
+                                            @case('verified')
+                                                <span class="badge badge-light-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Terverifikasi
+                                                </span>
+                                                @break
+                                            @case('pending_review')
+                                                <span class="badge badge-light-warning">
+                                                    <i class="bi bi-hourglass-split me-1"></i>Menunggu Review
+                                                </span>
+                                                @break
+                                            @case('rejected')
+                                                <span class="badge badge-light-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Ditolak
+                                                </span>
+                                                @break
+                                            @default
+                                                <span class="badge badge-light-secondary">
+                                                    Belum Disubmit
+                                                </span>
+                                        @endswitch
+                                    </td>
+                                    <td>
+                                        @if ($registration->payment)
+                                            @switch($registration->payment->status->value)
+                                                @case('verified')
+                                                    <span class="badge badge-light-success">
+                                                        <i class="bi bi-check-circle me-1"></i>Terverifikasi
+                                                    </span>
+                                                    @break
+                                                @case('pending')
+                                                    <span class="badge badge-light-warning">
+                                                        <i class="bi bi-clock me-1"></i>Menunggu
+                                                    </span>
+                                                    @break
+                                                @case('rejected')
+                                                    <span class="badge badge-light-danger">
+                                                        <i class="bi bi-x-circle me-1"></i>Ditolak
+                                                    </span>
+                                                    @break
+                                                @case('cancelled')
+                                                    <span class="badge badge-light-secondary">
+                                                        <i class="bi bi-slash-circle me-1"></i>Dibatalkan
+                                                    </span>
+                                                    @break
+                                                @default
+                                                    <span class="badge badge-light-secondary">-</span>
+                                            @endswitch
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-gray-600">
+                                        {{ $registration->created_at->format('d M Y') }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+        </div>
+    </div>
+
     @push('scripts')
         <script>
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
