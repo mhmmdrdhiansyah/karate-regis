@@ -130,7 +130,7 @@
                 </div>
 
                 <div class="mt-5">
-                    {{ $this->payments->links() }}
+                    <x-livewire-pagination :paginator="$this->payments" />
                 </div>
             </div>
         </div>
