@@ -64,7 +64,8 @@ class ParticipantController extends Controller
             $validated['document'] = $this->participantService->uploadDocument($request->file('document'));
         }
 
-        Participant::create($validated);
+        $participant = Participant::create($validated);
+        $this->participantService->autoVerifyIfNeeded($participant);
 
         return redirect()->route('participants.index')->with('success', 'Peserta berhasil ditambahkan.');
     }
@@ -102,14 +103,6 @@ class ParticipantController extends Controller
         $validated = $request->validated();
         $lockedFields = $this->participantService->getLockedFields($participant);
 
-        $skippedFields = [];
-        foreach ($lockedFields as $field) {
-            if (array_key_exists($field, $validated)) {
-                $skippedFields[] = $field;
-                unset($validated[$field]);
-            }
-        }
-
         if ($request->hasFile('photo')) {
             $validated['photo'] = $this->participantService->uploadPhoto(
                 $request->file('photo'),
@@ -129,13 +122,7 @@ class ParticipantController extends Controller
         }
 
         $participant->update($validated);
-
-        $message = 'Data peserta berhasil diperbarui.';
-        if (count($skippedFields) > 0) {
-            $message .= ' (' . count($skippedFields) . ' field terkunci dilewati)';
-        }
-
-        return redirect()->route('participants.index')->with('success', $message);
+        return redirect()->route('participants.index')->with('success', 'Data peserta berhasil diperbarui.');
     }
 
     public function destroy(Participant $participant)

@@ -23,13 +23,13 @@ class StoreParticipantRequest extends FormRequest
         return [
             'type' => 'required|in:athlete,coach,official',
             'name' => 'required|string|max:255',
-            'nik' => ['required', 'digits:16', 'unique:participants,nik'],
-            'birth_date' => ['required', 'date', 'before:today'],
-            'gender' => ['required', 'in:M,F'],
+            'nik' => ['required_if:type,athlete', 'nullable', 'digits:16', 'unique:participants,nik'],
+            'birth_date' => ['required_if:type,athlete', 'nullable', 'date', 'before:today'],
+            'gender' => ['required_if:type,athlete', 'nullable', 'in:M,F'],
 
             'institusi' => 'nullable|string|max:255',
             'photo' => 'required|image|max:2048',
-            'document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'document' => ['required_if:type,athlete', 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
     }
 

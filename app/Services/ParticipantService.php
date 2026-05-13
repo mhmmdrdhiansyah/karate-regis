@@ -102,4 +102,15 @@ class ParticipantService
             Storage::disk('public')->delete($participant->document);
         }
     }
+
+    public function autoVerifyIfNeeded(Participant $participant): void
+    {
+        if (in_array($participant->type->value, ['coach', 'official'])) {
+            $participant->update([
+                'is_verified' => true,
+                'verified_at' => now(),
+                'verified_by' => auth()->id(),
+            ]);
+        }
+    }
 }

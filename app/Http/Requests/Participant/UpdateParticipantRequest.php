@@ -44,9 +44,9 @@ class UpdateParticipantRequest extends FormRequest
         return [
             'type' => 'required|in:athlete,coach,official',
             'name' => 'required|string|max:255',
-            'nik' => ['required', 'digits:16', 'unique:participants,nik,' . $participantId],
-            'birth_date' => ['required', 'date', 'before:today'],
-            'gender' => ['required', 'in:M,F'],
+            'nik' => ['required_if:type,athlete', 'nullable', 'digits:16', 'unique:participants,nik,' . $participantId],
+            'birth_date' => ['required_if:type,athlete', 'nullable', 'date', 'before:today'],
+            'gender' => ['required_if:type,athlete', 'nullable', 'in:M,F'],
 
             'institusi' => 'nullable|string|max:255',
             'photo' => 'nullable|image|max:2048',
