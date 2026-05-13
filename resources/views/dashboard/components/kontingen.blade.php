@@ -32,6 +32,73 @@
 </div>
 
 @if($contingent)
+    {{-- Stat Cards --}}
+    <div class="row g-5 g-xl-8 mb-5">
+        <div class="col-xl-3">
+            <div class="card card-xl-stretch mb-xl-8">
+                <div class="card-body d-flex flex-column p-6">
+                    <div class="d-flex align-items-center mb-5">
+                        <span class="svg-icon svg-icon-3x me-4">
+                            <i class="bi bi-person-fill text-primary"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-400 fw-bold fs-7">Total Atlet</span>
+                            <span class="text-dark fw-bolder fs-2x">{{ number_format($totalAthletes) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3">
+            <div class="card card-xl-stretch mb-xl-8">
+                <div class="card-body d-flex flex-column p-6">
+                    <div class="d-flex align-items-center mb-5">
+                        <span class="svg-icon svg-icon-3x me-4">
+                            <i class="bi bi-whistle text-warning"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-400 fw-bold fs-7">Total Pelatih</span>
+                            <span class="text-dark fw-bolder fs-2x">{{ number_format($totalCoaches) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3">
+            <div class="card card-xl-stretch mb-xl-8">
+                <div class="card-body d-flex flex-column p-6">
+                    <div class="d-flex align-items-center mb-5">
+                        <span class="svg-icon svg-icon-3x me-4">
+                            <i class="bi bi-person-badge text-info"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-400 fw-bold fs-7">Total Official</span>
+                            <span class="text-dark fw-bolder fs-2x">{{ number_format($totalOfficials) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3">
+            <div class="card card-xl-stretch mb-xl-8">
+                <div class="card-body d-flex flex-column p-6">
+                    <div class="d-flex align-items-center mb-5">
+                        <span class="svg-icon svg-icon-3x me-4">
+                            <i class="bi bi-shield-check text-success"></i>
+                        </span>
+                        <div class="d-flex flex-column">
+                            <span class="text-gray-400 fw-bold fs-7">Terverifikasi</span>
+                            <span class="text-dark fw-bolder fs-2x">{{ number_format($totalVerified) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Contingent Data --}}
     <div class="row g-5 g-xl-10">
         <div class="col-xl-6">
