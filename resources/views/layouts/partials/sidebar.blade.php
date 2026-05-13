@@ -270,6 +270,16 @@
                         </a>
                     </div>
                 @endcan
+
+                @can('manage participants')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('admin.participants.*') ? 'active' : '' }}"
+                            href="{{ route('admin.participants.index') }}">
+                            <span class="menu-icon"><i class="bi bi-people-fill fs-3"></i></span>
+                            <span class="menu-title">Daftar Peserta</span>
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
     </div>

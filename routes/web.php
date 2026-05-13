@@ -93,6 +93,10 @@ Route::middleware('auth')->group(function () {
             Route::post('documents/{participant}/reject', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'reject'])->name('documents.reject');
             Route::post('documents/{participant}/revoke', [\App\Http\Controllers\Admin\DocumentVerificationController::class, 'revoke'])->name('documents.revoke');
         });
+
+        Route::middleware(['permission:manage participants'])->group(function () {
+            Route::get('participants', \App\Livewire\Admin\ParticipantManagement::class)->name('participants.index');
+        });
     });
 
     // Laporan (Reports) - simple index page
