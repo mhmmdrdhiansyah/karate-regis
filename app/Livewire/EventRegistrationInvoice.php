@@ -261,7 +261,7 @@ class EventRegistrationInvoice extends Component
 
                 // Cek eligibility
                 $athleteIds = $athletes->pluck('participant.id')->toArray();
-                $eligibleIds = Participant::eligibleFor($subCategory)
+                $eligibleIds = Participant::eligibleFor($subCategory, $contingent->id)
                     ->whereIn('id', $athleteIds)
                     ->pluck('id')
                     ->toArray();

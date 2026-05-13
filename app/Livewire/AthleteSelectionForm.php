@@ -30,6 +30,9 @@ class AthleteSelectionForm extends Component
     #[Locked]
     public int $subCategoryId;
 
+    #[Locked]
+    public int $contingentId;
+
     // Array ID atlet yang dipilih user (dari checkbox)
     public array $selectedAthleteIds = [];
 
@@ -60,6 +63,7 @@ class AthleteSelectionForm extends Component
         if (! $contingent) {
             abort(403, 'Anda belum memiliki data kontingen.');
         }
+        $this->contingentId = $contingent->id;
 
         // Validasi: pastikan sub_category milik category, dan category milik event
         $subCategory = SubCategory::findOrFail($sub_category);
@@ -107,7 +111,7 @@ class AthleteSelectionForm extends Component
     #[Computed]
     public function eligibleAthletes()
     {
-        return Participant::eligibleFor($this->subCategory)
+        return Participant::eligibleFor($this->subCategory, $this->contingentId)
             ->with(['registrations.subCategory', 'draftItems.subCategory'])
             ->when($this->search !== '', fn($q) => $q->where('name', 'like', "%{$this->search}%"))
             ->orderBy('name')
@@ -119,7 +123,7 @@ class AthleteSelectionForm extends Component
     {
         // Ambil SEMUA atlet milik kontingen
         $allAthletes = Participant::athletes()
-            ->where('contingent_id', auth()->user()->contingent->id)
+            ->where('contingent_id', $this->contingentId)
             ->with(['registrations.subCategory', 'draftItems.subCategory'])
             ->get();
 
@@ -166,7 +170,7 @@ class AthleteSelectionForm extends Component
     public function deleteTeam(int $teamGroupId): void
     {
         $team = \App\Models\TeamGroup::where('id', $teamGroupId)
-            ->where('contingent_id', auth()->user()->contingent->id)
+            ->where('contingent_id', $this->contingentId)
             ->first();
 
         if ($team) {
@@ -206,7 +210,7 @@ class AthleteSelectionForm extends Component
             }
         } else {
             \App\Models\TeamGroup::where('id', $teamGroupId)
-                ->where('contingent_id', auth()->user()->contingent->id)
+                ->where('contingent_id', $this->contingentId)
                 ->update(['team_name' => $name]);
         }
 
@@ -267,7 +271,7 @@ class AthleteSelectionForm extends Component
             }
 
             // Cek eligibility
-            $isEligible = Participant::eligibleFor($this->subCategory)->where('participants.id', $athleteId)->exists();
+            $isEligible = Participant::eligibleFor($this->subCategory, $this->contingentId)->where('participants.id', $athleteId)->exists();
             if (!$isEligible) {
                 $this->errorMessage = 'Atlet tidak memenuhi syarat untuk kategori ini.';
                 return;
@@ -288,7 +292,7 @@ class AthleteSelectionForm extends Component
     public function loadTeams(): void
     {
         $contingent = auth()->user()->contingent;
-        $teamGroups = \App\Models\TeamGroup::where('contingent_id', $contingent->id)
+        $teamGroups = \App\Models\TeamGroup::where('contingent_id', $this->contingentId)
             ->where('sub_category_id', $this->subCategoryId)
             ->with('draftItems')
             ->orderBy('team_number')
@@ -316,7 +320,7 @@ class AthleteSelectionForm extends Component
     {
         $this->showSavedIndicator = false;
         $this->selectedAthleteIds = array_values(array_unique(array_map('intval', $this->selectedAthleteIds)));
-        $draft = RegistrationDraft::where('contingent_id', auth()->user()->contingent->id)
+        $draft = RegistrationDraft::where('contingent_id', $this->contingentId)
             ->where('event_id', $this->eventId)
             ->where('status', 'draft')
             ->first();

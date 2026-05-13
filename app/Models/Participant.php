@@ -85,12 +85,12 @@ class Participant extends Model
         return $query->where('type', ParticipantType::Coach);
     }
 
-    public function scopeEligibleFor($query, SubCategory $subCategory)
+    public function scopeEligibleFor($query, SubCategory $subCategory, int $contingentId)
     {
         $eventCategory = $subCategory->eventCategory;
 
         return $query->athletes()
-            ->where('contingent_id', auth()->user()->contingent->id)
+            ->where('contingent_id', $contingentId)
             ->where(function ($q) use ($subCategory) {
                 if ($subCategory->gender === SubCategoryGender::Mixed) {
                     $q->whereNotNull('gender');
@@ -111,10 +111,6 @@ class Participant extends Model
     {
         if (!$this->photo) {
             return asset('assets/media/avatars/blank.png');
-        }
-
-        if (str_starts_with($this->photo, 'assets/')) {
-            return asset($this->photo);
         }
 
         return \Illuminate\Support\Facades\Storage::url($this->photo);
