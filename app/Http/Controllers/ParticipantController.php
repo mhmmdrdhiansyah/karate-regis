@@ -14,7 +14,7 @@ class ParticipantController extends Controller
     public function __construct(
         private ParticipantService $participantService
     ) {
-        $this->middleware('permission:view participants|create participants|edit participants')->only(['index', 'show']);
+        $this->middleware('permission:view participants|create participants|edit participants')->only(['index', 'show', 'checkNik']);
         $this->middleware('permission:create participants')->only(['create', 'store']);
         $this->middleware('permission:edit participants')->only(['edit', 'update']);
         $this->middleware('permission:delete participants')->only(['destroy']);
@@ -133,6 +133,27 @@ class ParticipantController extends Controller
         $participant->delete();
 
         return redirect()->route('participants.index')->with('success', 'Peserta berhasil dihapus.');
+    }
+
+    public function checkNik(Request $request)
+    {
+        $request->validate([
+            'nik' => 'required|digits:16',
+            'exclude_id' => 'nullable|integer|exists:participants,id',
+        ]);
+
+        $query = Participant::where('nik', $request->nik);
+
+        if ($request->filled('exclude_id')) {
+            $query->where('id', '!=', $request->exclude_id);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json([
+            'exists' => $exists,
+            'message' => $exists ? 'NIK sudah terdaftar' : 'NIK tersedia',
+        ]);
     }
 
     private function authorizeParticipant(Participant $participant): void

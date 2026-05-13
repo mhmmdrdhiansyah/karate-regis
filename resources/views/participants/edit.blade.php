@@ -135,11 +135,16 @@
                                 </label>
                                 <input type="text" name="nik" class="form-control form-control-solid"
                                     value="{{ old('nik', $participant->nik) }}" maxlength="16" inputmode="numeric"
-                                    {{ $isNikLocked ? 'disabled' : '' }} />
+                                    {{ $isNikLocked ? 'disabled' : '' }} id="nik_input" />
                                 @if ($isNikLocked)
                                     <input type="hidden" name="nik" value="{{ $participant->nik }}" />
                                 @endif
                                 <span class="text-muted fs-7">Masukkan 16 digit NIK</span>
+                                @if (!$isNikLocked)
+                                    <div id="nik_feedback" class="mt-1" style="display: none;">
+                                        <span id="nik_badge" class="badge"></span>
+                                    </div>
+                                @endif
                                 @error('nik')
                                     <span class="text-danger small">{{ $message }}</span>
                                 @enderror
@@ -328,6 +333,55 @@
                     btn.setAttribute('data-kt-indicator', 'on');
                     btn.disabled = true;
                 });
+
+                // === NIK Real-time Validation (Edit Form) ===
+                @if (!$isNikLocked)
+                    const nikInput = document.getElementById('nik_input');
+                    const nikFeedback = document.getElementById('nik_feedback');
+                    const nikBadge = document.getElementById('nik_badge');
+                    const excludeId = {{ $participant->id }};
+                    let nikDebounceTimer = null;
+
+                    function checkNikAvailability(nik, excludeId) {
+                        let url = '/api/check-nik?nik=' + encodeURIComponent(nik);
+                        if (excludeId) {
+                            url += '&exclude_id=' + encodeURIComponent(excludeId);
+                        }
+
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                nikFeedback.style.display = 'block';
+                                if (data.exists) {
+                                    nikBadge.className = 'badge badge-light-danger';
+                                    nikBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i> NIK sudah terdaftar';
+                                } else {
+                                    nikBadge.className = 'badge badge-light-success';
+                                    nikBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i> NIK tersedia';
+                                }
+                            })
+                            .catch(() => {
+                                nikFeedback.style.display = 'none';
+                            });
+                    }
+
+                    if (nikInput) {
+                        nikInput.addEventListener('input', function() {
+                            clearTimeout(nikDebounceTimer);
+                            const nik = this.value.replace(/\D/g, '');
+                            this.value = nik;
+
+                            if (nik.length < 16) {
+                                nikFeedback.style.display = 'none';
+                                return;
+                            }
+
+                            nikDebounceTimer = setTimeout(function() {
+                                checkNikAvailability(nik, excludeId); // exclude current participant
+                            }, 500);
+                        });
+                    }
+                @endif
             </script>
         @endpush
     @endif

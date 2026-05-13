@@ -61,6 +61,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('participants/{participant}', [ParticipantController::class, 'destroy'])->name('participants.destroy');
     });
 
+    Route::get('/api/check-nik', [ParticipantController::class, 'checkNik']);
+
     // Event Management — Protected by permission middleware (checked at controller level)
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware(['permission:view events|create events|edit events|delete events'])->group(function () {
