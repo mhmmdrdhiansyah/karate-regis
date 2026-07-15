@@ -265,12 +265,20 @@
 
                 // Restore sidebar state after page load
                 function restoreSidebarState() {
-                    const savedState = localStorage.getItem('aside_minimize_state');
-                    if (savedState === 'minimized') {
-                        const body = document.body;
-                        if (!body.classList.contains('aside-minimize')) {
-                            body.classList.add('aside-minimize');
-                        }
+                    const ourState = localStorage.getItem('aside_minimize_state');
+
+                    if (ourState === 'minimized') {
+                        // Wait a bit longer for everything to load
+                        setTimeout(function() {
+                            const toggleButton = document.getElementById('kt_aside_toggle');
+                            const body = document.body;
+
+                            // Only click if sidebar is NOT currently minimized
+                            if (toggleButton && !body.classList.contains('aside-minimize')) {
+                                // Programmatically click to trigger Metronic's toggle
+                                toggleButton.click();
+                            }
+                        }, 300);
                     }
                 }
 
