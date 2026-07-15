@@ -58,7 +58,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select name="status_berkas" id="filter-status" class="form-select form-select-sm">
+                    <select name="status_berkas" id="filter-status-berkas" class="form-select form-select-sm">
                         <option value="">Semua Status</option>
                         @foreach($statusBerkasOptions as $key => $label)
                             <option value="{{ $key }}" {{ request('status_berkas') === $key ? 'selected' : '' }}>
@@ -229,12 +229,18 @@
                 const filters = ['event', 'contingent', 'category_type', 'gender', 'status_berkas', 'search'];
                 const urlParams = new URLSearchParams(window.location.search);
 
+                console.log('[Sidebar] Attaching event listeners to filters...');
                 filters.forEach(filterName => {
-                    const element = document.getElementById('filter-' + filterName.replace('_', '-'));
+                    const elementId = 'filter-' + filterName.replace('_', '-');
+                    const element = document.getElementById(elementId);
+                    console.log('[Sidebar] Filter:', filterName, '| Element ID:', elementId, '| Found:', !!element);
                     if (element) {
                         element.addEventListener('change', function() {
+                            console.log('[Sidebar] Filter changed:', filterName);
                             applyFilters();
                         });
+                    } else {
+                        console.error('[Sidebar] ERROR: Element not found for filter:', filterName);
                     }
                 });
 
