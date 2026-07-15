@@ -222,6 +222,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Restore sidebar state after page load
+                restoreSidebarState();
+
                 // Filter change handlers
                 const filters = ['event', 'contingent', 'category_type', 'gender', 'status_berkas', 'search'];
                 const urlParams = new URLSearchParams(window.location.search);
@@ -253,6 +256,24 @@
                     });
                 }
 
+                // Save sidebar state before navigation
+                function saveSidebarState() {
+                    const body = document.body;
+                    const isMinimized = body.classList.contains('aside-minimize');
+                    localStorage.setItem('aside_minimize_state', isMinimized ? 'minimized' : 'expanded');
+                }
+
+                // Restore sidebar state after page load
+                function restoreSidebarState() {
+                    const savedState = localStorage.getItem('aside_minimize_state');
+                    if (savedState === 'minimized') {
+                        const body = document.body;
+                        if (!body.classList.contains('aside-minimize')) {
+                            body.classList.add('aside-minimize');
+                        }
+                    }
+                }
+
                 function applyFilters() {
                     const params = new URLSearchParams();
 
@@ -268,6 +289,9 @@
                     if (perPage && perPage.value !== '25') {
                         params.set('per_page', perPage.value);
                     }
+
+                    // Save sidebar state before navigation
+                    saveSidebarState();
 
                     window.location.href = '{{ route('reports.participants') }}?' + params.toString();
                 }
