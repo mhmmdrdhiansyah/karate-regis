@@ -28,6 +28,8 @@ class EventRegistrationInvoice extends Component
     #[Locked]
     public ?int $subCategoryId = null;
 
+    public int $uniqueCode = 0;
+
     public array $selectedSubCategories = [];
     public array $selectedCoachIds = [];
     public string $errorMessage = '';
@@ -79,11 +81,7 @@ class EventRegistrationInvoice extends Component
             return;
         }
 
-        if (count($this->selectedSubCategories) === 0 && count($this->selectedCoachIds) === 0) {
-            session()->flash('error', 'Draft pendaftaran masih kosong. Silakan pilih atlet atau pelatih terlebih dahulu.');
-            $this->redirect(route('registration.index'), navigate: true);
-            return;
-        }
+        $this->uniqueCode = rand(100, 999);
     }
 
     #[Computed]
@@ -189,7 +187,7 @@ class EventRegistrationInvoice extends Component
     #[Computed]
     public function totalAmount(): float
     {
-        return (float) $this->event->event_fee + $this->totalAthleteFee + $this->totalCoachFee;
+        return (float) $this->event->event_fee + $this->totalAthleteFee + $this->totalCoachFee + $this->uniqueCode;
     }
 
     public function confirmSubmit(): void

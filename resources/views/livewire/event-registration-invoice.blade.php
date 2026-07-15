@@ -154,6 +154,10 @@
                         <span class="text-gray-600 fw-bold fs-6">Subtotal Pelatih</span>
                         <span class="fw-bolder">Rp {{ number_format($this->totalCoachFee, 0, ',', '.') }}</span>
                     </div>
+                    <div class="d-flex flex-stack mb-5">
+                        <span class="text-gray-600 fw-bold fs-6">Kode Unik</span>
+                        <span class="fw-bolder text-warning">Rp {{ number_format($this->uniqueCode, 0, ',', '.') }}</span>
+                    </div>
                     <div class="separator separator-dashed my-5"></div>
                     <div class="d-flex flex-stack">
                         <span class="fw-bolder fs-5">Total</span>
@@ -193,9 +197,13 @@
                     @endif
 
                     <p class="text-muted mb-4">Pastikan data atlet dan pelatih sudah sesuai sebelum membuat invoice.</p>
+                    <div class="d-flex flex-stack mb-3">
+                        <span class="fw-bold">Kode Unik</span>
+                        <span class="fw-bolder text-warning">Rp {{ number_format($this->uniqueCode, 0, ',', '.') }}</span>
+                    </div>
                     <div class="d-flex flex-stack">
                         <span class="fw-bold">Total yang harus dibayar</span>
-                        <span class="fw-bolder text-primary">Rp {{ number_format($this->totalAmount, 0, ',', '.') }}</span>
+                        <span class="fw-bolder text-primary fs-3">Rp {{ number_format($this->totalAmount, 0, ',', '.') }}</span>
                     </div>
                 </div>
                 <div class="modal-footer">

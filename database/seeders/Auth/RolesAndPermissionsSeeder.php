@@ -62,6 +62,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'view registrations',
             'edit registrations',
             'delete registrations',
+            // Reports Permissions
+            'view reports',
         ];
 
         foreach ($permissions as $permission) {
@@ -92,9 +94,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'guard_name' => 'web'
         ]);
         // Panitia dapat mengelola event dan registrasi serta kontingen
+        // Catatan: User Management hanya untuk super-admin (route di-gate role:super-admin)
         $panitiaRole->syncPermissions([
             'view dashboard',
-            'view users',
             'view kontingen',
             'create kontingen',
             'edit kontingen',
@@ -113,6 +115,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view registrations',
             'edit registrations',
             'delete registrations',
+            'view reports',
         ]);
 
         // --- Role: Kontingen (Contingent/Team Representative) ---
