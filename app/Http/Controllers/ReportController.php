@@ -22,8 +22,8 @@ class ReportController extends Controller
     {
         // Build query with all necessary joins
         $query = Registration::with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
-            ->whereNull('deleted_at')           // Exclude soft-deleted registrations
-            ->whereNotNull('sub_category_id')   // Exclude coach registrations
+            ->whereNull('registrations.deleted_at')  // Exclude soft-deleted registrations
+            ->whereNotNull('registrations.sub_category_id')  // Exclude coach registrations
             ->join('participants', 'participants.id', '=', 'registrations.participant_id')
             ->join('sub_categories', 'sub_categories.id', '=', 'registrations.sub_category_id')
             ->join('event_categories', 'event_categories.id', '=', 'sub_categories.event_category_id')
