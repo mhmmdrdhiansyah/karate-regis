@@ -260,18 +260,18 @@
                 function saveSidebarState() {
                     const body = document.body;
                     const isMinimized = body.classList.contains('aside-minimize');
-                    console.log('[Sidebar] Body classes:', body.className);
-                    console.log('[Sidebar] Saving state:', isMinimized ? 'minimized' : 'expanded');
-                    localStorage.setItem('aside_minimize_state', isMinimized ? 'minimized' : 'expanded');
+                    const state = isMinimized ? 'minimized' : 'expanded';
+                    console.log('[Sidebar] SAVING state:', state, '| Body classes:', body.className);
+                    localStorage.setItem('aside_minimize_state', state);
+                    sessionStorage.setItem('aside_minimize_debug', state + ' at ' + new Date().toLocaleTimeString());
                 }
 
                 // Restore sidebar state after page load
                 function restoreSidebarState() {
-                    // Debug: log all localStorage keys related to sidebar
-                    console.log('[Sidebar] All localStorage:', localStorage);
                     const ourState = localStorage.getItem('aside_minimize_state');
-                    const metronicState = localStorage.getItem('kt_aside_minimize_state');
-                    console.log('[Sidebar] Restoring state - ours:', ourState, 'metronic:', metronicState);
+                    const debugInfo = sessionStorage.getItem('aside_minimize_debug');
+                    console.log('[Sidebar] Previous save info:', debugInfo);
+                    console.log('[Sidebar] Current localStorage state:', ourState);
 
                     if (ourState === 'minimized') {
                         console.log('[Sidebar] State is minimized, will restore after 300ms');
