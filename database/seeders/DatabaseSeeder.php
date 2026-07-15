@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             ParticipantSeeder::class,
             EventSeeder::class,
+            ParticipantReportSeeder::class,
         ]);
     }
 }
