@@ -232,18 +232,13 @@
                 const filters = ['event', 'contingent', 'category_type', 'gender', 'status_berkas', 'search'];
                 const urlParams = new URLSearchParams(window.location.search);
 
-                console.log('[Sidebar] Attaching event listeners to filters...');
                 filters.forEach(filterName => {
                     const elementId = 'filter-' + filterName.replace('_', '-');
                     const element = document.getElementById(elementId);
-                    console.log('[Sidebar] Filter:', filterName, '| Element ID:', elementId, '| Found:', !!element);
                     if (element) {
                         element.addEventListener('change', function() {
-                            console.log('[Sidebar] Filter changed:', filterName);
                             applyFilters();
                         });
-                    } else {
-                        console.error('[Sidebar] ERROR: Element not found for filter:', filterName);
                     }
                 });
 
@@ -269,28 +264,14 @@
                 function saveSidebarState() {
                     const body = document.body;
                     const toggleBtn = document.getElementById('kt_aside_toggle');
-                    const aside = document.getElementById('kt_aside');
-
-                    // Check multiple ways to determine if sidebar is minimized
                     const hasClass = body.classList.contains('aside-minimize');
                     const toggleActive = toggleBtn && toggleBtn.classList.contains('active');
-                    const asideClasses = aside ? aside.className : 'aside not found';
-
-                    console.log('[Sidebar] Body classes:', body.className);
-                    console.log('[Sidebar] Aside classes:', asideClasses);
-                    console.log('[Sidebar] Toggle button active:', toggleActive);
-                    console.log('[Sidebar] Has aside-minimize class:', hasClass);
-
-                    // Use toggle button state as primary indicator
                     const isMinimized = toggleActive || hasClass;
                     const state = isMinimized ? 'minimized' : 'expanded';
-
-                    console.log('[Sidebar] SAVING state:', state);
                     localStorage.setItem('aside_minimize_state', state);
-                    sessionStorage.setItem('aside_minimize_debug', state + ' at ' + new Date().toLocaleTimeString());
                 }
 
-                // NEW: Watch sidebar state changes continuously
+                // Watch sidebar state changes continuously
                 function watchSidebarState() {
                     const toggleBtn = document.getElementById('kt_aside_toggle');
                     if (!toggleBtn) return;
@@ -303,7 +284,6 @@
                                 const isMinimized = body.classList.contains('aside-minimize') ||
                                                   (toggleBtn && toggleBtn.classList.contains('active'));
                                 const state = isMinimized ? 'minimized' : 'expanded';
-                                console.log('[Sidebar] State changed, saving:', state);
                                 localStorage.setItem('aside_minimize_state', state);
                             }
                         });
@@ -322,40 +302,23 @@
                 // Restore sidebar state after page load
                 function restoreSidebarState() {
                     const ourState = localStorage.getItem('aside_minimize_state');
-                    const debugInfo = sessionStorage.getItem('aside_minimize_debug');
-
-                    console.log('[Sidebar] Previous save info:', debugInfo);
-                    console.log('[Sidebar] Current localStorage state:', ourState);
 
                     if (ourState === 'minimized') {
-                        console.log('[Sidebar] State is minimized, will restore after 300ms');
-                        // Wait a bit longer for everything to load
                         setTimeout(function() {
                             const toggleButton = document.getElementById('kt_aside_toggle');
                             const body = document.body;
-                            const aside = document.getElementById('kt_aside');
                             const isCurrentlyMinimized = body.classList.contains('aside-minimize');
                             const toggleActive = toggleButton && toggleButton.classList.contains('active');
 
-                            console.log('[Sidebar] Toggle button found:', !!toggleButton);
-                            console.log('[Sidebar] Currently has aside-minimize class:', isCurrentlyMinimized);
-                            console.log('[Sidebar] Toggle button currently active:', toggleActive);
-                            console.log('[Sidebar] Aside classes:', aside ? aside.className : 'not found');
-
                             // Only click if sidebar is NOT currently minimized
                             if (toggleButton && !isCurrentlyMinimized && !toggleActive) {
-                                console.log('[Sidebar] Clicking toggle button to minimize...');
-                                // Programmatically click to trigger Metronic's toggle
                                 toggleButton.click();
-                            } else {
-                                console.log('[Sidebar] Skip: already minimized or button not found');
                             }
                         }, 300);
                     }
                 }
 
                 function applyFilters() {
-                    console.log('[Sidebar] applyFilters called');
                     const params = new URLSearchParams();
 
                     filters.forEach(filterName => {
