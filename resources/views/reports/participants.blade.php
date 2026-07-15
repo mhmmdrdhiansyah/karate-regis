@@ -225,6 +225,9 @@
                 // Restore sidebar state after page load
                 restoreSidebarState();
 
+                // Start watching sidebar state changes
+                watchSidebarState();
+
                 // Filter change handlers
                 const filters = ['event', 'contingent', 'category_type', 'gender', 'status_berkas', 'search'];
                 const urlParams = new URLSearchParams(window.location.search);
@@ -285,6 +288,35 @@
                     console.log('[Sidebar] SAVING state:', state);
                     localStorage.setItem('aside_minimize_state', state);
                     sessionStorage.setItem('aside_minimize_debug', state + ' at ' + new Date().toLocaleTimeString());
+                }
+
+                // NEW: Watch sidebar state changes continuously
+                function watchSidebarState() {
+                    const toggleBtn = document.getElementById('kt_aside_toggle');
+                    if (!toggleBtn) return;
+
+                    // Use MutationObserver to watch for class changes on body and aside
+                    const observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                                const body = document.body;
+                                const isMinimized = body.classList.contains('aside-minimize') ||
+                                                  (toggleBtn && toggleBtn.classList.contains('active'));
+                                const state = isMinimized ? 'minimized' : 'expanded';
+                                console.log('[Sidebar] State changed, saving:', state);
+                                localStorage.setItem('aside_minimize_state', state);
+                            }
+                        });
+                    });
+
+                    // Observe body element for class changes
+                    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+                    // Also observe aside element
+                    const aside = document.getElementById('kt_aside');
+                    if (aside) {
+                        observer.observe(aside, { attributes: true, attributeFilter: ['class'] });
+                    }
                 }
 
                 // Restore sidebar state after page load
