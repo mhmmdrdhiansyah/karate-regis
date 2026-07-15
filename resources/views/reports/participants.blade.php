@@ -260,23 +260,33 @@
                 function saveSidebarState() {
                     const body = document.body;
                     const isMinimized = body.classList.contains('aside-minimize');
+                    console.log('[Sidebar] Saving state:', isMinimized ? 'minimized' : 'expanded');
                     localStorage.setItem('aside_minimize_state', isMinimized ? 'minimized' : 'expanded');
                 }
 
                 // Restore sidebar state after page load
                 function restoreSidebarState() {
                     const ourState = localStorage.getItem('aside_minimize_state');
+                    console.log('[Sidebar] Restoring state:', ourState);
 
                     if (ourState === 'minimized') {
+                        console.log('[Sidebar] State is minimized, will restore after 300ms');
                         // Wait a bit longer for everything to load
                         setTimeout(function() {
                             const toggleButton = document.getElementById('kt_aside_toggle');
                             const body = document.body;
+                            const isCurrentlyMinimized = body.classList.contains('aside-minimize');
+
+                            console.log('[Sidebar] Toggle button found:', !!toggleButton);
+                            console.log('[Sidebar] Currently minimized:', isCurrentlyMinimized);
 
                             // Only click if sidebar is NOT currently minimized
-                            if (toggleButton && !body.classList.contains('aside-minimize')) {
+                            if (toggleButton && !isCurrentlyMinimized) {
+                                console.log('[Sidebar] Clicking toggle button...');
                                 // Programmatically click to trigger Metronic's toggle
                                 toggleButton.click();
+                            } else {
+                                console.log('[Sidebar] Skip: button not found or already minimized');
                             }
                         }, 300);
                     }
