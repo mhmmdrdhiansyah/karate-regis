@@ -222,12 +222,33 @@
                         </a>
                     </div>
                     @can('view reports')
-                    <div class="menu-item">
-                        <a class="menu-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
-                            href="{{ route('reports.index') }}">
+                    <div data-kt-menu-trigger="click"
+                        class="menu-item menu-accordion {{ request()->routeIs('reports.*') ? 'hover show' : '' }}">
+                        <span class="menu-link">
                             <span class="menu-icon"><i class="bi bi-file-earmark fs-3"></i></span>
                             <span class="menu-title">Laporan</span>
-                        </a>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('reports.index') ? 'active' : '' }}"
+                                    href="{{ route('reports.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Laporan Keuangan</span>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a class="menu-link {{ request()->routeIs('reports.participants') ? 'active' : '' }}"
+                                    href="{{ route('reports.participants') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Laporan Peserta</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     @endcan
                 @endcanany
