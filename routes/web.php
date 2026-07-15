@@ -34,10 +34,12 @@ Route::middleware('auth')->group(function () {
 
     // Auth Management
     Route::prefix('auth')->name('auth.')->group(function () {
-        // Users - Panitia bisa akses (punya permission)
-        Route::post('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
-        Route::delete('users/{user}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
-        Route::resource('users', UserController::class);
+        // Users - Hanya super-admin
+        Route::middleware(['role:super-admin'])->group(function () {
+            Route::post('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+            Route::delete('users/{user}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
+            Route::resource('users', UserController::class);
+        });
 
         // Roles & Permissions - Hanya super-admin
         Route::middleware(['role:super-admin'])->group(function () {
@@ -101,8 +103,10 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Laporan (Reports) - simple index page
-    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    // Laporan (Reports) - butuh permission view reports (super-admin & panitia)
+    Route::get('reports', [ReportController::class, 'index'])
+        ->middleware(['permission:view reports'])
+        ->name('reports.index');
 
     // Pendaftaran Event (User/Kontingen)
     Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {

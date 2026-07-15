@@ -82,8 +82,8 @@
 
                         <div class="menu-sub menu-sub-accordion">
 
-                            {{-- Child 1: Users --}}
-                            @can('view users')
+                            {{-- Child 1: Users (hanya super-admin) --}}
+                            @role('super-admin')
                                 <div class="menu-item">
                                     <a class="menu-link {{ request()->routeIs('auth.users.*') ? 'active' : '' }}"
                                         href="{{ route('auth.users.index') }}">
@@ -93,7 +93,7 @@
                                         <span class="menu-title">Users List</span>
                                     </a>
                                 </div>
-                            @endcan
+                            @endrole
 
                             {{-- Child 2: Roles --}}
                             @can('view roles')
@@ -208,7 +208,7 @@
                 @endcan
 
                 {{-- 4. SECTION OPERASIONAL --}}
-                @canany(['view users', 'manage settings'])
+                @canany(['view users', 'manage settings', 'view reports'])
                     <div class="menu-item">
                         <div class="menu-content pt-8 pb-2">
                             <span class="menu-section text-muted text-uppercase fs-8 ls-1">Operasional</span>
@@ -221,6 +221,7 @@
                             <span class="menu-title">Event Management</span>
                         </a>
                     </div>
+                    @can('view reports')
                     <div class="menu-item">
                         <a class="menu-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
                             href="{{ route('reports.index') }}">
@@ -228,6 +229,7 @@
                             <span class="menu-title">Laporan</span>
                         </a>
                     </div>
+                    @endcan
                 @endcanany
 
                 @can('verify payments')
