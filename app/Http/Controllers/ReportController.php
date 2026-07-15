@@ -29,6 +29,7 @@ class ReportController extends Controller
             ->join('event_categories', 'event_categories.id', '=', 'sub_categories.event_category_id')
             ->join('events', 'events.id', '=', 'event_categories.event_id')
             ->join('contingents', 'contingents.id', '=', 'participants.contingent_id')
+            ->leftJoin('team_groups', 'team_groups.id', '=', 'registrations.team_group_id')
             ->select([
                 'registrations.*',
                 'participants.name as participant_name',
