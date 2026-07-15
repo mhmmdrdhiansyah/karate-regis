@@ -293,6 +293,7 @@
                 }
 
                 function applyFilters() {
+                    console.log('[Sidebar] applyFilters called');
                     const params = new URLSearchParams();
 
                     filters.forEach(filterName => {
