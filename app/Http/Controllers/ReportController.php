@@ -40,7 +40,8 @@ class ReportController extends Controller
                 'sub_categories.name as sub_category_name',
                 'sub_categories.category_type',
                 'sub_categories.gender as sub_category_gender',
-                'event_categories.name as event_category_name',
+                'event_categories.type',
+                'event_categories.class_name',
                 'event_categories.min_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
@@ -115,8 +116,8 @@ class ReportController extends Controller
                 ? \Carbon\Carbon::parse($registration->subCategory->eventCategory->min_birth_date)->age
                 : '-';
 
-            // Kelas: event_category.name - sub_category.name
-            $registration->kelas = $registration->subCategory->eventCategory->name . ' - ' . $registration->subCategory->name;
+            // Kelas: event_category.type - event_category.class_name - sub_category.name
+            $registration->kelas = $registration->subCategory->eventCategory->type->value . ' ' . $registration->subCategory->eventCategory->class_name . ' - ' . $registration->subCategory->name;
 
             // Team: "t" if beregu, else ""
             $registration->team = $registration->subCategory->category_type === 'beregu' ? 't' : '';
@@ -132,5 +133,91 @@ class ReportController extends Controller
             'genders',
             'statusBerkasOptions',
         ));
+    }
+
+    public function participantsExport(Request $request)
+    {
+        // Build query with all necessary joins (same as participants method)
+        $query = Registration::with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
+            ->whereNull('registrations.deleted_at')
+            ->whereNotNull('registrations.sub_category_id')
+            ->join('participants', 'participants.id', '=', 'registrations.participant_id')
+            ->join('sub_categories', 'sub_categories.id', '=', 'registrations.sub_category_id')
+            ->join('event_categories', 'event_categories.id', '=', 'sub_categories.event_category_id')
+            ->join('events', 'events.id', '=', 'event_categories.event_id')
+            ->join('contingents', 'contingents.id', '=', 'participants.contingent_id')
+            ->leftJoin('team_groups', 'team_groups.id', '=', 'registrations.team_group_id')
+            ->select([
+                'registrations.*',
+                'participants.name as participant_name',
+                'participants.institusi',
+                'participants.birth_date',
+                'participants.gender as participant_gender',
+                'contingents.name as contingent_name',
+                'sub_categories.name as sub_category_name',
+                'sub_categories.category_type',
+                'sub_categories.gender as sub_category_gender',
+                'event_categories.type',
+                'event_categories.class_name',
+                'event_categories.min_birth_date',
+                'events.name as event_name',
+                'team_groups.team_name',
+            ]);
+
+        // Apply filters (same as participants method)
+        if ($request->filled('event')) {
+            $query->where('events.id', $request->event);
+        }
+
+        if ($request->filled('contingent')) {
+            $query->where('contingents.id', $request->contingent);
+        }
+
+        if ($request->filled('category_type')) {
+            $query->where('sub_categories.category_type', $request->category_type);
+        }
+
+        if ($request->filled('gender')) {
+            $query->where('sub_categories.gender', $request->gender);
+        }
+
+        if ($request->filled('status_berkas')) {
+            $query->where('registrations.status_berkas', $request->status_berkas);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('participants.name', 'like', '%' . $search . '%')
+                  ->orWhere('contingents.name', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Same ordering
+        $query->orderBy('contingents.name', 'asc')
+              ->orderBy('participants.name', 'asc');
+
+        // Get ALL data (no pagination)
+        $registrations = $query->get();
+
+        // Calculate ages for each registration
+        $registrations->transform(function ($registration) {
+            $registration->age = $registration->participant->birth_date
+                ? \Carbon\Carbon::parse($registration->participant->birth_date)->age
+                : '-';
+
+            $registration->min_age = $registration->subCategory->eventCategory->min_birth_date
+                ? \Carbon\Carbon::parse($registration->subCategory->eventCategory->min_birth_date)->age
+                : '-';
+
+            $registration->kelas = $registration->subCategory->eventCategory->type->value . ' ' . $registration->subCategory->eventCategory->class_name . ' - ' . $registration->subCategory->name;
+
+            $registration->team = $registration->subCategory->category_type === 'beregu' ? 't' : '';
+
+            return $registration;
+        });
+
+        // Return JSON for export
+        return response()->json($registrations);
     }
 }

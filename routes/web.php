@@ -112,6 +112,9 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/participants', [ReportController::class, 'participants'])
         ->middleware(['permission:view reports'])
         ->name('reports.participants');
+    Route::get('reports/participants/export', [ReportController::class, 'participantsExport'])
+        ->middleware(['permission:view reports'])
+        ->name('reports.participants.export');
 
     // Pendaftaran Event (User/Kontingen)
     Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {
