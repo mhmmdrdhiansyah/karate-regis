@@ -136,8 +136,34 @@
 
                             <div class="fv-row mb-7">
                                 <label class="form-label">Institusi</label>
-                                <input type="text" name="institusi" class="form-control form-control-solid"
-                                    placeholder="Masukkan institusi" value="{{ old('institusi') }}" />
+                                <select name="institusi" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih institusi...">
+                                    <option value="">-- Pilih Institusi --</option>
+                                    <option value="ASKI" {{ old('institusi') == 'ASKI' ? 'selected' : '' }}>ASKI</option>
+                                    <option value="BUDOKAI" {{ old('institusi') == 'BUDOKAI' ? 'selected' : '' }}>BUDOKAI</option>
+                                    <option value="BKC" {{ old('institusi') == 'BKC' ? 'selected' : '' }}>BKC</option>
+                                    <option value="BLACK PANTHER" {{ old('institusi') == 'BLACK PANTHER' ? 'selected' : '' }}>BLACK PANTHER</option>
+                                    <option value="FUNAKOSHI" {{ old('institusi') == 'FUNAKOSHI' ? 'selected' : '' }}>FUNAKOSHI</option>
+                                    <option value="GABDIKA" {{ old('institusi') == 'GABDIKA' ? 'selected' : '' }}>GABDIKA</option>
+                                    <option value="GOJUKAI" {{ old('institusi') == 'GOJUKAI' ? 'selected' : '' }}>GOJUKAI</option>
+                                    <option value="GOJU ASS" {{ old('institusi') == 'GOJU ASS' ? 'selected' : '' }}>GOJU ASS</option>
+                                    <option value="GOKASI" {{ old('institusi') == 'GOKASI' ? 'selected' : '' }}>GOKASI</option>
+                                    <option value="INKADO" {{ old('institusi') == 'INKADO' ? 'selected' : '' }}>INKADO</option>
+                                    <option value="INKAI" {{ old('institusi') == 'INKAI' ? 'selected' : '' }}>INKAI</option>
+                                    <option value="INKANAS" {{ old('institusi') == 'INKANAS' ? 'selected' : '' }}>INKANAS</option>
+                                    <option value="KALA HITAM" {{ old('institusi') == 'KALA HITAM' ? 'selected' : '' }}>KALA HITAM</option>
+                                    <option value="KEI SHIN KAN" {{ old('institusi') == 'KEI SHIN KAN' ? 'selected' : '' }}>KEI SHIN KAN</option>
+                                    <option value="KKNSI" {{ old('institusi') == 'KKNSI' ? 'selected' : '' }}>KKNSI</option>
+                                    <option value="KKI" {{ old('institusi') == 'KKI' ? 'selected' : '' }}>KKI</option>
+                                    <option value="KYOKUSHINKAI" {{ old('institusi') == 'KYOKUSHINKAI' ? 'selected' : '' }}>KYOKUSHINKAI</option>
+                                    <option value="LEMKARI" {{ old('institusi') == 'LEMKARI' ? 'selected' : '' }}>LEMKARI</option>
+                                    <option value="SHOKAIDO" {{ old('institusi') == 'SHOKAIDO' ? 'selected' : '' }}>SHOKAIDO</option>
+                                    <option value="SHOTOKAI" {{ old('institusi') == 'SHOTOKAI' ? 'selected' : '' }}>SHOTOKAI</option>
+                                    <option value="PORBIKAWA" {{ old('institusi') == 'PORBIKAWA' ? 'selected' : '' }}>PORBIKAWA</option>
+                                    <option value="SHINDOKA" {{ old('institusi') == 'SHINDOKA' ? 'selected' : '' }}>SHINDOKA</option>
+                                    <option value="SHIROITE" {{ old('institusi') == 'SHIROITE' ? 'selected' : '' }}>SHIROITE</option>
+                                    <option value="TAKO" {{ old('institusi') == 'TAKO' ? 'selected' : '' }}>TAKO</option>
+                                    <option value="WADOKAI" {{ old('institusi') == 'WADOKAI' ? 'selected' : '' }}>WADOKAI</option>
+                                </select>
                                 @error('institusi')
                                     <span class="text-danger small">{{ $message }}</span>
                                 @enderror
@@ -263,6 +289,14 @@
 
             // Run on load
             toggleRequiredFields();
+
+            // Initialize Select2 for Institusi dropdown with search
+            $('select[name="institusi"]').select2({
+                dropdownParent: $('#kt_participant_form'),
+                placeholder: 'Pilih institusi...',
+                allowClear: true,
+                width: '100%'
+            });
 
             // === NIK Real-time Validation ===
             const nikInput = document.getElementById('nik_input');
