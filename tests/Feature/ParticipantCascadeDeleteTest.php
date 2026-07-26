@@ -16,6 +16,7 @@ use App\Models\SubCategory;
 use App\Models\User;
 use App\Services\ParticipantService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
 
 uses(RefreshDatabase::class);
 
@@ -164,4 +165,46 @@ it('reports delete impact including soft-deleted registrations', function () {
         ->and($impact['counts']['results'])->toBe(0)
         ->and($impact['counts']['draft_items'])->toBe(0)
         ->and($impact['details']['registrations'])->toHaveCount(1);
+});
+
+it('returns delete-preview as json for an authorized user', function () {
+    ['user' => $user, 'contingent' => $contingent] = setupWorld();
+    Permission::findOrCreate('delete participants');
+    $user->givePermissionTo('delete participants');
+
+    $participant = Participant::factory()->create(['contingent_id' => $contingent->id]);
+
+    $this->actingAs($user)
+        ->getJson(route('participants.delete-preview', $participant))
+        ->assertOk()
+        ->assertJsonStructure([
+            'participant' => ['name', 'type'],
+            'counts' => ['registrations', 'results', 'draft_items'],
+            'details' => ['registrations', 'results'],
+        ]);
+});
+
+it('deletes a participant with connected data over HTTP without a 500', function () {
+    ['user' => $user, 'contingent' => $contingent, 'event' => $event, 'subCategory' => $subCategory] = setupWorld();
+    Permission::findOrCreate('delete participants');
+    $user->givePermissionTo('delete participants');
+
+    $participant = Participant::factory()->create(['contingent_id' => $contingent->id]);
+    $payment = Payment::create([
+        'contingent_id' => $contingent->id, 'event_id' => $event->id,
+        'total_amount' => 100000, 'status' => PaymentStatus::Cancelled,
+    ]);
+    $registration = Registration::create([
+        'participant_id' => $participant->id, 'payment_id' => $payment->id,
+        'sub_category_id' => $subCategory->id, 'status_berkas' => RegistrationStatus::PendingReview,
+    ]);
+    $registration->delete(); // reproduce the exact production 500 trigger
+
+    $this->actingAs($user)
+        ->delete(route('participants.destroy', $participant))
+        ->assertRedirect(route('participants.index'));
+
+    expect(Participant::find($participant->id))->toBeNull()
+        ->and(Registration::withTrashed()->count())->toBe(0)
+        ->and(Payment::find($payment->id))->not->toBeNull();
 });
