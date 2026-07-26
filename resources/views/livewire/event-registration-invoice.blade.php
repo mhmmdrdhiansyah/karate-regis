@@ -163,9 +163,41 @@
                         <span class="fw-bolder fs-5">Total</span>
                         <span class="fw-bolder fs-3 text-primary">Rp {{ number_format($this->totalAmount, 0, ',', '.') }}</span>
                     </div>
+
+                    @if($this->event->bank_name && $this->event->account_number)
+                        <div class="separator separator-dashed my-5"></div>
+                        <div class="bg-light-primary p-4 rounded">
+                            <h5 class="fw-bolder text-dark mb-3">
+                                <i class="fas fa-university me-2"></i> Informasi Pembayaran
+                            </h5>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex flex-stack">
+                                    <span class="text-gray-600 fw-bold">Bank</span>
+                                    <span class="fw-bolder">{{ $this->event->bank_name }}</span>
+                                </div>
+                                <div class="d-flex flex-stack">
+                                    <span class="text-gray-600 fw-bold">No. Rekening</span>
+                                    <span class="fw-bolder text-primary fs-5">{{ $this->event->account_number }}</span>
+                                </div>
+                                <div class="d-flex flex-stack">
+                                    <span class="text-gray-600 fw-bold">Atas Nama</span>
+                                    <span class="fw-bolder">{{ $this->event->account_holder }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     <div class="d-flex flex-column gap-4 mt-6">
                         <button wire:click="confirmSubmit" class="btn btn-primary fw-bolder">
                             <i class="fas fa-check me-2"></i> Konfirmasi Invoice
+                        </button>
+                        <button wire:click="downloadPDF" class="btn btn-info fw-bolder" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="downloadPDF">
+                                <i class="fas fa-file-pdf me-2"></i> Download PDF
+                            </span>
+                            <span wire:loading wire:target="downloadPDF">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Memproses...
+                            </span>
                         </button>
                         <a href="{{ route('registration.index') }}" wire:navigate class="btn btn-light-danger fw-bold">
                             Batalkan
