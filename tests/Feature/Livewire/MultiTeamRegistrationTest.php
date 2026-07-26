@@ -194,9 +194,11 @@ class MultiTeamRegistrationTest extends TestCase
             ]);
         }
 
-        // Total should be: Event Fee (250k) + 2 teams * 300k = 850k
-        Livewire::test(EventRegistrationInvoice::class, ['event' => $this->event->id])
-            ->assertSet('totalAmount', 850000);
+        // Total should be: Event Fee (250k) + 2 teams * 300k = 850k, plus the
+        // unique payment code that is generated once and persisted on the draft.
+        $invoice = Livewire::test(EventRegistrationInvoice::class, ['event' => $this->event->id]);
+
+        $invoice->assertSet('totalAmount', 850000 + $draft->fresh()->unique_code);
     }
 
     /** @test */
