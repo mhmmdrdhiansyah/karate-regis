@@ -1,26 +1,6 @@
 buatkan issues.md di dalam folder agent yang berisi perencanaan untuk nanti di implementasikan oleh junior programmer atau ai model yang lebih murah.
 
-Isi dari planning nya adalah sebagai berikut :
-
-### Step 5.1 — Upload Bukti Transfer (User Side)
-
-**Tugas:** User upload bukti bayar untuk invoice yang sudah dibuat.
-
-**Yang harus dikerjakan:**
-1. Di dashboard user, tampilkan daftar payment milik kontingennya
-2. Untuk payment status `pending` (belum ada bukti) atau `rejected`, tampilkan form upload
-3. User upload file gambar bukti transfer
-4. Simpan path file ke kolom `transfer_proof`
-5. Jika status `rejected` dan user upload ulang: status kembali ke `pending`, `rejection_reason` di-clear
-
-**Validasi:**
-- File: required, image, max:5MB
-- Hanya bisa upload jika status `pending` atau `rejected`
-
-**Best Practices:**
-- Simpan bukti transfer di folder terpisah: `storage/app/public/payments/proofs/`
-- JANGAN hapus file bukti lama saat upload ulang (simpan untuk audit trail)
-- Tampilkan status payment dengan warna: pending=kuning, verified=hijau, rejected=merah
+saya buthu report untuk data peserta, ambil semua dari table peserta yang mendaftar, jangan lupa untuk filternya agar mudah di monitoring. saya butuh report tersebut memiliki kolom full name kontingen(diambil dari name di table contingent), shor name kontingen(diambil dari name kontingen juga), kode negera (untuk sekarang generate INA terus), first name (ambil dojo/institusi di table participant), last name(isi dengan name dari table participants), sex (diambil dari gender), age (diambil dari birth_date), kelas (diambil dari class_name-table-event_categories + name-table-sub_categories),sex(ini yang ke-2 namun diambil dari gender table sub_categories), team (ini menunjukan kelas nya team/beregu atau bukan jika dia team tolong isi dengan "t"), name team (isi dengan nama team nya diambil dari team_name table team_group ), min age (hitung dari table event_categories kolom min_birth_date dan max_birth_date)
 
 Jelaskan tahapan-tahapan yang harus dilakukan untuk mengimplementasikan penyelesaian permasalahan ini, anggap nanti yang menggunakan implementasi adalah junior programmer atau model AI yang lebih murah
 
@@ -33,3 +13,6 @@ kenapa yang berlaku hanya pada tab ringkasan harian saja, pada tab lain seperti 
 apakah semua ini sudah dikerjakan?
 push ke remote di branch baru (aku minta saran darimu mana yang baik, buat brnch baru di lokal baru push atau push ke remote branch yang baru)
 buat pull request
+
+
+saya buthu report untuk data peserta, ambil semua dari table peserta yang mendaftar, jangan lupa untuk filternya agar mudah di monitoring. saya butuh report tersebut memiliki kolom full name kontingen(diambil dari name di table contingent), shor name kontingen(diambil dari name kontingen juga), kode negera (untuk sekarang generate INA terus), first name (ambil dojo/institusi di table participant), last name(isi dengan name dari table participants), sex (diambil dari gender), age (diambil dari birth_date), kelas (diambil dari class_name-table-event_categories + name-table-sub_categories),sex(ini yang ke-2 namun diambil dari gender table sub_categories), team (ini menunjukan kelas nya team/beregu atau bukan jika dia team tolong isi dengan "t"), name team (isi dengan nama team nya diambil dari team_name table team_group ), min age (hitung dari table event_categories kolom min_birth_date dan max_birth_date)

@@ -222,11 +222,39 @@
                                             title="{{ $lockReasons['institusi'] ?? 'Field ini terkunci dan tidak dapat diubah' }}"></i>
                                     @endif
                                 </label>
-                                <input type="text" name="institusi" class="form-control form-control-solid"
-                                    value="{{ old('institusi', $participant->institusi) }}"
-                                    {{ in_array('institusi', $lockedFields) ? 'disabled' : '' }} />
                                 @if (in_array('institusi', $lockedFields))
+                                    <input type="text" class="form-control form-control-solid"
+                                        value="{{ $participant->institusi }}" readonly />
                                     <input type="hidden" name="institusi" value="{{ $participant->institusi }}" />
+                                @else
+                                    <select name="institusi" class="form-select form-select-solid select-institusi" data-placeholder="Pilih institusi...">
+                                        <option value="">-- Pilih Institusi --</option>
+                                        <option value="ASKI" {{ old('institusi', $participant->institusi) == 'ASKI' ? 'selected' : '' }}>ASKI</option>
+                                        <option value="BUDOKAI" {{ old('institusi', $participant->institusi) == 'BUDOKAI' ? 'selected' : '' }}>BUDOKAI</option>
+                                        <option value="BKC" {{ old('institusi', $participant->institusi) == 'BKC' ? 'selected' : '' }}>BKC</option>
+                                        <option value="BLACK PANTHER" {{ old('institusi', $participant->institusi) == 'BLACK PANTHER' ? 'selected' : '' }}>BLACK PANTHER</option>
+                                        <option value="FUNAKOSHI" {{ old('institusi', $participant->institusi) == 'FUNAKOSHI' ? 'selected' : '' }}>FUNAKOSHI</option>
+                                        <option value="GABDIKA" {{ old('institusi', $participant->institusi) == 'GABDIKA' ? 'selected' : '' }}>GABDIKA</option>
+                                        <option value="GOJUKAI" {{ old('institusi', $participant->institusi) == 'GOJUKAI' ? 'selected' : '' }}>GOJUKAI</option>
+                                        <option value="GOJU ASS" {{ old('institusi', $participant->institusi) == 'GOJU ASS' ? 'selected' : '' }}>GOJU ASS</option>
+                                        <option value="GOKASI" {{ old('institusi', $participant->institusi) == 'GOKASI' ? 'selected' : '' }}>GOKASI</option>
+                                        <option value="INKADO" {{ old('institusi', $participant->institusi) == 'INKADO' ? 'selected' : '' }}>INKADO</option>
+                                        <option value="INKAI" {{ old('institusi', $participant->institusi) == 'INKAI' ? 'selected' : '' }}>INKAI</option>
+                                        <option value="INKANAS" {{ old('institusi', $participant->institusi) == 'INKANAS' ? 'selected' : '' }}>INKANAS</option>
+                                        <option value="KALA HITAM" {{ old('institusi', $participant->institusi) == 'KALA HITAM' ? 'selected' : '' }}>KALA HITAM</option>
+                                        <option value="KEI SHIN KAN" {{ old('institusi', $participant->institusi) == 'KEI SHIN KAN' ? 'selected' : '' }}>KEI SHIN KAN</option>
+                                        <option value="KKNSI" {{ old('institusi', $participant->institusi) == 'KKNSI' ? 'selected' : '' }}>KKNSI</option>
+                                        <option value="KKI" {{ old('institusi', $participant->institusi) == 'KKI' ? 'selected' : '' }}>KKI</option>
+                                        <option value="KYOKUSHINKAI" {{ old('institusi', $participant->institusi) == 'KYOKUSHINKAI' ? 'selected' : '' }}>KYOKUSHINKAI</option>
+                                        <option value="LEMKARI" {{ old('institusi', $participant->institusi) == 'LEMKARI' ? 'selected' : '' }}>LEMKARI</option>
+                                        <option value="SHOKAIDO" {{ old('institusi', $participant->institusi) == 'SHOKAIDO' ? 'selected' : '' }}>SHOKAIDO</option>
+                                        <option value="SHOTOKAI" {{ old('institusi', $participant->institusi) == 'SHOTOKAI' ? 'selected' : '' }}>SHOTOKAI</option>
+                                        <option value="PORBIKAWA" {{ old('institusi', $participant->institusi) == 'PORBIKAWA' ? 'selected' : '' }}>PORBIKAWA</option>
+                                        <option value="SHINDOKA" {{ old('institusi', $participant->institusi) == 'SHINDOKA' ? 'selected' : '' }}>SHINDOKA</option>
+                                        <option value="SHIROITE" {{ old('institusi', $participant->institusi) == 'SHIROITE' ? 'selected' : '' }}>SHIROITE</option>
+                                        <option value="TAKO" {{ old('institusi', $participant->institusi) == 'TAKO' ? 'selected' : '' }}>TAKO</option>
+                                        <option value="WADOKAI" {{ old('institusi', $participant->institusi) == 'WADOKAI' ? 'selected' : '' }}>WADOKAI</option>
+                                    </select>
                                 @endif
                                 @error('institusi')
                                     <span class="text-danger small">{{ $message }}</span>
@@ -284,6 +312,14 @@
             <script>
                 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
                     new bootstrap.Tooltip(el);
+                });
+
+                // Initialize Select2 for Institusi dropdown with search
+                $('.select-institusi').select2({
+                    dropdownParent: $('#kt_participant_form'),
+                    placeholder: 'Pilih institusi...',
+                    allowClear: true,
+                    width: '100%'
                 });
 
                 document.getElementById('photo_input').addEventListener('change', function(e) {

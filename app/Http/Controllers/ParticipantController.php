@@ -17,7 +17,7 @@ class ParticipantController extends Controller
         $this->middleware('permission:view participants|create participants|edit participants')->only(['index', 'show', 'checkNik']);
         $this->middleware('permission:create participants')->only(['create', 'store']);
         $this->middleware('permission:edit participants')->only(['edit', 'update']);
-        $this->middleware('permission:delete participants')->only(['destroy']);
+        $this->middleware('permission:delete participants')->only(['destroy', 'deletePreview']);
     }
 
     public function index(Request $request)
@@ -122,17 +122,18 @@ class ParticipantController extends Controller
     {
         $this->authorizeParticipant($participant);
 
-        if (!$this->participantService->canDelete($participant)) {
-            return back()->withErrors([
-                'delete' => $this->participantService->getDeleteReason($participant),
-            ]);
-        }
-
-        $this->participantService->deleteFiles($participant);
-
-        $participant->delete();
+        $this->participantService->cascadeDelete($participant);
 
         return redirect()->route('participants.index')->with('success', 'Peserta berhasil dihapus.');
+    }
+
+    public function deletePreview(Participant $participant)
+    {
+        $this->authorizeParticipant($participant);
+
+        return response()->json(
+            $this->participantService->getDeleteImpact($participant)
+        );
     }
 
     public function checkNik(Request $request)

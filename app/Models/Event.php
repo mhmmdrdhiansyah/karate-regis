@@ -6,6 +6,7 @@ use App\Enums\EventStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -14,6 +15,9 @@ class Event extends Model
     protected $fillable = [
         'name',
         'poster',
+        'bank_name',
+        'account_number',
+        'account_holder',
         'event_date',
         'registration_deadline',
         'coach_fee',
@@ -88,5 +92,37 @@ class Event extends Model
             EventStatus::Ongoing => 'badge-light-primary',
             EventStatus::Completed => 'badge-light-dark',
         };
+    }
+
+    /**
+     * Get formatted event date for display.
+     */
+    public function getFormattedDateAttribute(): string
+    {
+        return $this->event_date->format('d M Y'); // e.g., "12 OKT 2024"
+    }
+
+    /**
+     * Get the URL for the event poster/image.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->poster) {
+            // If poster is stored as path in storage
+            if (filter_var($this->poster, FILTER_VALIDATE_URL)) {
+                return $this->poster;
+            }
+            // If poster is a storage path
+            if (Storage::disk('public')->exists($this->poster)) {
+                return Storage::disk('public')->url($this->poster);
+            }
+            // If poster is relative path in assets
+            if (file_exists(public_path('assets/' . $this->poster))) {
+                return asset('assets/' . $this->poster);
+            }
+        }
+
+        // Default fallback image
+        return 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80';
     }
 }

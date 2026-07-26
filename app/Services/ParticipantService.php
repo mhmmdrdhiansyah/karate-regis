@@ -3,7 +3,11 @@
 namespace App\Services;
 
 use App\Models\Participant;
+use App\Models\Registration;
+use App\Models\RegistrationDraftItem;
+use App\Models\Result;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ParticipantService
@@ -101,6 +105,75 @@ class ParticipantService
         if ($participant->document) {
             Storage::disk('public')->delete($participant->document);
         }
+    }
+
+    /**
+     * Soft-deleted registrations and draft items still block a participant's
+     * deletion at the DB level (FK restrictOnDelete) — the source of the 500
+     * in production. Force-remove every child row in FK order, then delete the
+     * participant, all inside a transaction.
+     */
+    public function cascadeDelete(Participant $participant): void
+    {
+        DB::transaction(function () use ($participant) {
+            $registrationIds = $participant->registrations()
+                ->withTrashed()
+                ->pluck('id');
+
+            // 1. Results first (FK results.registration_id = restrictOnDelete).
+            Result::whereIn('registration_id', $registrationIds)->delete();
+
+            // 2. Force-delete registrations incl. trashed (FK participant_id = restrictOnDelete).
+            $participant->registrations()->withTrashed()->forceDelete();
+
+            // 3. Draft items (FK registration_draft_items.participant_id = restrictOnDelete).
+            $participant->draftItems()->delete();
+
+            // 4. Uploaded files.
+            $this->deleteFiles($participant);
+
+            // 5. The participant itself.
+            $participant->delete();
+        });
+    }
+
+    /**
+     * Structured preview of everything cascadeDelete() will remove.
+     * Includes soft-deleted registrations so the warning matches reality.
+     */
+    public function getDeleteImpact(Participant $participant): array
+    {
+        $registrations = $participant->registrations()
+            ->withTrashed()
+            ->with(['payment.event', 'subCategory.eventCategory'])
+            ->get();
+
+        $results = Result::whereIn('registration_id', $registrations->pluck('id'))
+            ->with('registration.payment.event')
+            ->get();
+
+        return [
+            'participant' => [
+                'name' => $participant->name,
+                'type' => $participant->type?->value,
+            ],
+            'counts' => [
+                'registrations' => $registrations->count(),
+                'results' => $results->count(),
+                'draft_items' => $participant->draftItems()->count(),
+            ],
+            'details' => [
+                'registrations' => $registrations->map(fn ($r) => [
+                    'event' => $r->payment?->event?->name ?? '-',
+                    'category' => $r->subCategory?->eventCategory?->name ?? '-',
+                    'status' => $r->status_berkas?->value,
+                ])->values()->all(),
+                'results' => $results->map(fn ($res) => [
+                    'event' => $res->registration?->payment?->event?->name ?? '-',
+                    'medal' => $res->medal_type?->value,
+                ])->values()->all(),
+            ],
+        ];
     }
 
     public function autoVerifyIfNeeded(Participant $participant): void

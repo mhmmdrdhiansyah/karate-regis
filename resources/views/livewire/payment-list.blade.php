@@ -45,20 +45,27 @@
                                 <span class="text-muted mt-1 fw-bold fs-7">Invoice #{{ $payment->id }} - {{ $payment->created_at->translatedFormat('j F Y, H:i') }}</span>
                             </h3>
                             <div class="card-toolbar">
-                                @switch($payment->status)
-                                    @case(App\Enums\PaymentStatus::Pending)
-                                        <span class="badge badge-light-warning fw-bolder px-4 py-3">Pending</span>
-                                        @break
-                                    @case(App\Enums\PaymentStatus::Verified)
-                                        <span class="badge badge-light-success fw-bolder px-4 py-3">Verified</span>
-                                        @break
-                                    @case(App\Enums\PaymentStatus::Rejected)
-                                        <span class="badge badge-light-danger fw-bolder px-4 py-3">Rejected</span>
-                                        @break
-                                    @case(App\Enums\PaymentStatus::Cancelled)
-                                        <span class="badge badge-light-dark fw-bolder px-4 py-3">Cancelled</span>
-                                        @break
-                                @endswitch
+                                <div class="d-flex gap-3 align-items-center">
+                                    <a href="{{ route('payments.invoice', $payment->id) }}"
+                                       target="_blank"
+                                       class="btn btn-sm btn-light-primary">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i> Download Invoice
+                                    </a>
+                                    @switch($payment->status)
+                                        @case(App\Enums\PaymentStatus::Pending)
+                                            <span class="badge badge-light-warning fw-bolder px-4 py-3">Pending</span>
+                                            @break
+                                        @case(App\Enums\PaymentStatus::Verified)
+                                            <span class="badge badge-light-success fw-bolder px-4 py-3">Verified</span>
+                                            @break
+                                        @case(App\Enums\PaymentStatus::Rejected)
+                                            <span class="badge badge-light-danger fw-bolder px-4 py-3">Rejected</span>
+                                            @break
+                                        @case(App\Enums\PaymentStatus::Cancelled)
+                                            <span class="badge badge-light-dark fw-bolder px-4 py-3">Cancelled</span>
+                                            @break
+                                    @endswitch
+                                </div>
                             </div>
                         </div>
                         <div class="card-body py-5">

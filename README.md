@@ -1,4 +1,4 @@
-# Karatae Regis
+# Combat Pro
 
 Aplikasi manajemen registrasi karate berbasis Laravel untuk mengelola kontingen, peserta, event, kategori pertandingan, pembayaran, verifikasi berkas, dan hasil kejuaraan.
 

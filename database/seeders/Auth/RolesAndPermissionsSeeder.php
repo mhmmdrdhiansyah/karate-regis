@@ -179,17 +179,6 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $kontingen->assignRole($kontingenRole);
 
-        // Buat Contingent untuk user kontingen
-        Contingent::updateOrCreate(
-            ['user_id' => $kontingen->id],
-            [
-                'name' => 'Kontingen Contoh',
-                'official_name' => 'Kontingen Contoh Official',
-                'phone' => '08123456789',
-                'address' => 'Alamat Contoh',
-            ]
-        );
-
         $this->command->info('Seeder selesai! Data lama aman, data baru ditambahkan.');
     }
 }

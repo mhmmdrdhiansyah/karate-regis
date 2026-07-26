@@ -81,7 +81,7 @@ class EventRegistrationInvoice extends Component
             return;
         }
 
-        $this->uniqueCode = rand(100, 999);
+        $this->uniqueCode = $draft->getOrAssignUniqueCode();
     }
 
     #[Computed]
@@ -363,5 +363,13 @@ class EventRegistrationInvoice extends Component
     public function render()
     {
         return view('livewire.event-registration-invoice');
+    }
+
+    public function downloadPDF(): void
+    {
+        $this->redirect(route('invoice.pdf', [
+            'event' => $this->eventId,
+            'draft' => $this->draftId,
+        ]));
     }
 }

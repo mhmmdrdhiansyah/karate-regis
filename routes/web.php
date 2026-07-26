@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KontingenManagementController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\WilayahController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfileController;
@@ -14,9 +15,9 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/events/{event}', [LandingController::class, 'show'])->name('events.show');
+Route::post('/check-status', [LandingController::class, 'checkStatus'])->name('check-status');
 
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'provinces']);
 Route::get('/api/wilayah/regencies/{provinceCode}', [WilayahController::class, 'regencies']);
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::middleware(['permission:delete participants'])->group(function () {
         Route::delete('participants/{participant}', [ParticipantController::class, 'destroy'])->name('participants.destroy');
+        Route::get('participants/{participant}/delete-preview', [ParticipantController::class, 'deletePreview'])->name('participants.delete-preview');
     });
 
     Route::get('/api/check-nik', [ParticipantController::class, 'checkNik']);
@@ -131,6 +133,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('registration/invoice/{event}', \App\Livewire\EventRegistrationInvoice::class)
             ->name('registration.invoice');
+
+        Route::get('registration/invoice/{event}/pdf', [\App\Http\Controllers\InvoiceController::class, 'pdf'])
+            ->name('invoice.pdf');
+
+        Route::get('payments/{payment}/invoice', [\App\Http\Controllers\InvoiceController::class, 'downloadByPayment'])
+            ->name('payments.invoice');
 
         Route::get('payments', \App\Livewire\PaymentList::class)
             ->name('payments.index');
