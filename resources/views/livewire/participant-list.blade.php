@@ -245,23 +245,61 @@
     </div>
 
     <script>
+        window.participantDeletePreviewUrl = (id) =>
+            "{{ route('participants.delete-preview', '__ID__') }}".replace('__ID__', id);
+
+        function renderDeleteImpactHtml(impact) {
+            const c = impact.counts || {};
+            const regs = (impact.details && impact.details.registrations) || [];
+            const medals = (impact.details && impact.details.results) || [];
+
+            let html = '<div class="text-start">';
+            html += '<p class="fw-bold text-danger mb-2">Data berikut akan dihapus permanen:</p>';
+            html += '<ul class="small text-start mb-2">'
+                + '<li><b>' + c.registrations + '</b> registrasi pendaftaran</li>'
+                + '<li><b>' + c.results + '</b> hasil/medal pertandingan</li>'
+                + '<li><b>' + c.draft_items + '</b> item keranjang draft</li>'
+                + '</ul>';
+
+            if (medals.length) {
+                html += '<p class="small text-danger mb-1"><b>History pertandingan (medal):</b></p><ul class="small text-start">';
+                medals.forEach(m => html += '<li>' + (m.event || '-') + ' — ' + (m.medal || '-') + '</li>');
+                html += '</ul>';
+            }
+            if (regs.length) {
+                html += '<p class="small text-muted mb-1"><b>Pendaftaran:</b></p><ul class="small text-start">';
+                regs.forEach(r => html += '<li>' + (r.event || '-') + ' — ' + (r.category || '-') + '</li>');
+                html += '</ul>';
+            }
+
+            html += '<p class="small text-muted mt-2 mb-0">Pembayaran &amp; data kontingen lainnya <b>tidak</b> ikut dihapus.</p>';
+            html += '</div>';
+            return html;
+        }
+
         function confirmDelete(e, id) {
             e.preventDefault();
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data peserta ini akan dihapus secara permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + id)?.submit() ||
-                        document.getElementById('m-delete-' + id)?.submit();
-                }
-            });
+            Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            fetch(window.participantDeletePreviewUrl(id), { headers: { 'Accept': 'application/json' } })
+                .then(r => r.ok ? r.json() : Promise.reject(r))
+                .then(impact => {
+                    Swal.fire({
+                        title: 'Hapus peserta ini?',
+                        html: renderDeleteImpactHtml(impact),
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, hapus permanen',
+                        cancelButtonText: 'Batal'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            (document.getElementById('delete-form-' + id) || document.getElementById('m-delete-' + id))?.submit();
+                        }
+                    });
+                })
+                .catch(() => Swal.fire('Gagal', 'Tidak dapat memuat data. Coba lagi.', 'error'));
         }
     </script>
 </div>

@@ -167,6 +167,16 @@ it('reports delete impact including soft-deleted registrations', function () {
         ->and($impact['details']['registrations'])->toHaveCount(1);
 });
 
+it('renders the Bank Peserta list page without errors', function () {
+    ['user' => $user, 'contingent' => $contingent] = setupWorld();
+    Permission::findOrCreate('view participants');
+    $user->givePermissionTo('view participants');
+
+    $this->actingAs($user)
+        ->get(route('participants.index'))
+        ->assertOk();
+});
+
 it('returns delete-preview as json for an authorized user', function () {
     ['user' => $user, 'contingent' => $contingent] = setupWorld();
     Permission::findOrCreate('delete participants');
