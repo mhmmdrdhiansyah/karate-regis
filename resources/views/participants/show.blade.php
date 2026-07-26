@@ -10,7 +10,7 @@
             <div class="d-flex flex-column">
                 <h5 class="mb-1 text-warning">Peserta terdaftar di event</h5>
                 <span class="text-gray-600">
-                    NIK, tanggal lahir, dan jenis kelamin tidak dapat diubah. Peserta tidak dapat dihapus.
+                    NIK, tanggal lahir, dan jenis kelamin tidak dapat diubah.
                 </span>
             </div>
         </div>
@@ -23,7 +23,7 @@
             <div class="d-flex flex-column">
                 <h5 class="mb-1 text-danger">Data sudah terverifikasi</h5>
                 <span class="text-gray-600">
-                    Semua field terkunci kecuali foto. Peserta tidak dapat dihapus.
+                    Semua field terkunci kecuali foto.
                 </span>
             </div>
         </div>
@@ -90,19 +90,19 @@
                                 </a>
                             @endif
 
-                            @if ($hasDeletePermission && $canDelete)
+                            @if ($hasDeletePermission)
+                                <button type="button" class="btn btn-light-danger btn-sm me-2" onclick="confirmDeleteParticipant()">
+                                    <i class="bi bi-trash me-1"></i> Hapus
+                                </button>
                                 <form action="{{ route('participants.destroy', $participant) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin ingin menghapus peserta ini?')">
+                                    id="participant-delete-form" style="display:none;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-light-danger btn-sm me-2">
-                                        <i class="bi bi-trash me-1"></i> Hapus
-                                    </button>
                                 </form>
                             @elseif(!$hasDeletePermission)
                                 <span class="btn btn-light-danger btn-sm me-2 opacity-50 cursor-default"
                                     data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                    title="{{ $deleteReason ?? 'Peserta tidak dapat dihapus' }}"
+                                    title="Anda tidak memiliki izin menghapus peserta ini"
                                     style="cursor: not-allowed;">
                                     <i class="bi bi-trash me-1"></i> Hapus
                                 </span>
@@ -374,6 +374,61 @@
             @if ($errors->has('delete'))
                 toastr.error(@js($errors->first('delete')));
             @endif
+
+            window.participantDeletePreviewUrl = "{{ route('participants.delete-preview', $participant) }}";
+
+            function renderDeleteImpactHtml(impact) {
+                const c = impact.counts || {};
+                const regs = (impact.details && impact.details.registrations) || [];
+                const medals = (impact.details && impact.details.results) || [];
+
+                let html = '<div class="text-start">';
+                html += '<p class="fw-bold text-danger mb-2">Data berikut akan dihapus permanen:</p>';
+                html += '<ul class="small text-start mb-2">'
+                    + '<li><b>' + c.registrations + '</b> registrasi pendaftaran</li>'
+                    + '<li><b>' + c.results + '</b> hasil/medal pertandingan</li>'
+                    + '<li><b>' + c.draft_items + '</b> item keranjang draft</li>'
+                    + '</ul>';
+
+                if (medals.length) {
+                    html += '<p class="small text-danger mb-1"><b>History pertandingan (medal):</b></p><ul class="small text-start">';
+                    medals.forEach(m => html += '<li>' + (m.event || '-') + ' — ' + (m.medal || '-') + '</li>');
+                    html += '</ul>';
+                }
+                if (regs.length) {
+                    html += '<p class="small text-muted mb-1"><b>Pendaftaran:</b></p><ul class="small text-start">';
+                    regs.forEach(r => html += '<li>' + (r.event || '-') + ' — ' + (r.category || '-') + '</li>');
+                    html += '</ul>';
+                }
+
+                html += '<p class="small text-muted mt-2 mb-0">Pembayaran &amp; data kontingen lainnya <b>tidak</b> ikut dihapus.</p>';
+                html += '</div>';
+                return html;
+            }
+
+            function confirmDeleteParticipant() {
+                Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                fetch(window.participantDeletePreviewUrl, { headers: { 'Accept': 'application/json' } })
+                    .then(r => r.ok ? r.json() : Promise.reject(r))
+                    .then(impact => {
+                        Swal.fire({
+                            title: 'Hapus peserta ini?',
+                            html: renderDeleteImpactHtml(impact),
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Ya, hapus permanen',
+                            cancelButtonText: 'Batal'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                document.getElementById('participant-delete-form')?.submit();
+                            }
+                        });
+                    })
+                    .catch(() => Swal.fire('Gagal', 'Tidak dapat memuat data. Coba lagi.', 'error'));
+            }
         </script>
     @endpush
 </x-app-layout>

@@ -177,6 +177,17 @@ it('renders the Bank Peserta list page without errors', function () {
         ->assertOk();
 });
 
+it('renders the participant detail page without errors', function () {
+    ['user' => $user, 'contingent' => $contingent] = setupWorld();
+    Permission::findOrCreate('view participants');
+    $user->givePermissionTo('view participants');
+    $participant = Participant::factory()->create(['contingent_id' => $contingent->id]);
+
+    $this->actingAs($user)
+        ->get(route('participants.show', $participant))
+        ->assertOk();
+});
+
 it('returns delete-preview as json for an authorized user', function () {
     ['user' => $user, 'contingent' => $contingent] = setupWorld();
     Permission::findOrCreate('delete participants');
