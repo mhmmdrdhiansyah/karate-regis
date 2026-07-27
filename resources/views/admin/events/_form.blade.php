@@ -106,3 +106,34 @@
             <span class="text-danger small">{{ $message }}</span>
         @enderror
     </div>
+</div>
+
+<div class="row mb-7">
+    <div class="col-md-4 fv-row">
+        <label class="form-label">Nama Bank</label>
+        <input type="text" name="bank_name" class="form-control form-control-solid"
+            value="{{ old('bank_name', $event->bank_name) }}" placeholder="Opsional">
+        @error('bank_name')
+            <span class="text-danger small d-block">{{ $message }}</span>
+        @enderror
+    </div>
+    <div class="col-md-4 fv-row">
+        <label class="form-label">No. Rekening</label>
+        <input type="text" inputmode="numeric" name="account_number" class="form-control form-control-solid"
+            value="{{ old('account_number', $event->account_number) }}" placeholder="Opsional">
+        @error('account_number')
+            <span class="text-danger small d-block">{{ $message }}</span>
+        @enderror
+    </div>
+    <div class="col-md-4 fv-row">
+        <label class="form-label">Atas Nama</label>
+        <input type="text" name="account_holder" class="form-control form-control-solid"
+            value="{{ old('account_holder', $event->account_holder) }}" placeholder="Opsional">
+        @error('account_holder')
+            <span class="text-danger small d-block">{{ $message }}</span>
+        @enderror
+    </div>
+    <div class="col-12">
+        <span class="text-muted fs-7">Informasi pembayaran (opsional). Muncul pada invoice peserta jika Nama Bank &amp; No. Rekening terisi.</span>
+    </div>
+</div>

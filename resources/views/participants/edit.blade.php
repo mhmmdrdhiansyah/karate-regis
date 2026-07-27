@@ -109,7 +109,7 @@
                                 <input type="file" name="photo" class="form-control" accept="image/*"
                                     id="photo_input" />
                                 <span class="text-muted fs-7">Kosongkan jika tidak ingin mengubah. Format: JPG, PNG.
-                                    Maksimal 2MB</span>
+                                    Maksimal 1MB</span>
                                 <div id="photo_preview" class="mt-3" style="display: none;">
                                     <div class="w-125px h-125px overflow-hidden rounded border">
                                         <img src="#" alt="Preview" class="w-100 h-100 object-fit-cover" />
@@ -215,7 +215,7 @@
                         <div class="col-md-6">
                             <div class="fv-row">
                                 <label class="form-label">
-                                    Institusi
+                                    Perguruan
                                     @if (in_array('institusi', $lockedFields))
                                         <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -227,8 +227,8 @@
                                         value="{{ $participant->institusi }}" readonly />
                                     <input type="hidden" name="institusi" value="{{ $participant->institusi }}" />
                                 @else
-                                    <select name="institusi" class="form-select form-select-solid select-institusi" data-placeholder="Pilih institusi...">
-                                        <option value="">-- Pilih Institusi --</option>
+                                    <select name="institusi" class="form-select form-select-solid select-institusi" data-placeholder="Pilih perguruan...">
+                                        <option value="">-- Pilih Perguruan --</option>
                                         <option value="ASKI" {{ old('institusi', $participant->institusi) == 'ASKI' ? 'selected' : '' }}>ASKI</option>
                                         <option value="BUDOKAI" {{ old('institusi', $participant->institusi) == 'BUDOKAI' ? 'selected' : '' }}>BUDOKAI</option>
                                         <option value="BKC" {{ old('institusi', $participant->institusi) == 'BKC' ? 'selected' : '' }}>BKC</option>
@@ -282,7 +282,7 @@
                                 <input type="file" name="document" class="form-control"
                                     accept=".jpg,.jpeg,.png,.pdf" id="document_input"
                                     {{ $isDocumentLocked ? 'disabled' : '' }} />
-                                <span class="text-muted fs-7">Format: JPG, PNG, PDF. Maksimal 5MB</span>
+                                <span class="text-muted fs-7">Format: JPG, PNG, PDF. Maksimal 2MB</span>
                                 <div id="document_info" class="mt-2" style="display: none;">
                                     <span class="badge badge-light-info"></span>
                                 </div>
@@ -314,10 +314,10 @@
                     new bootstrap.Tooltip(el);
                 });
 
-                // Initialize Select2 for Institusi dropdown with search
+                // Initialize Select2 for Perguruan dropdown with search
                 $('.select-institusi').select2({
                     dropdownParent: $('#kt_participant_form'),
-                    placeholder: 'Pilih institusi...',
+                    placeholder: 'Pilih perguruan...',
                     allowClear: true,
                     width: '100%'
                 });
@@ -328,8 +328,8 @@
                         document.getElementById('photo_preview').style.display = 'none';
                         return;
                     }
-                    if (file.size > 2 * 1024 * 1024) {
-                        toastr.error('Ukuran foto maksimal 2MB');
+                    if (file.size > 1 * 1024 * 1024) {
+                        toastr.error('Ukuran foto maksimal 1MB');
                         e.target.value = '';
                         return;
                     }
@@ -348,8 +348,8 @@
                             document.getElementById('document_info').style.display = 'none';
                             return;
                         }
-                        if (file.size > 5 * 1024 * 1024) {
-                            toastr.error('Ukuran dokumen maksimal 5MB');
+                        if (file.size > 2 * 1024 * 1024) {
+                            toastr.error('Ukuran dokumen maksimal 2MB');
                             e.target.value = '';
                             return;
                         }

@@ -168,7 +168,7 @@
                                 </div>
 
                                 <div class="d-flex flex-stack mb-5">
-                                    <span class="text-muted fw-bold">Institusi</span>
+                                    <span class="text-muted fw-bold">Perguruan</span>
                                     <span class="text-gray-800 fw-bolder text-end" id="modalInstitusi">-</span>
                                 </div>
                                 

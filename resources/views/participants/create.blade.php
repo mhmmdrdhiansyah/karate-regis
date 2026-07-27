@@ -35,7 +35,7 @@
                                     </div>
                                     <input type="file" name="photo" class="form-control mt-4" accept="image/*"
                                         id="photo_input" />
-                                    <span class="text-muted fs-7">Format: JPG, PNG. Maksimal 2MB</span>
+                                    <span class="text-muted fs-7">Format: JPG, PNG. Maksimal 1MB</span>
                                     @error('photo')
                                         <span class="text-danger small d-block mt-1">{{ $message }}</span>
                                     @enderror
@@ -135,9 +135,9 @@
                             </div>
 
                             <div class="fv-row mb-7">
-                                <label class="form-label">Institusi</label>
-                                <select name="institusi" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih institusi...">
-                                    <option value="">-- Pilih Institusi --</option>
+                                <label class="form-label">Perguruan</label>
+                                <select name="institusi" class="form-select form-select-solid" data-control="select2" data-placeholder="Pilih perguruan...">
+                                    <option value="">-- Pilih Perguruan --</option>
                                     <option value="ASKI" {{ old('institusi') == 'ASKI' ? 'selected' : '' }}>ASKI</option>
                                     <option value="BUDOKAI" {{ old('institusi') == 'BUDOKAI' ? 'selected' : '' }}>BUDOKAI</option>
                                     <option value="BKC" {{ old('institusi') == 'BKC' ? 'selected' : '' }}>BKC</option>
@@ -173,7 +173,7 @@
                                 <label class="required form-label">Dokumen</label>
                                 <input type="file" name="document" class="form-control"
                                     accept=".jpg,.jpeg,.png,.pdf" id="document_input" />
-                                <span class="text-muted fs-7">Format: JPG, PNG, PDF. Maksimal 5MB</span>
+                                <span class="text-muted fs-7">Format: JPG, PNG, PDF. Maksimal 2MB</span>
                                 <div id="document_info" class="mt-2" style="display: none;">
                                     <span class="badge badge-light-info">{{ old('document_name', '') }}</span>
                                 </div>
@@ -215,8 +215,8 @@
                     document.getElementById('photo_preview').src = '{{ asset('assets/media/avatars/blank.png') }}';
                     return;
                 }
-                if (file.size > 2 * 1024 * 1024) {
-                    toastr.error('Ukuran foto maksimal 2MB');
+                if (file.size > 1 * 1024 * 1024) {
+                    toastr.error('Ukuran foto maksimal 1MB');
                     e.target.value = '';
                     document.getElementById('photo_preview').src = '{{ asset('assets/media/avatars/blank.png') }}';
                     return;
@@ -234,8 +234,8 @@
                     document.getElementById('document_info').style.display = 'none';
                     return;
                 }
-                if (file.size > 5 * 1024 * 1024) {
-                    toastr.error('Ukuran dokumen maksimal 5MB');
+                if (file.size > 2 * 1024 * 1024) {
+                    toastr.error('Ukuran dokumen maksimal 2MB');
                     e.target.value = '';
                     return;
                 }
@@ -290,10 +290,10 @@
             // Run on load
             toggleRequiredFields();
 
-            // Initialize Select2 for Institusi dropdown with search
+            // Initialize Select2 for Perguruan dropdown with search
             $('select[name="institusi"]').select2({
                 dropdownParent: $('#kt_participant_form'),
-                placeholder: 'Pilih institusi...',
+                placeholder: 'Pilih perguruan...',
                 allowClear: true,
                 width: '100%'
             });

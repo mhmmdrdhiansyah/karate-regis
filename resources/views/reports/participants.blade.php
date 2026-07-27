@@ -240,7 +240,7 @@
                                         <span class="text-dark fw-bold fs-7">{{ $registration->sub_category_gender?->value ?? '-' }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between py-2 border-bottom border-gray-200">
-                                        <span class="text-gray-500 fs-7">Institusi</span>
+                                        <span class="text-gray-500 fs-7">Perguruan</span>
                                         <span class="text-dark fw-bold fs-7">{{ $registration->institusi ?? '-' }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between py-2">

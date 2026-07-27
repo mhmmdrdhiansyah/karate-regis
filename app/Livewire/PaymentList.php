@@ -50,7 +50,7 @@ class PaymentList extends Component
     {
         // 1. Validasi file
         $this->validate([
-            'proofFile' => ['required', 'image', 'max:5120'], // 5MB
+            'proofFile' => ['required', 'image', 'max:1024'], // 1MB
         ]);
 
         // 2. Ambil payment dan cek authorization
