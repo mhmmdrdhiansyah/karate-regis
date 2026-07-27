@@ -28,8 +28,8 @@ class StoreParticipantRequest extends FormRequest
             'gender' => ['required_if:type,athlete', 'nullable', 'in:M,F'],
 
             'institusi' => 'nullable|string|max:255',
-            'photo' => 'required|image|max:2048',
-            'document' => ['required_if:type,athlete', 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'photo' => 'required|image|max:1024',
+            'document' => ['required_if:type,athlete', 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ];
     }
 
@@ -49,9 +49,9 @@ class StoreParticipantRequest extends FormRequest
             'gender.in' => 'Gender tidak valid',
             'photo.required' => 'Foto wajib diisi',
             'photo.image' => 'File harus berupa gambar',
-            'photo.max' => 'Ukuran foto maksimal 2MB',
+            'photo.max' => 'Ukuran foto maksimal 1MB',
             'document.mimes' => 'Dokumen harus berupa JPG, PNG, atau PDF',
-            'document.max' => 'Ukuran dokumen maksimal 5MB',
+            'document.max' => 'Ukuran dokumen maksimal 2MB',
         ];
     }
 }

@@ -134,7 +134,7 @@
                                             @error('proofFile')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <div class="form-text">Format: JPG, PNG, GIF. Maksimal 5MB.</div>
+                                            <div class="form-text">Format: JPG, PNG, GIF. Maksimal 1MB.</div>
                                             
                                             {{-- Indikator Loading khusus untuk proses upload file ke server --}}
                                             <div wire:loading wire:target="proofFile" class="mt-2 text-primary fw-bold fs-7">

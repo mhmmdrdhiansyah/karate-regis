@@ -165,7 +165,7 @@
                                     </tr>
                                 @endif
                                 <tr>
-                                    <td class="text-gray-600 fw-bold">Institusi</td>
+                                    <td class="text-gray-600 fw-bold">Perguruan</td>
                                     <td class="text-gray-800">{{ $participant->institusi ?? '-' }}</td>
                                 </tr>
                             </tbody>

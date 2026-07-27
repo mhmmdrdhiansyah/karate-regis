@@ -83,7 +83,7 @@
     <!-- Hero Section -->
     <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-on-background">
         <div class="absolute inset-0 opacity-40">
-            <img alt="Karate Athlete" class="w-full h-full object-cover"
+            <img alt="Atlet Bertanding" class="w-full h-full object-cover"
                  src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1920&q=80"
                  onerror="this.style.display='none';" />
         </div>
@@ -95,10 +95,10 @@
                     OFFICIAL TOURNAMENT PLATFORM
                 </div>
                 <h1 class="font-display-lg text-display-lg text-white uppercase leading-none mb-sm">
-                    DOMINASI <span class="text-primary">MATRAS</span>
+                    DOMINASI <span class="text-primary">ARENA</span>
                 </h1>
                 <p class="font-body-lg text-surface-variant max-w-xl mb-lg">
-                    Platform turnamen karate tercanggih untuk para atlet sejati. Presisi dalam manajemen, kekuatan dalam eksekusi. Buktikan disiplinmu sekarang.
+                    Platform turnamen olahraga tercanggih untuk para atlet sejati. Presisi dalam manajemen, kekuatan dalam eksekusi. Buktikan kemampuanmu sekarang.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-md">
                     @guest
@@ -143,7 +143,7 @@
                     <span class="material-symbols-outlined text-4xl">app_registration</span>
                 </div>
                 <h3 class="font-headline-md mb-sm uppercase">Easy Registration</h3>
-                <p class="font-body-md text-surface-variant">Pendaftaran digital yang efisien untuk dojo, tim, atau individu. Upload berkas dan verifikasi hanya dalam hitungan menit.</p>
+                <p class="font-body-md text-surface-variant">Pendaftaran digital yang efisien untuk klub, tim, atau individu. Upload berkas dan verifikasi hanya dalam hitungan menit.</p>
                 <div class="mt-md h-1 w-0 bg-accent group-hover:w-full transition-all duration-300"></div>
             </div>
 
@@ -177,7 +177,7 @@
                     [
                         'id' => 1,
                         'date' => '12 OKT 2024',
-                        'type' => 'KUMITE',
+                        'type' => 'OPEN',
                         'title' => 'KEJUARAAN NASIONAL OPEN',
                         'location' => 'ISTORA SENAYAN, JAKARTA',
                         'image' => 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80'
@@ -185,16 +185,16 @@
                     [
                         'id' => 2,
                         'date' => '25 NOV 2024',
-                        'type' => 'KATA',
-                        'title' => 'SABUK HITAM CHAMPIONSHIP',
+                        'type' => 'CHAMPIONSHIP',
+                        'title' => 'PROVINCIAL CHAMPIONSHIP',
                         'location' => 'GOR CITRA, BANDUNG',
                         'image' => 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800&q=80'
                     ],
                     [
                         'id' => 3,
                         'date' => '05 DES 2024',
-                        'type' => 'MIXED',
-                        'title' => 'KARATE JUNIOR CUP',
+                        'type' => 'JUNIOR',
+                        'title' => 'JUNIOR SPORTS CUP',
                         'location' => 'DBL ARENA, SURABAYA',
                         'image' => 'https://images.unsplash.com/photo-1574620053332-6ed12729cc44?w=800&q=80'
                     ]
@@ -235,7 +235,7 @@
             <div class="relative z-10 grid md:grid-cols-2 gap-lg items-center">
                 <div>
                     <h2 class="font-headline-lg text-white uppercase mb-sm">
-                        MULAI LANGKAHMU <br/>DI <span class="text-accent">MATRAS</span>
+                        MULAI LANGKAHMU <br/>DI <span class="text-accent">ARENA</span>
                     </h2>
                     <p class="text-primary-fixed font-body-lg">
                         Daftarkan dirimu atau cek status pendaftaran yang sedang berlangsung. Cukup masukkan email atau ID pendaftaran.
@@ -287,7 +287,7 @@
                     TENTANG <span class="text-primary">PLATFORM</span>
                 </h2>
                 <p class="font-body-lg text-secondary mb-lg">
-                    Kami adalah platform turnamen karate terdepan yang menghubungkan atlet, pelatih, dan penyelenggara turnamen dalam satu ekosistem digital yang terintegrasi.
+                    Kami adalah platform turnamen olahraga terdepan yang menghubungkan atlet, pelatih, dan penyelenggara dari berbagai cabang olahraga dalam satu ekosistem digital yang terintegrasi.
                 </p>
                 <div class="space-y-md">
                     <div class="flex items-start gap-md">
@@ -315,7 +315,7 @@
             </div>
             <div class="border-4 border-on-background hard-shadow">
                 <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&q=80"
-                     alt="Karate Training"
+                     alt="Latihan Olahraga"
                      class="w-full h-auto"
                      onerror="this.src='https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80'; this.onerror=null;" />
             </div>

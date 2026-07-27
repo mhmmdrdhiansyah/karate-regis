@@ -160,7 +160,7 @@
                     Tentang Event
                 </h2>
                 <p class="font-body-lg text-secondary leading-relaxed mb-md">
-                    <strong class="text-on-background">{{ $event->name }}</strong> adalah bagian dari seri kejuaraan Combat Pro yang diselenggarakan pada {{ $event->formatted_date }}. Kompetisi ini terbuka bagi para karateka untuk membuktikan ketangkasan, disiplin, dan semangat bertarung di atas matras.
+                    <strong class="text-on-background">{{ $event->name }}</strong> adalah bagian dari seri kejuaraan Combat Pro yang diselenggarakan pada {{ $event->formatted_date }}. Kompetisi ini terbuka bagi para atlet dari berbagai cabang olahraga untuk membuktikan kemampuan, disiplin, dan semangat bertarung di arena.
                 </p>
                 <p class="font-body-lg text-secondary leading-relaxed">
                     Detail teknis, peraturan, dan informasi penyelenggaraan akan diperbarui oleh panitia menjelang hari pertandingan. Pastikan akunmu aktif agar menerima pembaruan terkini.
@@ -179,7 +179,7 @@
                             <div class="border-2 border-on-background p-md bg-white">
                                 <div class="flex items-center gap-sm mb-md">
                                     <span class="bg-primary text-white px-md py-1 font-display-lg uppercase">{{ $type }}</span>
-                                    <span class="material-symbols-outlined text-primary">{{ $type === 'Open' ? 'sports_kabaddi' : 'emoji_events' }}</span>
+                                    <span class="material-symbols-outlined text-primary">{{ $type === 'Open' ? 'sports_martial_arts' : 'emoji_events' }}</span>
                                 </div>
                                 <ul class="space-y-sm font-label-bold">
                                     @foreach ($categories as $category)
@@ -222,7 +222,7 @@
         <div class="max-w-container-max mx-auto px-md text-center">
             <h2 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-md uppercase">Siap Untuk Bertanding?</h2>
             <p class="font-body-lg mb-lg max-w-2xl mx-auto opacity-90">
-                Ambil langkah pertamamu menuju podium juara. Daftar sekarang dan tunjukkan semangat bertarungmu di ajang Combat Pro.
+                Ambil langkah pertamamu menuju podium juara. Daftar sekarang dan tunjukkan kemampuan terbaikmu di ajang Combat Pro.
             </p>
             <div class="flex justify-center">
                 <a href="{{ $ctaHref }}"
