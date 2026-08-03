@@ -75,13 +75,28 @@
                                         <span class="text-gray-800 fw-bolder">#{{ $payment->id }}</span>
                                     </td>
                                     <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-gray-800 fw-bolder mb-1">{{ $payment->contingent->name }}</span>
-                                            <span class="text-muted fs-7">{{ $payment->contingent->official_name }}</span>
-                                        </div>
+                                        @if($payment->contingent)
+                                            @if($payment->contingent->trashed())
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-gray-800 fw-bolder mb-1">{{ $payment->contingent->name }}</span>
+                                                    <span class="badge badge-light-danger fs-7">Kontingen Dihapus</span>
+                                                </div>
+                                            @else
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-gray-800 fw-bolder mb-1">{{ $payment->contingent->name }}</span>
+                                                    <span class="text-muted fs-7">{{ $payment->contingent->official_name }}</span>
+                                                </div>
+                                            @endif
+                                        @else
+                                            <span class="text-danger fw-bolder">Kontingen Hilang (ID: {{ $payment->contingent_id }})</span>
+                                        @endif
                                     </td>
                                     <td>
-                                        <span class="text-gray-800 fw-bold">{{ $payment->event->name }}</span>
+                                        @if($payment->event)
+                                            <span class="text-gray-800 fw-bold">{{ $payment->event->name }}</span>
+                                        @else
+                                            <span class="text-danger fw-bolder">Event Terhapus (ID: {{ $payment->event_id }})</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <span class="text-gray-800 fw-bolder">Rp {{ number_format($payment->total_amount, 0, ',', '.') }}</span>
@@ -163,7 +178,18 @@
                                                 <h6 class="fw-bolder mb-3">Detail Invoice:</h6>
                                                 <div class="d-flex flex-stack mb-2">
                                                     <span class="text-muted fw-bold">Kontingen:</span>
-                                                    <span class="text-gray-800 fw-bolder">{{ $currentPayment->contingent->name }}</span>
+                                                    @if($currentPayment->contingent)
+                                                        @if($currentPayment->contingent->trashed())
+                                                            <div class="text-end">
+                                                                <span class="text-gray-800 fw-bolder">{{ $currentPayment->contingent->name }}</span>
+                                                                <span class="badge badge-light-danger fs-7 ms-2">Dihapus</span>
+                                                            </div>
+                                                        @else
+                                                            <span class="text-gray-800 fw-bolder">{{ $currentPayment->contingent->name }}</span>
+                                                        @endif
+                                                    @else
+                                                        <span class="text-danger fw-bolder">Kontingen Hilang (ID: {{ $currentPayment->contingent_id }})</span>
+                                                    @endif
                                                 </div>
                                                 <div class="d-flex flex-stack mb-2">
                                                     <span class="text-muted fw-bold">Total:</span>

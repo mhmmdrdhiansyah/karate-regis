@@ -32,7 +32,9 @@ class PaymentManagement extends Component
     public function payments()
     {
         return Payment::query()
-            ->with(['contingent', 'event'])
+            ->with(['contingent' => function ($query) {
+                $query->withTrashed(); // Include soft-deleted contingents
+            }, 'event'])
             ->when($this->search, function ($query) {
                 $query->whereHas('contingent', function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
