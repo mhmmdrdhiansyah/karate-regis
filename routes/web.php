@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SubCategoryController;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/events/{event}', [LandingController::class, 'show'])->name('events.show');
+Route::get('/events/{event}/klasemen', [LandingController::class, 'klasemen'])->name('events.klasemen');
 Route::post('/check-status', [LandingController::class, 'checkStatus'])->name('check-status');
 
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'provinces']);
@@ -103,6 +104,14 @@ Route::middleware('auth')->group(function () {
         Route::middleware(['permission:manage participants'])->group(function () {
             Route::get('participants', \App\Livewire\Admin\ParticipantManagement::class)->name('participants.index');
         });
+
+        Route::get('results', [\App\Http\Controllers\Admin\ResultController::class, 'index'])
+            ->name('results.index')
+            ->middleware('permission:manage results');
+
+        Route::get('events/{event}/results', \App\Livewire\Admin\ResultEntry::class)
+            ->name('events.results.entry')
+            ->middleware('permission:manage results');
     });
 
     // Laporan (Reports) - butuh permission view reports (super-admin & panitia)

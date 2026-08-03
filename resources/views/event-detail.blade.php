@@ -108,6 +108,11 @@
                    class="bg-primary text-on-primary font-display-lg text-headline-md px-lg py-sm h-16 hard-shadow-red hover:bg-white hover:text-on-background transition-all transform active:translate-y-1 flex items-center justify-center text-center">
                     {{ $ctaLabel }}
                 </a>
+                <a href="{{ route('events.klasemen', $event->id) }}"
+                   style="background-color: #FFD700;"
+                   class="text-black font-display-lg text-headline-md px-lg py-sm h-16 border-2 border-on-background hard-shadow hover:bg-on-background hover:text-white transition-all transform active:translate-y-1 flex items-center justify-center text-center uppercase">
+                    LIHAT KLASEMEN
+                </a>
             </div>
         </div>
     </section>

@@ -64,6 +64,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete registrations',
             // Reports Permissions
             'view reports',
+            'manage results',
         ];
 
         foreach ($permissions as $permission) {
@@ -116,6 +117,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit registrations',
             'delete registrations',
             'view reports',
+            'manage results',
         ]);
 
         // --- Role: Kontingen (Contingent/Team Representative) ---

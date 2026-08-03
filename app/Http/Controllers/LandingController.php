@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Services\StandingsService;
 
 class LandingController extends Controller
 {
@@ -58,5 +59,18 @@ class LandingController extends Controller
         // This could search by email or registration ID
         return redirect()->route('login')
             ->with('info', 'Fitur cek status sedang dalam pengembangan. Silakan login terlebih dahulu.');
+    }
+
+    /**
+     * Display the public standings page for an event.
+     */
+    public function klasemen(Event $event)
+    {
+        // Jangan tampilkan klasemen untuk event draft
+        abort_unless($event->status !== EventStatus::Draft, 404);
+
+        $standings = app(StandingsService::class)->forEvent($event);
+
+        return view('event-klasemen', compact('event', 'standings'));
     }
 }

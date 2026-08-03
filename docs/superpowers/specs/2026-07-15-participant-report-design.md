@@ -221,7 +221,7 @@ Add under "Operasional" section (accordion):
 - [ ] Filter state preserved in URL
 - [ ] Search filters by participant name and contingent name
 
-### Pagination & Sorting
+### Pagination & Sortingnah 
 - [ ] Pagination options (10, 25, 50, 100) work
 - [ ] Default sort order applied (contingent, then name)
 - [ ] Sorting headers work correctly
