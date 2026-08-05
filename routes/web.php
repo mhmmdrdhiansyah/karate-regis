@@ -14,6 +14,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventCategoryController;
 use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\EventFileController;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/events/{event}', [LandingController::class, 'show'])->name('events.show');
@@ -73,6 +74,8 @@ Route::middleware('auth')->group(function () {
         Route::middleware(['permission:view events|create events|edit events|delete events'])->group(function () {
             Route::resource('events', EventController::class);
             Route::patch('events/{event}/transition', [EventController::class, 'transition'])->name('events.transition');
+            Route::post('events/{event}/files', [EventFileController::class, 'store'])->name('events.files.store');
+            Route::delete('events/{event}/files/{eventFile}', [EventFileController::class, 'destroy'])->name('events.files.destroy');
         });
 
         Route::middleware(['permission:manage event categories'])->group(function () {

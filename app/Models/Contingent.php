@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Support\Facades\Storage;
+
 class Contingent extends Model
 {
     use HasFactory, SoftDeletes;
@@ -20,7 +22,13 @@ class Contingent extends Model
         'address',
         'province',
         'regency',
+        'photo',
     ];
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return $this->photo ? asset('storage/' . ltrim($this->photo, '/')) : null;
+    }
 
     public function user(): BelongsTo
     {

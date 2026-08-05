@@ -200,6 +200,65 @@
         </div>
     </div>
 
+    <!-- Event Files -->
+    <div class="card mb-5">
+        <div class="card-header border-0 pt-6">
+            <div class="card-title">
+                <h3 class="card-label fw-bold text-dark">Dokumen Event</h3>
+            </div>
+        </div>
+        <div class="card-body py-4">
+            <form action="{{ route('admin.events.files.store', $event) }}" method="POST" enctype="multipart/form-data" class="row g-4 mb-6 align-items-end">
+                @csrf
+                <div class="col-12 col-md-5">
+                    <label class="required form-label">Nama Dokumen</label>
+                    <input type="text" name="name" class="form-control form-control-solid" placeholder="Contoh: Proposal, Jadwal Pertandingan" required>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="required form-label">File Dokumen</label>
+                    <input type="file" name="file" class="form-control form-control-solid" required>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-upload me-2"></i> Unggah
+                    </button>
+                </div>
+            </form>
+
+            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                <table class="table align-middle table-row-dashed fs-6 gy-5">
+                    <thead>
+                        <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
+                            <th>Nama Dokumen</th>
+                            <th class="text-end">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($event->files as $file)
+                            <tr>
+                                <td>
+                                    <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="text-dark text-hover-primary fw-bold">
+                                        <i class="bi bi-file-earmark-text text-primary me-2"></i>{{ $file->name }}
+                                    </a>
+                                </td>
+                                <td class="text-end">
+                                    <form action="{{ route('admin.events.files.destroy', [$event, $file]) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus file ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-light-danger btn-sm">Hapus</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-10">Belum ada dokumen yang diunggah</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">

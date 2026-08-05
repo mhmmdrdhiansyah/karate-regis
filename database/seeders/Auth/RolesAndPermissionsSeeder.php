@@ -181,6 +181,18 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $kontingen->assignRole($kontingenRole);
 
+        Contingent::firstOrCreate(
+            ['user_id' => $kontingen->id],
+            [
+                'name' => 'Kontingen Dojo Utama',
+                'official_name' => 'Sensei Budi',
+                'phone' => '08123456789',
+                'address' => 'Jl. Pemuda No. 123',
+                'province' => 'Jawa Barat',
+                'regency' => 'Kota Bandung',
+            ]
+        );
+
         $this->command->info('Seeder selesai! Data lama aman, data baru ditambahkan.');
     }
 }

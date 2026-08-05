@@ -159,6 +159,28 @@
         <!-- Content Area -->
         <div class="md:col-span-8 flex flex-col gap-xl">
 
+            <!-- Dokumen Event -->
+            @if($event->files->isNotEmpty())
+            <div>
+                <h2 class="font-display-lg text-display-lg-mobile border-l-8 border-primary pl-md mb-md uppercase">
+                    Dokumen Unduhan
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-md pr-2" style="max-height: 150px; overflow-y: auto;">
+                    @foreach($event->files as $file)
+                    <div class="border-2 border-on-background p-sm bg-white hard-shadow flex items-center justify-between">
+                        <div class="flex items-center gap-sm overflow-hidden">
+                            <span class="material-symbols-outlined text-primary" style="font-size:32px">description</span>
+                            <span class="font-label-bold text-on-background truncate">{{ $file->name }}</span>
+                        </div>
+                        <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="bg-primary text-on-primary p-2 border-2 border-on-background hover:bg-on-background hover:text-white transition-colors flex-shrink-0" title="Unduh">
+                            <span class="material-symbols-outlined">download</span>
+                        </a>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <!-- Tentang Event (placeholder copy referencing real data) -->
             <div>
                 <h2 class="font-display-lg text-display-lg-mobile border-l-8 border-primary pl-md mb-md uppercase">

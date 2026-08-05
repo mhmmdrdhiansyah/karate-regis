@@ -51,7 +51,58 @@ class KontingenManagementTest extends TestCase
         $response->assertRedirect(route('kontingen.index'));
         $response->assertSessionHas('success', 'Kontingen berhasil dihapus');
 
-        $this->assertDatabaseMissing('contingents', ['id' => $contingent->id]);
-        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertSoftDeleted('contingents', ['id' => $contingent->id]);
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
+
+    public function test_kontingen_user_can_upload_and_remove_profile_photo()
+    {
+        Permission::create(['name' => 'edit own kontingen']);
+        $user = User::factory()->create();
+        $user->givePermissionTo('edit own kontingen');
+        $user->assignRole('kontingen');
+
+        $contingent = Contingent::create([
+            'user_id' => $user->id,
+            'name' => 'Test Kontingen',
+            'official_name' => 'Official Kontingen',
+            'phone' => '08123456789',
+            'address' => 'Test Address',
+            'province' => 'Jawa Barat',
+            'regency' => 'Kota Bandung',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $file = \Illuminate\Http\UploadedFile::fake()->image('logo.png');
+
+        $response = $this->actingAs($user)
+            ->patch(route('profile.update.kontingen'), [
+                'name' => 'Test Kontingen Updated',
+                'official_name' => 'Official Kontingen Updated',
+                'province' => 'Jawa Barat',
+                'regency' => 'Kota Bandung',
+                'photo' => $file,
+            ]);
+
+        $response->assertRedirect(route('profile.edit'));
+        $response->assertSessionHas('status', 'kontingen-updated');
+
+        $contingent->refresh();
+        $this->assertNotNull($contingent->photo);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($contingent->photo);
+
+        // Test removing photo
+        $responseRemove = $this->actingAs($user)
+            ->patch(route('profile.update.kontingen'), [
+                'name' => 'Test Kontingen Updated',
+                'official_name' => 'Official Kontingen Updated',
+                'province' => 'Jawa Barat',
+                'regency' => 'Kota Bandung',
+                'remove_photo' => 1,
+            ]);
+
+        $responseRemove->assertRedirect(route('profile.edit'));
+        $contingent->refresh();
+        $this->assertNull($contingent->photo);
     }
 }

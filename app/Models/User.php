@@ -10,6 +10,8 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Support\Facades\Storage;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -22,7 +24,17 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
+        'avatar',
     ];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if ($this->avatar) {
+            return asset('storage/' . ltrim($this->avatar, '/'));
+        }
+
+        return $this->contingent?->photo_url ?? null;
+    }
 
     protected $hidden = [
         'password',

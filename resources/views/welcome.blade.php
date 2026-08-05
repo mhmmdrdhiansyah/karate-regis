@@ -83,8 +83,8 @@
     <!-- Hero Section -->
     <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-on-background">
         <div class="absolute inset-0 opacity-40">
-            <img alt="Atlet Bertanding" class="w-full h-full object-cover"
-                 src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1920&q=80"
+            <img alt="Karate Athlete" class="w-full h-full object-contain object-right"
+                 src="{{ asset('assets/media/karate-hero/screen.png') }}"
                  onerror="this.style.display='none';" />
         </div>
         <div class="absolute inset-0 bg-gradient-to-r from-on-background via-on-background/60 to-transparent"></div>
@@ -157,69 +157,221 @@
                 <div class="mt-md h-1 w-0 bg-accent group-hover:w-full transition-all duration-300"></div>
             </div>
         </div>
-    </section>
-
-    <!-- Upcoming Events -->
-    <section id="events" class="py-xl bg-surface-container-low border-y-2 border-on-background">
+    </section>    <!-- Events Section -->
+    <section id="events" class="py-xl bg-surface-container-low border-y-2 border-on-background overflow-hidden">
         <div class="container mx-auto px-lg">
             <div class="flex flex-col md:flex-row justify-between items-end mb-xl gap-md">
                 <div>
                     <h2 class="font-display-lg-mobile md:text-display-lg text-on-background uppercase leading-none">
-                        UPCOMING <br/><span class="text-primary">EVENTS</span>
+                        COMBAT <br/><span class="text-primary">EVENTS</span>
                     </h2>
                 </div>
                 <div class="hidden md:block w-32 h-2 bg-accent mb-base"></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
-                <!-- Data events - diambil dari database via LandingController -->
-                @foreach(($upcomingEvents ?? [
-                    [
-                        'id' => 1,
-                        'date' => '12 OKT 2024',
-                        'type' => 'OPEN',
-                        'title' => 'KEJUARAAN NASIONAL OPEN',
-                        'location' => 'ISTORA SENAYAN, JAKARTA',
-                        'image' => 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80'
-                    ],
-                    [
-                        'id' => 2,
-                        'date' => '25 NOV 2024',
-                        'type' => 'CHAMPIONSHIP',
-                        'title' => 'PROVINCIAL CHAMPIONSHIP',
-                        'location' => 'GOR CITRA, BANDUNG',
-                        'image' => 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800&q=80'
-                    ],
-                    [
-                        'id' => 3,
-                        'date' => '05 DES 2024',
-                        'type' => 'JUNIOR',
-                        'title' => 'JUNIOR SPORTS CUP',
-                        'location' => 'DBL ARENA, SURABAYA',
-                        'image' => 'https://images.unsplash.com/photo-1574620053332-6ed12729cc44?w=800&q=80'
-                    ]
-                ]) as $event)
-                <div class="flex flex-col border-2 border-on-background bg-white group">
-                    <div class="aspect-[3/4] w-full overflow-hidden border-b-2 border-on-background">
-                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover" src="{{ $event['image'] }}" />
+            <!-- Two Columns Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+                
+                <!-- Column 1: Active Events -->
+                <div x-data="{
+                    startIndex: 0,
+                    get perPage() {
+                        if (window.innerWidth < 640) return 1;
+                        if (window.innerWidth < 768) return 2;
+                        return 3;
+                    },
+                    itemsCount: {{ count($activeEvents ?? []) }},
+                    next() {
+                        if (this.startIndex + this.perPage < this.itemsCount) {
+                            this.startIndex++;
+                        }
+                    },
+                    prev() {
+                        if (this.startIndex > 0) {
+                            this.startIndex--;
+                        }
+                    }
+                }" 
+                @resize.window.debounce.100="if (startIndex + perPage > itemsCount) startIndex = Math.max(0, itemsCount - perPage)"
+                class="flex flex-col">
+                    
+                    <!-- Column Header -->
+                    <div class="flex justify-between items-center mb-md pb-xs border-b-2 border-on-background">
+                        <div class="flex items-center gap-xs">
+                            <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 border-2 border-emerald-600 px-2.5 py-1 text-xs font-bold uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Event Aktif & Pendaftaran
+                            </span>
+                            <span class="text-xs font-bold text-secondary">({{ count($activeEvents ?? []) }})</span>
+                        </div>
+                        <div class="flex gap-xs" x-show="itemsCount > perPage">
+                            <button @click="prev()" :disabled="startIndex === 0" 
+                                    class="w-8 h-8 flex items-center justify-center border-2 border-on-background bg-white hover:bg-primary hover:text-white hover:border-primary active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_#1b1c1c] disabled:opacity-30 disabled:pointer-events-none" 
+                                    aria-label="Previous">
+                                <span class="material-symbols-outlined text-base font-bold">arrow_back</span>
+                            </button>
+                            <button @click="next()" :disabled="startIndex + perPage >= itemsCount" 
+                                    class="w-8 h-8 flex items-center justify-center border-2 border-on-background bg-white hover:bg-primary hover:text-white hover:border-primary active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_#1b1c1c] disabled:opacity-30 disabled:pointer-events-none" 
+                                    aria-label="Next">
+                                <span class="material-symbols-outlined text-base font-bold">arrow_forward</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="bg-on-background text-white p-sm font-label-bold uppercase flex justify-between items-center">
-                        <span>{{ $event['date'] }}</span>
-                        <span class="bg-accent text-on-accent px-xs">{{ $event['type'] }}</span>
-                    </div>
-                    <div class="p-md flex-grow">
-                        <h4 class="font-headline-md mb-xs">{{ $event['title'] }}</h4>
-                        <p class="text-secondary font-label-sm mb-md flex items-center gap-xs">
-                            <span class="material-symbols-outlined text-sm text-accent">location_on</span> {{ $event['location'] }}
-                        </p>
-                    </div>
-                    <div class="p-md pt-0">
-                        <a href="{{ route('events.show', $event['id']) }}" class="block w-full border-2 border-on-background py-sm font-headline-md uppercase text-center group-hover:bg-on-background group-hover:text-white transition-all">
-                            Detail Event
-                        </a>
+
+                    <!-- Slider Wrapper with Generous Padding for Hover & Shadows -->
+                    <div class="relative overflow-hidden py-md px-2 -mx-2">
+                        <div class="flex transition-transform duration-300 ease-out -mx-3"
+                             :style="`transform: translateX(-${startIndex * (100 / perPage)}%)`">
+                            @forelse(($activeEvents ?? []) as $event)
+                            <div class="shrink-0 px-3 flex flex-col"
+                                 :style="`width: ${100 / perPage}%`">
+                                <div class="flex flex-col border-2 border-on-background bg-white group h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[5px_5px_0px_0px_#b9001c] shadow-[3px_3px_0px_0px_#1b1c1c]">
+                                    
+                                    <!-- Poster Image -->
+                                    <div class="aspect-[3/4] w-full overflow-hidden border-b-2 border-on-background relative bg-surface-container">
+                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" />
+                                        <span class="absolute top-2 right-2 bg-accent text-on-accent font-bold uppercase px-2 py-0.5 border border-on-background text-[10px] tracking-wider shadow-sm">
+                                            {{ $event['type'] }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Date Banner -->
+                                    <div class="bg-on-background text-white px-md py-1.5 font-bold uppercase flex justify-between items-center text-[10px] tracking-wider border-b border-on-background">
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[13px] text-accent">calendar_today</span>
+                                            {{ $event['date'] }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Card Details -->
+                                    <div class="p-sm flex-grow flex flex-col justify-between gap-sm">
+                                        <div>
+                                            <h4 class="font-headline-sm line-clamp-2 text-xs md:text-sm leading-snug uppercase font-bold text-on-background group-hover:text-primary transition-colors min-h-[36px] flex items-center">
+                                                {{ $event['title'] }}
+                                            </h4>
+                                            <p class="text-secondary font-label-xs flex items-center gap-1 text-[11px] mt-2">
+                                                <span class="material-symbols-outlined text-[14px] text-primary">location_on</span>
+                                                <span class="truncate">{{ $event['location'] }}</span>
+                                            </p>
+                                        </div>
+
+                                        <div class="pt-xs">
+                                            <a href="{{ route('events.show', $event['id']) }}" class="block w-full border-2 border-on-background py-2 text-xs font-bold uppercase text-center bg-surface group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all tracking-wider shadow-xs">
+                                                Detail Event
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="w-full px-3 text-center py-xl text-secondary text-sm border-2 border-dashed border-on-background/20 bg-white">
+                                Belum ada event aktif saat ini.
+                            </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
-                @endforeach
+
+                <!-- Column 2: Completed Events -->
+                <div x-data="{
+                    startIndex: 0,
+                    get perPage() {
+                        if (window.innerWidth < 640) return 1;
+                        if (window.innerWidth < 768) return 2;
+                        return 3;
+                    },
+                    itemsCount: {{ count($completedEvents ?? []) }},
+                    next() {
+                        if (this.startIndex + this.perPage < this.itemsCount) {
+                            this.startIndex++;
+                        }
+                    },
+                    prev() {
+                        if (this.startIndex > 0) {
+                            this.startIndex--;
+                        }
+                    }
+                }" 
+                @resize.window.debounce.100="if (startIndex + perPage > itemsCount) startIndex = Math.max(0, itemsCount - perPage)"
+                class="flex flex-col">
+                    
+                    <!-- Column Header -->
+                    <div class="flex justify-between items-center mb-md pb-xs border-b-2 border-on-background">
+                        <div class="flex items-center gap-xs">
+                            <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-800 border-2 border-slate-400 px-2.5 py-1 text-xs font-bold uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                Event Telah Dilaksanakan
+                            </span>
+                            <span class="text-xs font-bold text-secondary">({{ count($completedEvents ?? []) }})</span>
+                        </div>
+                        <div class="flex gap-xs" x-show="itemsCount > perPage">
+                            <button @click="prev()" :disabled="startIndex === 0" 
+                                    class="w-8 h-8 flex items-center justify-center border-2 border-on-background bg-white hover:bg-primary hover:text-white hover:border-primary active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_#1b1c1c] disabled:opacity-30 disabled:pointer-events-none" 
+                                    aria-label="Previous">
+                                <span class="material-symbols-outlined text-base font-bold">arrow_back</span>
+                            </button>
+                            <button @click="next()" :disabled="startIndex + perPage >= itemsCount" 
+                                    class="w-8 h-8 flex items-center justify-center border-2 border-on-background bg-white hover:bg-primary hover:text-white hover:border-primary active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_#1b1c1c] disabled:opacity-30 disabled:pointer-events-none" 
+                                    aria-label="Next">
+                                <span class="material-symbols-outlined text-base font-bold">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Slider Wrapper with Generous Padding for Hover & Shadows -->
+                    <div class="relative overflow-hidden py-md px-2 -mx-2">
+                        <div class="flex transition-transform duration-300 ease-out -mx-3"
+                             :style="`transform: translateX(-${startIndex * (100 / perPage)}%)`">
+                            @forelse(($completedEvents ?? []) as $event)
+                            <div class="shrink-0 px-3 flex flex-col"
+                                 :style="`width: ${100 / perPage}%`">
+                                <div class="flex flex-col border-2 border-on-background bg-white group h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[5px_5px_0px_0px_#1b1c1c] shadow-[3px_3px_0px_0px_#1b1c1c] opacity-90 hover:opacity-100">
+                                    
+                                    <!-- Poster Image -->
+                                    <div class="aspect-[3/4] w-full overflow-hidden border-b-2 border-on-background relative grayscale group-hover:grayscale-0 transition-all duration-500 bg-surface-container">
+                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" />
+                                        <span class="absolute top-2 right-2 bg-slate-800 text-white font-bold uppercase px-2 py-0.5 border border-on-background text-[10px] tracking-wider shadow-sm">
+                                            {{ $event['type'] }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Date Banner -->
+                                    <div class="bg-on-background text-white px-md py-1.5 font-bold uppercase flex justify-between items-center text-[10px] tracking-wider border-b border-on-background">
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[13px] text-accent">calendar_today</span>
+                                            {{ $event['date'] }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Card Details -->
+                                    <div class="p-sm flex-grow flex flex-col justify-between gap-sm">
+                                        <div>
+                                            <h4 class="font-headline-sm line-clamp-2 text-xs md:text-sm leading-snug uppercase font-bold text-on-background group-hover:text-primary transition-colors min-h-[36px] flex items-center">
+                                                {{ $event['title'] }}
+                                            </h4>
+                                            <p class="text-secondary font-label-xs flex items-center gap-1 text-[11px] mt-2">
+                                                <span class="material-symbols-outlined text-[14px] text-primary">location_on</span>
+                                                <span class="truncate">{{ $event['location'] }}</span>
+                                            </p>
+                                        </div>
+
+                                        <div class="pt-xs">
+                                            <a href="{{ route('events.show', $event['id']) }}" class="block w-full border-2 border-on-background py-2 text-xs font-bold uppercase text-center bg-surface group-hover:bg-on-background group-hover:text-white transition-all tracking-wider shadow-xs">
+                                                Detail Event
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="w-full px-3 text-center py-xl text-secondary text-sm border-2 border-dashed border-on-background/20 bg-white">
+                                Belum ada event selesai.
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -227,9 +379,9 @@
     <!-- Registration Status Section -->
     <section class="py-xl container mx-auto px-lg">
         <div class="bg-primary p-lg md:p-xl border-4 border-on-background hard-shadow-red relative overflow-hidden">
-            <!-- Decorative "Strike" bg -->
+            <!-- Decorative "Champion" bg -->
             <div class="absolute -right-20 top-0 text-accent opacity-20 font-display-lg select-none pointer-events-none rotate-12">
-                STRIKE STRIKE STRIKE
+                CHAMPION CHAMPION CHAMPION
             </div>
 
             <div class="relative z-10 grid md:grid-cols-2 gap-lg items-center">
