@@ -222,7 +222,7 @@
                                                                 <span class="badge badge-light-primary">Pelatih</span>
                                                             @endif
                                                         </td>
-                                                        <td>{{ $reg->subCategory?->name ?? '-' }}</td>
+                                                        <td>{{ $reg->subCategory?->full_name ?? '-' }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

@@ -26,6 +26,7 @@ class Participant extends Model
         'photo',
         'document',
         'is_verified',
+        'rejection_reason',
         'verified_at',
         'verified_by',
     ];

@@ -137,6 +137,20 @@
                 @endcanany
 
                 {{-- PROFIL KONTINGEN (Role Kontingen) --}}
+                @php
+                    $userContingentId = Auth::user()->contingent?->id;
+                    $rejectedPaymentsCount = $userContingentId 
+                        ? \App\Models\Payment::where('contingent_id', $userContingentId)
+                            ->where('status', \App\Enums\PaymentStatus::Rejected)
+                            ->count() 
+                        : 0;
+                    $rejectedDocsCount = $userContingentId 
+                        ? \App\Models\Participant::where('contingent_id', $userContingentId)
+                            ->whereNotNull('rejection_reason')
+                            ->count() 
+                        : 0;
+                @endphp
+
                 @role('kontingen')
                     <div class="menu-item">
                         <a class="menu-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
@@ -153,16 +167,22 @@
                             href="{{ route('participants.index') }}">
                             <span class="menu-icon"><i class="bi bi-person-lines-fill fs-3"></i></span>
                             <span class="menu-title">Bank Peserta</span>
+                            @if($rejectedDocsCount > 0)
+                                <span class="badge badge-circle badge-danger ms-2" title="Ada berkas/verifikasi atlet ditolak">{{ $rejectedDocsCount }}</span>
+                            @endif
                         </a>
                     </div>
                 @endrole
 
                 @can('create registrations')
                     <div data-kt-menu-trigger="click"
-                        class="menu-item menu-accordion {{ request()->routeIs('registration.*') ? 'hover show' : '' }}">
+                        class="menu-item menu-accordion {{ request()->routeIs('registration.*') || request()->routeIs('payments.*') ? 'hover show' : '' }}">
                         <span class="menu-link">
                             <span class="menu-icon"><i class="bi bi-journal-text fs-3"></i></span>
                             <span class="menu-title">Pendaftaran</span>
+                            @if($rejectedPaymentsCount > 0)
+                                <span class="badge badge-circle badge-danger ms-2">{{ $rejectedPaymentsCount }}</span>
+                            @endif
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -191,6 +211,9 @@
                                         <span class="bullet bullet-dot"></span>
                                     </span>
                                     <span class="menu-title">Pembayaran</span>
+                                    @if($rejectedPaymentsCount > 0)
+                                        <span class="badge badge-circle badge-danger ms-2" title="Ada pembayaran ditolak">{{ $rejectedPaymentsCount }}</span>
+                                    @endif
                                 </a>
                             </div>
                         </div>

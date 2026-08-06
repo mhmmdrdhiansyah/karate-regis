@@ -3,7 +3,7 @@
     <div class="card shadow-sm mb-6">
         <div class="card-body p-6">
             <h2 class="fs-2 fw-bolder text-dark mb-1">
-                Pilih Atlet — <span class="text-primary">{{ $this->subCategory->name }}</span>
+                Pilih Atlet — <span class="text-primary">{{ $this->subCategory->full_name }}</span>
             </h2>
             <div class="text-muted fw-bold fs-6 mb-5">
                 {{ $this->subCategory->eventCategory->event->name }}
@@ -221,12 +221,12 @@
                                                 $otherRegs = collect();
                                                 foreach ($athlete->draftItems as $item) {
                                                     if ($item->sub_category_id && $item->sub_category_id !== $this->subCategoryId) {
-                                                        $otherRegs->push(['name' => $item->subCategory->name, 'type' => 'draft']);
+                                                        $otherRegs->push(['name' => $item->subCategory->full_name, 'type' => 'draft']);
                                                     }
                                                 }
                                                 foreach ($athlete->registrations as $reg) {
                                                     if ($reg->sub_category_id && $reg->sub_category_id !== $this->subCategoryId) {
-                                                        $otherRegs->push(['name' => $reg->subCategory->name, 'type' => 'active']);
+                                                        $otherRegs->push(['name' => $reg->subCategory->full_name, 'type' => 'active']);
                                                     }
                                                 }
                                             @endphp
@@ -311,12 +311,12 @@
                                                         $otherRegs = collect();
                                                         foreach ($athlete->draftItems as $item) {
                                                             if ($item->sub_category_id && $item->sub_category_id !== $this->subCategoryId) {
-                                                                $otherRegs->push(['name' => $item->subCategory->name, 'type' => 'draft']);
+                                                                $otherRegs->push(['name' => $item->subCategory->full_name, 'type' => 'draft']);
                                                             }
                                                         }
                                                         foreach ($athlete->registrations as $reg) {
                                                             if ($reg->sub_category_id && $reg->sub_category_id !== $this->subCategoryId) {
-                                                                $otherRegs->push(['name' => $reg->subCategory->name, 'type' => 'active']);
+                                                                $otherRegs->push(['name' => $reg->subCategory->full_name, 'type' => 'active']);
                                                             }
                                                         }
                                                     @endphp

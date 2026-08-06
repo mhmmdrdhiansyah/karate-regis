@@ -138,16 +138,8 @@ class ParticipantManagement extends Component
                     'is_verified' => true,
                     'verified_at' => now(),
                     'verified_by' => auth()->id(),
+                    'rejection_reason' => null,
                 ]);
-
-                Registration::where('participant_id', $participant->id)
-                    ->where('status_berkas', RegistrationStatus::PendingReview->value)
-                    ->update([
-                        'status_berkas' => RegistrationStatus::Verified->value,
-                        'verified_at' => now(),
-                        'verified_by' => auth()->id(),
-                        'rejection_reason' => null,
-                    ]);
 
                 ActivityLog::create([
                     'user_id' => auth()->id(),
@@ -182,14 +174,8 @@ class ParticipantManagement extends Component
                     'is_verified' => false,
                     'verified_at' => null,
                     'verified_by' => null,
+                    'rejection_reason' => $this->rejectionReason,
                 ]);
-
-                Registration::where('participant_id', $participant->id)
-                    ->where('status_berkas', RegistrationStatus::PendingReview->value)
-                    ->update([
-                        'status_berkas' => RegistrationStatus::Rejected->value,
-                        'rejection_reason' => $this->rejectionReason,
-                    ]);
 
                 ActivityLog::create([
                     'user_id' => auth()->id(),
@@ -229,6 +215,7 @@ class ParticipantManagement extends Component
                     'is_verified' => false,
                     'verified_at' => null,
                     'verified_by' => null,
+                    'rejection_reason' => $this->rejectionReason,
                 ]);
 
                 ActivityLog::create([

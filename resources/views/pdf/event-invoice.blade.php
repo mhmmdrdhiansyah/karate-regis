@@ -348,7 +348,7 @@
                                     $names = collect($members)->pluck('participant.name')->implode(', ');
                                 @endphp
                                 <tr>
-                                    <td class="cat">{{ $sc->name }} <span class="tag">Beregu</span></td>
+                                    <td class="cat">{{ $sc->full_name }} <span class="tag">Beregu</span></td>
                                     <td class="who">{{ $teamName }} — {{ $names }}</td>
                                     <td class="num">1</td>
                                     <td class="num">Rp {{ number_format($unit, 0, ',', '.') }}</td>
@@ -363,7 +363,7 @@
                                 $names = $aths->pluck('participant.name')->implode(', ');
                             @endphp
                             <tr>
-                                <td class="cat">{{ $sc->name }}</td>
+                                <td class="cat">{{ $sc->full_name }}</td>
                                 <td class="who">{{ $names }}</td>
                                 <td class="num">{{ $count }}</td>
                                 <td class="num">Rp {{ number_format($unit, 0, ',', '.') }}</td>
@@ -401,6 +401,12 @@
                     @endif
                     <div class="row"><span>Biaya Event</span><span>Rp {{ number_format((float) $eventFee, 0, ',', '.') }}</span></div>
                     <div class="row"><span>Kode Unik (ID Transfer)</span><span>Rp {{ number_format($uniqueCode, 0, ',', '.') }}</span></div>
+                    @if (!empty($totalDiscount) && $totalDiscount > 0)
+                        <div class="row" style="color: #b9001c;">
+                            <span>Total Diskon</span>
+                            <span>-Rp {{ number_format($totalDiscount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
                     <div class="grand">
                         <span class="lbl">Total Tagihan</span>
                         <span class="amt">Rp {{ number_format($totalAmount, 0, ',', '.') }}</span>

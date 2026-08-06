@@ -183,6 +183,21 @@
                     </div>
                 </div>
                 <div class="card-body pt-3">
+                    @if($participant->rejection_reason)
+                        <div class="alert alert-danger d-flex align-items-center p-5 mb-5">
+                            <i class="bi bi-exclamation-triangle-fill fs-2 text-danger me-4"></i>
+                            <div class="d-flex flex-column flex-grow-1">
+                                <h4 class="mb-1 text-danger">Dokumen/Verifikasi Ditolak</h4>
+                                <span><b>Alasan:</b> {{ $participant->rejection_reason }}</span>
+                                <div class="mt-3">
+                                    <a href="{{ route('participants.edit', $participant) }}" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-pencil-square me-1"></i> Perbarui Data / Upload Berkas
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-row-dashed align-middle gs-2 gy-3">
                             <tbody>
@@ -192,6 +207,10 @@
                                         @if ($participant->is_verified)
                                             <span class="badge badge-light-success">
                                                 <i class="bi bi-check-circle me-1"></i>Terverifikasi
+                                            </span>
+                                        @elseif($participant->rejection_reason)
+                                            <span class="badge badge-light-danger">
+                                                <i class="bi bi-x-circle me-1"></i>Ditolak
                                             </span>
                                         @else
                                             <span class="badge badge-light-warning">Belum</span>
@@ -291,7 +310,7 @@
                                     </td>
                                     <td class="text-gray-600">
                                         @if ($registration->subCategory)
-                                            {{ $registration->subCategory->name }}
+                                            {{ $registration->subCategory->full_name }}
                                         @else
                                             <span class="text-muted fst-italic">Pelatih</span>
                                         @endif

@@ -9,6 +9,21 @@
             </div>
         </div>
     @else
+        @if ($participant->rejection_reason)
+            <div class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">
+                <i class="bi bi-exclamation-triangle-fill fs-2 text-danger me-4"></i>
+                <div class="d-flex flex-column">
+                    <h5 class="mb-1 text-danger">Verifikasi Dokumen/Data Ditolak</h5>
+                    <span class="text-gray-800 fw-semibold fs-6">
+                        <strong>Alasan Penolakan dari Admin:</strong> {{ $participant->rejection_reason }}
+                    </span>
+                    <span class="text-muted fs-7 mt-1">
+                        Silakan perbaiki data atau unggah ulang dokumen yang sesuai di bawah ini, lalu klik <strong>Simpan Perubahan</strong>.
+                    </span>
+                </div>
+            </div>
+        @endif
+
         @if ($participant->is_verified)
             <div
                 class="alert alert-dismissible bg-light-danger border border-danger border-dashed d-flex align-items-center p-5 mb-5">

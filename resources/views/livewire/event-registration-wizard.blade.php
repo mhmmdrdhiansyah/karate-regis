@@ -201,7 +201,7 @@
                                     @foreach($draftSelections as $draft)
                                         <div class="d-flex flex-stack">
                                             <div>
-                                                <div class="fw-bolder">{{ $draft['subCategory']->name }}</div>
+                                                <div class="fw-bolder">{{ $draft['subCategory']->full_name }}</div>
                                                 <div class="text-muted fs-7">{{ $draft['subCategory']->eventCategory->class_name }}</div>
                                             </div>
                                             <span class="badge badge-light-success fw-bolder">
@@ -224,18 +224,14 @@
                                 <div class="card shadow-sm border border-hover-primary h-100 cursor-pointer" wire:click="selectSubCategory({{ $subCategory->id }})">
                                     <div class="card-body p-6 d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-start mb-4">
-                                            <h4 class="fw-bolder text-dark fs-5">{{ $subCategory->name }}</h4>
+                                            <h4 class="fw-bolder text-dark fs-5">{{ $subCategory->full_name }}</h4>
                                             @php
                                                 $genderClass = match($subCategory->gender->value) {
                                                     'M' => 'badge-light-primary',
                                                     'F' => 'badge-light-danger',
                                                     default => 'badge-light-info',
                                                 };
-                                                $genderLabel = match($subCategory->gender->value) {
-                                                    'M' => 'Putra',
-                                                    'F' => 'Putri',
-                                                    default => 'Campuran',
-                                                };
+                                                $genderLabel = $subCategory->gender_label;
                                             @endphp
                                             <span class="badge {{ $genderClass }} fw-bolder">{{ $genderLabel }}</span>
                                         </div>

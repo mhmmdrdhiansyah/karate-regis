@@ -34,15 +34,16 @@ class ResultEntry extends Component
                 if ($results->isEmpty()) {
                     // Default 4 slots
                     $this->slots[$subCategory->id] = [
-                        ['rank_name' => 'Juara 1', 'medal_type' => 'Gold', 'registration_id' => ''],
-                        ['rank_name' => 'Juara 2', 'medal_type' => 'Silver', 'registration_id' => ''],
-                        ['rank_name' => 'Juara 3', 'medal_type' => 'Bronze', 'registration_id' => ''],
-                        ['rank_name' => 'Juara 3 Bersama', 'medal_type' => 'Bronze', 'registration_id' => ''],
+                        ['key' => uniqid('slot_'), 'rank_name' => 'Juara 1', 'medal_type' => 'Gold', 'registration_id' => ''],
+                        ['key' => uniqid('slot_'), 'rank_name' => 'Juara 2', 'medal_type' => 'Silver', 'registration_id' => ''],
+                        ['key' => uniqid('slot_'), 'rank_name' => 'Juara 3', 'medal_type' => 'Bronze', 'registration_id' => ''],
+                        ['key' => uniqid('slot_'), 'rank_name' => 'Juara 3 Bersama', 'medal_type' => 'Bronze', 'registration_id' => ''],
                     ];
                 } else {
                     $this->slots[$subCategory->id] = [];
                     foreach ($results as $res) {
                         $this->slots[$subCategory->id][] = [
+                            'key' => uniqid('slot_'),
                             'rank_name' => $res->rank_name ?? '',
                             'medal_type' => $res->medal_type ? $res->medal_type->value : '',
                             'registration_id' => $res->registration_id,
@@ -60,6 +61,7 @@ class ResultEntry extends Component
         }
         
         $this->slots[$subCategoryId][] = [
+            'key' => uniqid('slot_'),
             'rank_name' => '',
             'medal_type' => '', // Empty means No Medal
             'registration_id' => '',

@@ -64,19 +64,10 @@ class DocumentVerificationController extends Controller
                     'is_verified' => true,
                     'verified_at' => now(),
                     'verified_by' => auth()->id(),
+                    'rejection_reason' => null,
                 ]);
 
-                // 2. Update SEMUA registrasi miliknya yang sedang 'pending_review' menjadi 'verified'
-                Registration::where('participant_id', $participant->id)
-                    ->where('status_berkas', RegistrationStatus::PendingReview->value)
-                    ->update([
-                        'status_berkas' => RegistrationStatus::Verified->value,
-                        'verified_at' => now(),
-                        'verified_by' => auth()->id(),
-                        'rejection_reason' => null,
-                    ]);
-
-                // 3. Log Activity
+                // 2. Log Activity
                 ActivityLog::create([
                     'user_id' => auth()->id(),
                     'action' => 'participant.verified',
@@ -104,20 +95,13 @@ class DocumentVerificationController extends Controller
 
         try {
             DB::transaction(function () use ($request, $participant) {
-                // Pastikan participant tetap unverified
+                // Pastikan participant unverified & simpan alasan penolakan
                 $participant->update([
                     'is_verified' => false,
                     'verified_at' => null,
                     'verified_by' => null,
+                    'rejection_reason' => $request->rejection_reason,
                 ]);
-
-                // Tolak semua registrasi yang sedang menunggu
-                Registration::where('participant_id', $participant->id)
-                    ->where('status_berkas', RegistrationStatus::PendingReview->value)
-                    ->update([
-                        'status_berkas' => RegistrationStatus::Rejected->value,
-                        'rejection_reason' => $request->rejection_reason,
-                    ]);
 
                 ActivityLog::create([
                     'user_id' => auth()->id(),
@@ -150,11 +134,12 @@ class DocumentVerificationController extends Controller
 
         try {
             DB::transaction(function () use ($request, $participant) {
-                // 1. Reset Participant status
+                // 1. Reset Participant status & simpan alasan revoke
                 $participant->update([
                     'is_verified' => false,
                     'verified_at' => null,
                     'verified_by' => null,
+                    'rejection_reason' => $request->rejection_reason,
                 ]);
 
                 // 2. Log Activity

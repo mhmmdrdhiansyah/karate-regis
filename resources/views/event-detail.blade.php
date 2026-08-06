@@ -89,7 +89,7 @@
         <!-- Poster -->
         <div class="w-full md:w-1/2 relative h-[50vh] md:h-auto group">
             <img alt="{{ $event->name }}" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
-                 src="{{ $event->image_url }}" />
+                 src="{{ $event->image_url }}" onerror="this.onerror=null;this.src='{{ asset('assets/media/karate-hero/screen.png') }}';" />
             <div class="absolute inset-0 bg-gradient-to-t from-on-background via-transparent to-transparent md:bg-gradient-to-r md:via-on-background/40"></div>
         </div>
         <!-- Content -->

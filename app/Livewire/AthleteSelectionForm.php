@@ -342,7 +342,7 @@ class AthleteSelectionForm extends Component
         }
 
         if (count($this->selectedAthleteIds) > $this->subCategory->max_participants) {
-            $this->errorMessage = "{$this->subCategory->name} maksimal {$this->subCategory->max_participants} atlet.";
+            $this->errorMessage = "{$this->subCategory->full_name} maksimal {$this->subCategory->max_participants} atlet.";
             $this->selectedAthleteIds = array_slice($this->selectedAthleteIds, 0, $this->subCategory->max_participants);
         }
 

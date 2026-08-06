@@ -266,9 +266,9 @@
                                                                 <div class="fw-bolder text-gray-800">
                                                                     [{{ $reg->subCategory->eventCategory?->type?->value ?? 'Cat' }}] {{ $reg->subCategory->eventCategory?->class_name }}
                                                                 </div>
-                                                                <div class="text-muted fs-8">
-                                                                    Sub: <strong class="text-primary">{{ $reg->subCategory->name }}</strong>
-                                                                </div>
+                                                                 <div class="text-muted fs-8">
+                                                                     Sub: <strong class="text-primary">{{ $reg->subCategory->full_name }}</strong>
+                                                                 </div>
                                                                 <div class="text-gray-600 fs-8">
                                                                     Peserta: {{ $reg->teamGroup?->name ?? $reg->participant?->name ?? '-' }}
                                                                 </div>

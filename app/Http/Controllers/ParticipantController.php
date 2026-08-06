@@ -114,7 +114,9 @@ class ParticipantController extends Controller
             unset($validated['document']);
         }
 
+        $validated['rejection_reason'] = null;
         $participant->update($validated);
+
         return redirect()->route('participants.index')->with('success', 'Data peserta berhasil diperbarui.');
     }
 
