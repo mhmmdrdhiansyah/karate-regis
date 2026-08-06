@@ -31,6 +31,24 @@
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
                     </div>
+                    <div class="col-md-2">
+                        <label class="required form-label">Tipe Diskon</label>
+                        <select name="discount_type" class="form-select form-select-solid">
+                            <option value="fixed" @selected(old('discount_type', $eventCategory->discount_type ?? 'fixed') === 'fixed')>Nominal (Rp)</option>
+                            <option value="percentage" @selected(old('discount_type', $eventCategory->discount_type ?? 'fixed') === 'percentage')>Persen (%)</option>
+                        </select>
+                        @error('discount_type')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Nilai Diskon</label>
+                        <input type="number" step="0.01" min="0" name="discount_value" class="form-control form-control-solid"
+                            value="{{ old('discount_value', (float)$eventCategory->discount_value) }}">
+                        @error('discount_value')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
                     <div class="col-md-3">
                         <label class="required form-label">Min Birth Date</label>
                         <input type="text" name="min_birth_date" class="form-control form-control-solid"

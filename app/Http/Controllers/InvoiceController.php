@@ -74,23 +74,31 @@ class InvoiceController extends Controller
 
         // Calculate totals
         $totalAthleteFee = 0;
+        $totalDiscount = 0;
         foreach ($athleteSelections as $selection) {
-            if ($selection['subCategory']->isTeam()) {
+            $subCategory = $selection['subCategory'];
+            $eventCategory = $subCategory->eventCategory;
+            $discountPerUnit = $eventCategory ? $eventCategory->calculateDiscountAmount((float) $subCategory->price) : 0;
+
+            if ($subCategory->isTeam()) {
                 $teamCount = collect($selection['athletes'])
                     ->pluck('team_group_id')
                     ->filter()
                     ->unique()
                     ->count();
                 $teamCount = max($teamCount, 1);
-                $totalAthleteFee += (float) $selection['subCategory']->price * $teamCount;
+                $totalAthleteFee += (float) $subCategory->price * $teamCount;
+                $totalDiscount += $discountPerUnit * $teamCount;
             } else {
-                $totalAthleteFee += (float) $selection['subCategory']->price * count($selection['athletes']);
+                $count = count($selection['athletes']);
+                $totalAthleteFee += (float) $subCategory->price * $count;
+                $totalDiscount += $discountPerUnit * $count;
             }
         }
 
         $totalCoachFee = (float) $event->coach_fee * $coaches->count();
         $uniqueCode = $draft->getOrAssignUniqueCode();
-        $totalAmount = (float) $event->event_fee + $totalAthleteFee + $totalCoachFee + $uniqueCode;
+        $totalAmount = (float) $event->event_fee + $totalAthleteFee + $totalCoachFee + $uniqueCode - $totalDiscount;
 
         return view('pdf.event-invoice', [
             'event' => $event,
@@ -99,6 +107,7 @@ class InvoiceController extends Controller
             'coaches' => $coaches,
             'totalAthleteFee' => $totalAthleteFee,
             'totalCoachFee' => $totalCoachFee,
+            'totalDiscount' => $totalDiscount,
             'totalAmount' => $totalAmount,
             'uniqueCode' => $uniqueCode,
             'eventFee' => $event->event_fee,
@@ -161,8 +170,9 @@ class InvoiceController extends Controller
         }
 
         $totalCoachFee = (float) $event->coach_fee * $coaches->count();
-        $uniqueCode = $payment->total_amount - ($event->event_fee + $totalAthleteFee + $totalCoachFee);
-        $uniqueCode = max(0, (int) $uniqueCode);
+        $totalDiscount = (float) ($payment->total_discount ?? 0);
+        $uniqueCode = $payment->total_amount - ($event->event_fee + $totalAthleteFee + $totalCoachFee - $totalDiscount);
+        $uniqueCode = max(0, (int) round($uniqueCode));
         $totalAmount = (float) $payment->total_amount;
 
         return view('pdf.event-invoice', [
@@ -172,6 +182,7 @@ class InvoiceController extends Controller
             'coaches' => $coaches,
             'totalAthleteFee' => $totalAthleteFee,
             'totalCoachFee' => $totalCoachFee,
+            'totalDiscount' => $totalDiscount,
             'totalAmount' => $totalAmount,
             'uniqueCode' => $uniqueCode,
             'eventFee' => $event->event_fee,

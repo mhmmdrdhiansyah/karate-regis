@@ -21,7 +21,9 @@
                                 @foreach ($category->subCategories as $subCategory)
                                     <div class="card card-bordered mb-7 shadow-sm">
                                         <div class="card-header bg-light-primary min-h-40px py-2">
-                                            <h5 class="card-title text-primary m-0">{{ $subCategory->name }}</h5>
+                                            <h5 class="card-title text-primary m-0">
+                                                {{ $subCategory->full_name }}
+                                            </h5>
                                         </div>
                                         <div class="card-body py-4">
                                             @if (session()->has("success_{$subCategory->id}"))
@@ -41,14 +43,14 @@
                                                         <tr class="fw-bolder text-muted">
                                                             <th class="min-w-150px">Label Juara</th>
                                                             <th class="w-150px">Jenis Medali</th>
-                                                            <th class="min-w-200px">Pilih Peserta/Tim</th>
+                                                            <th class="min-w-250px">Pilih Peserta/Tim</th>
                                                             <th class="w-50px text-end">Aksi</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @if (isset($slots[$subCategory->id]) && count($slots[$subCategory->id]) > 0)
                                                             @foreach ($slots[$subCategory->id] as $slotIndex => $slot)
-                                                                <tr>
+                                                                <tr wire:key="slot-{{ $subCategory->id }}-{{ $slot['key'] ?? $slotIndex }}">
                                                                     <td>
                                                                         <input type="text" class="form-control form-control-sm" placeholder="Misal: Juara 4" wire:model="slots.{{ $subCategory->id }}.{{ $slotIndex }}.rank_name">
                                                                     </td>
@@ -60,19 +62,42 @@
                                                                             <option value="">Tanpa Medali</option>
                                                                         </select>
                                                                     </td>
-                                                                    <td>
-                                                                        <select class="form-select form-select-sm" wire:model="slots.{{ $subCategory->id }}.{{ $slotIndex }}.registration_id">
-                                                                            <option value="">-- Pilih Peserta --</option>
-                                                                            @foreach ($subCategory->registrations as $reg)
-                                                                                <option value="{{ $reg->id }}">
-                                                                                    @if($reg->participant)
-                                                                                        {{ $reg->participant->name }} ({{ optional($reg->participant->contingent)->name ?? '-' }})
-                                                                                    @elseif($reg->teamGroup)
-                                                                                        {{ $reg->teamGroup->name }} ({{ optional($reg->teamGroup->contingent)->name ?? '-' }})
-                                                                                    @endif
-                                                                                </option>
-                                                                            @endforeach
-                                                                        </select>
+                                                                    <td wire:ignore.self>
+                                                                        <div wire:ignore
+                                                                             x-data="{
+                                                                                 model: @entangle('slots.'.$subCategory->id.'.'.$slotIndex.'.registration_id')
+                                                                             }"
+                                                                             x-init="
+                                                                                 const $select = $( $refs.select );
+                                                                                 $select.select2({
+                                                                                     placeholder: '-- Pilih Peserta --',
+                                                                                     allowClear: true,
+                                                                                     width: '100%'
+                                                                                 });
+                                                                                 $select.on('change', function () {
+                                                                                     model = $select.val();
+                                                                                 });
+                                                                                 $watch('model', value => {
+                                                                                     if ($select.val() != value) {
+                                                                                         $select.val(value).trigger('change.select2');
+                                                                                     }
+                                                                                 });
+                                                                             "
+                                                                             class="w-100"
+                                                                        >
+                                                                            <select x-ref="select" class="form-select form-select-sm" data-placeholder="-- Pilih Peserta --">
+                                                                                <option value="">-- Pilih Peserta --</option>
+                                                                                @foreach ($subCategory->registrations as $reg)
+                                                                                    <option value="{{ $reg->id }}">
+                                                                                        @if($reg->participant)
+                                                                                            {{ $reg->participant->name }} ({{ optional($reg->participant->contingent)->name ?? '-' }})
+                                                                                        @elseif($reg->teamGroup)
+                                                                                            {{ $reg->teamGroup->name }} ({{ optional($reg->teamGroup->contingent)->name ?? '-' }})
+                                                                                        @endif
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
                                                                     </td>
                                                                     <td class="text-end">
                                                                         <button type="button" class="btn btn-icon btn-light-danger btn-sm" wire:click="removeSlot({{ $subCategory->id }}, {{ $slotIndex }})" title="Hapus Slot">

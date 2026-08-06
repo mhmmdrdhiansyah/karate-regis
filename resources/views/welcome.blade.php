@@ -229,7 +229,7 @@
                                     
                                     <!-- Poster Image -->
                                     <div class="aspect-[3/4] w-full overflow-hidden border-b-2 border-on-background relative bg-surface-container">
-                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" />
+                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" onerror="this.onerror=null;this.src='{{ asset('assets/media/karate-hero/screen.png') }}';" />
                                         <span class="absolute top-2 right-2 bg-accent text-on-accent font-bold uppercase px-2 py-0.5 border border-on-background text-[10px] tracking-wider shadow-sm">
                                             {{ $event['type'] }}
                                         </span>
@@ -329,7 +329,7 @@
                                     
                                     <!-- Poster Image -->
                                     <div class="aspect-[3/4] w-full overflow-hidden border-b-2 border-on-background relative grayscale group-hover:grayscale-0 transition-all duration-500 bg-surface-container">
-                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" />
+                                        <img alt="{{ $event['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="{{ $event['image'] }}" onerror="this.onerror=null;this.src='{{ asset('assets/media/karate-hero/screen.png') }}';" />
                                         <span class="absolute top-2 right-2 bg-slate-800 text-white font-bold uppercase px-2 py-0.5 border border-on-background text-[10px] tracking-wider shadow-sm">
                                             {{ $event['type'] }}
                                         </span>

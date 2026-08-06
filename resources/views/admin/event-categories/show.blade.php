@@ -246,8 +246,8 @@
                     <tbody>
                         @forelse ($eventCategory->subCategories as $subCategory)
                             <tr>
-                                <td>{{ $subCategory->name }}</td>
-                                <td>{{ $subCategory->gender->value }}</td>
+                                <td>{{ $subCategory->full_name }}</td>
+                                <td>{{ $subCategory->gender_label }}</td>
                                 <td>{{ number_format($subCategory->price, 2, ',', '.') }}</td>
                                 <td>{{ $subCategory->min_participants }} - {{ $subCategory->max_participants }}</td>
                                 <td>{{ $subCategory->max_teams }}</td>
@@ -281,7 +281,7 @@
                             <div class="k-card-av bg-light-success text-success">
                                 {{ strtoupper(substr($subCategory->name, 0, 1)) }}</div>
                             <div style="flex:1;min-width:0">
-                                <div class="k-card-nm">{{ $subCategory->name }}</div>
+                                <div class="k-card-nm">{{ $subCategory->full_name }}</div>
                                 <div class="k-card-em">{{ $subCategory->labelType() }}</div>
                             </div>
                             <div class="k-card-arr"><i class="bi bi-chevron-down"></i></div>

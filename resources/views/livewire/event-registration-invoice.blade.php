@@ -41,7 +41,7 @@
                             <div class="d-flex flex-column gap-4">
                                 @foreach ($this->athleteSelections as $selection)
                                     <div>
-                                        <div class="text-muted fs-7 mb-2">Sub-kategori: {{ $selection['subCategory']->name }}</div>
+                                        <div class="text-muted fs-7 mb-2">Sub-kategori: {{ $selection['subCategory']->full_name }}</div>
                                         @if ($selection['subCategory']->isTeam())
                                             @php
                                                 $teams = collect($selection['athletes'])->groupBy('team_group_id');
@@ -158,6 +158,12 @@
                         <span class="text-gray-600 fw-bold fs-6">Kode Unik</span>
                         <span class="fw-bolder text-warning">Rp {{ number_format($this->uniqueCode, 0, ',', '.') }}</span>
                     </div>
+                    @if($this->totalDiscount > 0)
+                        <div class="d-flex flex-stack mb-5 text-danger">
+                            <span class="fw-bold fs-6">Total Diskon</span>
+                            <span class="fw-bolder">-Rp {{ number_format($this->totalDiscount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
                     <div class="separator separator-dashed my-5"></div>
                     <div class="d-flex flex-stack">
                         <span class="fw-bolder fs-5">Total</span>
@@ -233,6 +239,12 @@
                         <span class="fw-bold">Kode Unik</span>
                         <span class="fw-bolder text-warning">Rp {{ number_format($this->uniqueCode, 0, ',', '.') }}</span>
                     </div>
+                    @if($this->totalDiscount > 0)
+                        <div class="d-flex flex-stack mb-3 text-danger">
+                            <span class="fw-bold">Total Diskon</span>
+                            <span class="fw-bolder">-Rp {{ number_format($this->totalDiscount, 0, ',', '.') }}</span>
+                        </div>
+                    @endif
                     <div class="d-flex flex-stack">
                         <span class="fw-bold">Total yang harus dibayar</span>
                         <span class="fw-bolder text-primary fs-3">Rp {{ number_format($this->totalAmount, 0, ',', '.') }}</span>

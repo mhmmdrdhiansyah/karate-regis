@@ -287,7 +287,25 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
+                    <label class="required form-label">Tipe Diskon</label>
+                    <select name="discount_type" class="form-select form-select-solid">
+                        <option value="fixed" @selected(old('discount_type') === 'fixed')>Nominal (Rp)</option>
+                        <option value="percentage" @selected(old('discount_type') === 'percentage')>Persen (%)</option>
+                    </select>
+                    @error('discount_type')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label">Nilai Diskon</label>
+                    <input type="number" step="0.01" min="0" name="discount_value" class="form-control form-control-solid"
+                        value="{{ old('discount_value', 0) }}">
+                    @error('discount_value')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="col-12 col-md-2">
                     <label class="required form-label">Min Birth Date</label>
                     <input type="text" name="min_birth_date" class="form-control form-control-solid"
                         id="kt_min_birth_date" value="{{ old('min_birth_date') }}">
@@ -295,7 +313,7 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <label class="required form-label">Max Birth Date</label>
                     <input type="text" name="max_birth_date" class="form-control form-control-solid"
                         id="kt_max_birth_date" value="{{ old('max_birth_date') }}">
@@ -318,6 +336,7 @@
                         <tr class="text-start text-muted fw-bolder fs-7 text-uppercase gs-0">
                             <th>Type</th>
                             <th>Class</th>
+                            <th>Diskon</th>
                             <th>Range Lahir</th>
                             <th>Sub Category</th>
                             <th class="text-end">Actions</th>
@@ -329,6 +348,15 @@
                                 <td><span class="badge badge-light-info">{{ $category->type->value }}</span></td>
                                 <td><a href="{{ route('admin.event-categories.show', $category) }}"
                                         class="text-dark text-hover-primary fw-bold">{{ $category->class_name }}</a>
+                                </td>
+                                <td>
+                                    @if ($category->discount_value > 0)
+                                        <span class="badge badge-light-success fw-bolder">
+                                            {{ $category->discount_type === 'percentage' ? (float)$category->discount_value . '%' : 'Rp ' . number_format($category->discount_value, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted fs-8">-</span>
+                                    @endif
                                 </td>
                                 <td>{{ $category->readableBirthRange() }}</td>
                                 <td>{{ $category->subCategories->count() }}</td>
@@ -345,7 +373,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-10">Belum ada kategori</td>
+                                <td colspan="6" class="text-center text-muted py-10">Belum ada kategori</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -368,6 +396,14 @@
                             <div class="k-card-dt">
                                 <div class="k-card-row"><span class="k-card-lbl">Type</span><span
                                         class="k-card-val">{{ $category->type->value }}</span></div>
+                                <div class="k-card-row"><span class="k-card-lbl">Diskon</span><span
+                                        class="k-card-val">
+                                        @if ($category->discount_value > 0)
+                                            {{ $category->discount_type === 'percentage' ? (float)$category->discount_value . '%' : 'Rp ' . number_format($category->discount_value, 0, ',', '.') }}
+                                        @else
+                                            -
+                                        @endif
+                                    </span></div>
                                 <div class="k-card-row"><span class="k-card-lbl">Sub Category</span><span
                                         class="k-card-val">{{ $category->subCategories->count() }}</span></div>
                             </div>

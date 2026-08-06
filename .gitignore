@@ -28,3 +28,7 @@ yarn-error.log
 /agent
 /docs
 /additional
+
+# Storage Backups
+/storage/backup
+

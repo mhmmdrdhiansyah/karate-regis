@@ -437,7 +437,17 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(response => {
+                return response.text().then(text => {
+                    let body;
+                    try {
+                        body = JSON.parse(text);
+                    } catch (e) {
+                        body = { message: 'Server mengembalikan respons tidak valid (HTTP ' + response.status + ')' };
+                    }
+                    return { status: response.status, body: body };
+                });
+            })
             .then(result => {
                 if (result.status >= 200 && result.status < 300) {
                     verifyModal.hide();
@@ -451,7 +461,7 @@
                         window.location.reload(); // Reload to update table
                     });
                 } else {
-                    Swal.fire('Error', result.body.message || 'Terjadi kesalahan pada server.', 'error');
+                    Swal.fire('Error', result.body.message || 'Terjadi kesalahan pada server (HTTP ' + result.status + ').', 'error');
                 }
             })
             .catch(error => {

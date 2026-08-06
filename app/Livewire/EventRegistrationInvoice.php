@@ -175,6 +175,33 @@ class EventRegistrationInvoice extends Component
     }
 
     #[Computed]
+    public function totalDiscount(): float
+    {
+        if ($this->athleteSelections->count() === 0) {
+            return 0;
+        }
+
+        return (float) $this->athleteSelections->sum(function (array $selection) {
+            $subCategory = $selection['subCategory'];
+            $eventCategory = $subCategory->eventCategory;
+
+            if (! $eventCategory || $eventCategory->discount_value <= 0) {
+                return 0;
+            }
+
+            $discountPerUnit = $eventCategory->calculateDiscountAmount((float) $subCategory->price);
+
+            if ($subCategory->isTeam()) {
+                $teamCount = collect($selection['athletes'])->pluck('team_group_id')->filter()->unique()->count();
+                $teamCount = max($teamCount, 1);
+                return $discountPerUnit * $teamCount;
+            }
+
+            return $discountPerUnit * count($selection['athletes']);
+        });
+    }
+
+    #[Computed]
     public function totalCoachFee(): float
     {
         if ($this->coaches->count() === 0) {
@@ -187,7 +214,7 @@ class EventRegistrationInvoice extends Component
     #[Computed]
     public function totalAmount(): float
     {
-        return (float) $this->event->event_fee + $this->totalAthleteFee + $this->totalCoachFee + $this->uniqueCode;
+        return (float) $this->event->event_fee + $this->totalAthleteFee + $this->totalCoachFee + $this->uniqueCode - $this->totalDiscount;
     }
 
     public function confirmSubmit(): void
@@ -232,19 +259,19 @@ class EventRegistrationInvoice extends Component
                     $teams = $athletes->groupBy('team_group_id');
                     
                     if ($teams->isEmpty()) {
-                        $this->errorMessage = "Sub-kategori {$subCategory->name} harus memiliki minimal 1 tim.";
+                        $this->errorMessage = "Sub-kategori {$subCategory->full_name} harus memiliki minimal 1 tim.";
                         return;
                     }
 
                     foreach ($teams as $teamId => $teamAthletes) {
                         if (empty($teamId)) {
-                            $this->errorMessage = "Terdapat atlet yang belum dimasukkan ke dalam tim pada {$subCategory->name}.";
+                            $this->errorMessage = "Terdapat atlet yang belum dimasukkan ke dalam tim pada {$subCategory->full_name}.";
                             return;
                         }
 
                         $count = $teamAthletes->count();
                         if ($count < $subCategory->min_participants || $count > $subCategory->max_participants) {
-                            $this->errorMessage = "Tim pada {$subCategory->name} harus berisi {$subCategory->min_participants}-{$subCategory->max_participants} atlet.";
+                            $this->errorMessage = "Tim pada {$subCategory->full_name} harus berisi {$subCategory->min_participants}-{$subCategory->max_participants} atlet.";
                             return;
                         }
                     }
@@ -252,7 +279,7 @@ class EventRegistrationInvoice extends Component
                     // Validasi individu
                     $athleteCount = $athletes->count();
                     if ($athleteCount < $subCategory->min_participants || $athleteCount > $subCategory->max_participants) {
-                        $this->errorMessage = "Jumlah atlet pada {$subCategory->name} tidak sesuai ketentuan.";
+                        $this->errorMessage = "Jumlah atlet pada {$subCategory->full_name} tidak sesuai ketentuan.";
                         return;
                     }
                 }
@@ -265,7 +292,7 @@ class EventRegistrationInvoice extends Component
                     ->toArray();
 
                 if (count($eligibleIds) !== count($athleteIds)) {
-                    $this->errorMessage = "Terdapat atlet pada {$subCategory->name} yang tidak memenuhi syarat.";
+                    $this->errorMessage = "Terdapat atlet pada {$subCategory->full_name} yang tidak memenuhi syarat.";
                     return;
                 }
             }
@@ -303,6 +330,7 @@ class EventRegistrationInvoice extends Component
                     'contingent_id' => $contingent->id,
                     'event_id' => $event->id,
                     'total_amount' => $this->totalAmount,
+                    'total_discount' => $this->totalDiscount,
                     'status' => PaymentStatus::Pending->value,
                 ]);
 

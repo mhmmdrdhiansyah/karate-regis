@@ -78,4 +78,32 @@ class SubCategory extends Model
     {
         return $this->isTeam() ? 'Beregu' : 'Individu';
     }
+
+    public function getGenderLabelAttribute(): string
+    {
+        if ($this->gender instanceof SubCategoryGender) {
+            return $this->gender->label();
+        }
+
+        return match ((string) $this->gender) {
+            'M' => 'Pria',
+            'F' => 'Perempuan',
+            'Mixed' => 'Campuran',
+            default => (string) $this->gender,
+        };
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        $label = $this->gender_label;
+        if (! $label) {
+            return $this->name;
+        }
+
+        if (preg_match('/\b(pria|perempuan|putra|putri|campuran)\b/i', $this->name)) {
+            return $this->name;
+        }
+
+        return "{$this->name} ({$label})";
+    }
 }

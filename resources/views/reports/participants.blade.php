@@ -43,7 +43,7 @@
             <div class="row g-3 mb-6">
                 <div class="col-lg-3 col-md-4">
                     <label class="form-label fs-7 text-gray-600 fw-semibold mb-1">Event</label>
-                    <select name="event" id="filter-event" class="form-select form-select-solid">
+                    <select name="event" id="filter-event" class="form-select form-select-solid" data-control="select2" data-placeholder="Semua Event" data-allow-clear="true">
                         <option value="">Semua Event</option>
                         @foreach($events as $event)
                             <option value="{{ $event->id }}" {{ request('event') == $event->id ? 'selected' : '' }}>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="col-lg-3 col-md-4">
                     <label class="form-label fs-7 text-gray-600 fw-semibold mb-1">Kontingen</label>
-                    <select name="contingent" id="filter-contingent" class="form-select form-select-solid">
+                    <select name="contingent" id="filter-contingent" class="form-select form-select-solid" data-control="select2" data-placeholder="Semua Kontingen" data-allow-clear="true">
                         <option value="">Semua Kontingen</option>
                         @foreach($contingents as $contingent)
                             <option value="{{ $contingent->id }}" {{ request('contingent') == $contingent->id ? 'selected' : '' }}>
@@ -130,15 +130,18 @@
                     <thead>
                         <tr class="text-start text-gray-600 fw-bold fs-7 bg-light">
                             <th class="min-w-50px sticky-left" style="left: 0;">No</th>
-                            <th class="min-w-180px sticky-left" style="left: 50px;">Kontingen</th>
-                            <th class="min-w-200px">Nama Peserta</th>
-                            <th class="min-w-100px">L/P</th>
-                            <th class="min-w-80px">Usia</th>
-                            <th class="min-w-250px">Kelas</th>
-                            <th class="min-w-100px">Kategori</th>
-                            <th class="min-w-60px">Tim</th>
-                            <th class="min-w-150px">Nama Tim</th>
-                            <th class="min-w-80px">Min Usia</th>
+                            <th class="min-w-160px sticky-left" style="left: 50px;">Full Name Kontingen</th>
+                            <th class="min-w-140px">Short Name</th>
+                            <th class="min-w-70px">Negara</th>
+                            <th class="min-w-120px">First Name</th>
+                            <th class="min-w-160px">Last Name</th>
+                            <th class="min-w-60px">Sex</th>
+                            <th class="min-w-100px">Age</th>
+                            <th class="min-w-220px">Kelas</th>
+                            <th class="min-w-100px">Cat. Gender</th>
+                            <th class="min-w-60px">Team</th>
+                            <th class="min-w-120px">Name Team</th>
+                            <th class="min-w-80px">Min Age</th>
                         </tr>
                     </thead>
                     <tbody class="text-gray-700 fw-semibold">
@@ -146,27 +149,17 @@
                             <tr>
                                 <td class="text-center sticky-left bg-body" style="left: 0;">{{ $registrations->firstItem() + $idx }}</td>
                                 <td class="sticky-left bg-body" style="left: 50px;">
-                                    <div class="d-flex align-items-center">
-                                        <div class="symbol symbol-40px symbol-circle me-3 bg-light-primary">
-                                            <span class="symbol-label fs-7 fw-bold text-primary">
-                                                {{ strtoupper(substr($registration->contingent_name, 0, 2)) }}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <div class="text-dark fw-bold">{{ $registration->contingent_name }}</div>
-                                            <div class="text-gray-500 fs-7">INA</div>
-                                        </div>
-                                    </div>
+                                    <div class="text-dark fw-bold">{{ $registration->full_name_kontingen }}</div>
                                 </td>
+                                <td>{{ $registration->short_name_kontingen }}</td>
+                                <td><span class="badge badge-light-info">{{ $registration->kode_negara }}</span></td>
+                                <td>{{ $registration->first_name ?: '-' }}</td>
+                                <td><div class="text-dark fw-semibold">{{ $registration->last_name }}</div></td>
                                 <td>
-                                    <div class="text-dark">{{ $registration->participant_name }}</div>
-                                    <div class="text-gray-500 fs-7">{{ $registration->institusi ?? '-' }}</div>
-                                </td>
-                                <td>
-                                    @if($registration->participant_gender === 'M')
-                                        <span class="badge badge-light-primary">L</span>
-                                    @elseif($registration->participant_gender === 'F')
-                                        <span class="badge badge-light-danger">P</span>
+                                    @if($registration->sex === 'M' || $registration->sex === 'L')
+                                        <span class="badge badge-light-primary">M</span>
+                                    @elseif($registration->sex === 'F' || $registration->sex === 'P')
+                                        <span class="badge badge-light-danger">F</span>
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
@@ -175,9 +168,9 @@
                                 <td>
                                     <div class="text-dark">{{ $registration->kelas }}</div>
                                 </td>
-                                <td>{{ $registration->sub_category_gender?->value ?? '-' }}</td>
+                                <td>{{ $registration->category_gender ?: '-' }}</td>
                                 <td>{{ $registration->team ?: '-' }}</td>
-                                <td>{{ $registration->team_name ?? '-' }}</td>
+                                <td>{{ $registration->name_team ?: '-' }}</td>
                                 <td>{{ $registration->min_age }}</td>
                             </tr>
                         @endforeach
@@ -191,24 +184,24 @@
                     <div class="card mb-3 border border-dashed border-gray-300 shadow-sm">
                         <div class="card-body p-4">
                             <div class="d-flex align-items-start gap-3 mb-3">
-                                <div class="symbol symbol-50px symbol-circle flex-shrink-0 bg-light-{{ $registration->participant_gender === 'M' ? 'primary' : ($registration->participant_gender === 'F' ? 'danger' : 'secondary') }}">
-                                    <span class="symbol-label fs-6 fw-bold text-{{ $registration->participant_gender === 'M' ? 'primary' : ($registration->participant_gender === 'F' ? 'danger' : 'secondary') }}">
-                                        {{ strtoupper(substr($registration->participant_name, 0, 1)) }}
+                                <div class="symbol symbol-50px symbol-circle flex-shrink-0 bg-light-{{ $registration->sex === 'M' ? 'primary' : ($registration->sex === 'F' ? 'danger' : 'secondary') }}">
+                                    <span class="symbol-label fs-6 fw-bold text-{{ $registration->sex === 'M' ? 'primary' : ($registration->sex === 'F' ? 'danger' : 'secondary') }}">
+                                        {{ strtoupper(substr($registration->last_name, 0, 1)) }}
                                     </span>
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
                                         <h5 class="card-title fw-bold text-dark mb-0 text-truncate">
-                                            {{ $registration->participant_name }}
+                                            {{ $registration->last_name }}
                                         </h5>
-                                        @if($registration->participant_gender === 'M')
-                                            <span class="badge badge-light-primary ms-2 flex-shrink-0">L</span>
-                                        @elseif($registration->participant_gender === 'F')
-                                            <span class="badge badge-light-danger ms-2 flex-shrink-0">P</span>
+                                        @if($registration->sex === 'M' || $registration->sex === 'L')
+                                            <span class="badge badge-light-primary ms-2 flex-shrink-0">M</span>
+                                        @elseif($registration->sex === 'F' || $registration->sex === 'P')
+                                            <span class="badge badge-light-danger ms-2 flex-shrink-0">F</span>
                                         @endif
                                     </div>
                                     <p class="text-gray-500 fs-7 fw-semibold mb-0">
-                                        {{ $registration->contingent_name }}
+                                        {{ $registration->full_name_kontingen }} ({{ $registration->kode_negara }})
                                     </p>
                                 </div>
                             </div>
@@ -222,8 +215,8 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="bg-light rounded p-2 text-center">
-                                        <div class="text-gray-500 fs-7 mb-1">Usia / Tim</div>
-                                        <div class="text-dark fw-bold fs-7">{{ $registration->age }} / {{ $registration->team_name ?? '-' }}</div>
+                                        <div class="text-gray-500 fs-7 mb-1">Age / Tim</div>
+                                        <div class="text-dark fw-bold fs-7">{{ $registration->age }} / {{ $registration->name_team ?: '-' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -236,15 +229,15 @@
                             <div class="p-card-details" style="display: none; margin-top: 12px;">
                                 <div class="bg-light rounded p-3">
                                     <div class="d-flex justify-content-between py-2 border-bottom border-gray-200">
-                                        <span class="text-gray-500 fs-7">Kategori</span>
-                                        <span class="text-dark fw-bold fs-7">{{ $registration->sub_category_gender?->value ?? '-' }}</span>
+                                        <span class="text-gray-500 fs-7">First Name (Perguruan)</span>
+                                        <span class="text-dark fw-bold fs-7">{{ $registration->first_name ?: '-' }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between py-2 border-bottom border-gray-200">
-                                        <span class="text-gray-500 fs-7">Perguruan</span>
-                                        <span class="text-dark fw-bold fs-7">{{ $registration->institusi ?? '-' }}</span>
+                                        <span class="text-gray-500 fs-7">Category Gender</span>
+                                        <span class="text-dark fw-bold fs-7">{{ $registration->category_gender ?: '-' }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between py-2">
-                                        <span class="text-gray-500 fs-7">Min Usia</span>
+                                        <span class="text-gray-500 fs-7">Min Age</span>
                                         <span class="text-dark fw-bold fs-7">{{ $registration->min_age }}</span>
                                     </div>
                                 </div>
@@ -332,6 +325,13 @@
                         });
                     }
                 });
+
+                // Select2 change event listener
+                if (window.jQuery) {
+                    $('#filter-event, #filter-contingent').on('change', function() {
+                        applyFilters();
+                    });
+                }
 
                 // Search on Enter key
                 const searchInput = document.getElementById('filter-search');
@@ -468,40 +468,45 @@
                             return;
                         }
 
-                        // CSV headers
+                        // CSV headers exact specification
                         const headers = [
-                            'No',
-                            'Kontingen',
-                            'Nama Peserta',
-                            'L/P',
-                            'Usia',
+                            'Full Name Kontingen',
+                            'Short Name Kontingen',
+                            'Kode Negara',
+                            'First Name',
+                            'Last Name',
+                            'Sex',
+                            'Age',
                             'Kelas',
-                            'Kategori',
-                            'Tim',
-                            'Nama Tim',
-                            'Min Usia'
+                            'Category Gender',
+                            'Team',
+                            'Name Team',
+                            'Min Age'
                         ];
 
                         // Build CSV rows
-                        const csv = [headers.join(',')];
-                        data.forEach((reg, idx) => {
+                        const csvRows = [headers.join(',')];
+                        data.forEach((reg) => {
+                            const escapeCsv = (val) => `"${(val !== null && val !== undefined ? String(val) : '').replace(/"/g, '""')}"`;
                             const row = [
-                                idx + 1,
-                                `"${reg.contingent_name}"`,
-                                `"${reg.participant_name}"`,
-                                reg.participant_gender === 'M' ? 'L' : (reg.participant_gender === 'F' ? 'P' : '-'),
-                                reg.age,
-                                `"${reg.kelas}"`,
-                                reg.sub_category_gender || '-',
-                                reg.team || '-',
-                                `"${reg.team_name || '-'}"`,
-                                reg.min_age
+                                escapeCsv(reg.full_name_kontingen),
+                                escapeCsv(reg.short_name_kontingen),
+                                escapeCsv(reg.kode_negara || 'INA'),
+                                escapeCsv(reg.first_name),
+                                escapeCsv(reg.last_name),
+                                escapeCsv(reg.sex),
+                                escapeCsv(reg.age),
+                                escapeCsv(reg.kelas),
+                                escapeCsv(reg.category_gender),
+                                escapeCsv(reg.team),
+                                escapeCsv(reg.name_team),
+                                escapeCsv(reg.min_age)
                             ];
-                            csv.push(row.join(','));
+                            csvRows.push(row.join(','));
                         });
 
-                        // Download CSV
-                        const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                        // Download CSV with BOM for Excel compatibility
+                        const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
@@ -516,79 +521,11 @@
                     }
                 });
 
-                // Export PDF using jsPDF + autoTable
-                document.getElementById('btn-export-pdf').addEventListener('click', async function() {
-                    try {
-                        const { jsPDF } = window.jspdf || {};
-                        if (!jsPDF) {
-                            alert('Library jsPDF belum tersedia.');
-                            return;
-                        }
-
-                        // Get current filter parameters
-                        const params = new URLSearchParams(window.location.search);
-
-                        // Fetch all filtered data
-                        const response = await fetch('{{ route('reports.participants.export') }}?' + params.toString());
-                        const data = await response.json();
-
-                        if (!data || data.length === 0) {
-                            alert('Tidak ada data untuk diekspor');
-                            return;
-                        }
-
-                        // PDF headers
-                        const headers = [
-                            'No',
-                            'Kontingen',
-                            'Nama Peserta',
-                            'L/P',
-                            'Usia',
-                            'Kelas',
-                            'Kategori',
-                            'Tim',
-                            'Nama Tim',
-                            'Min Usia'
-                        ];
-
-                        // Build PDF body
-                        const body = data.map((reg, idx) => [
-                            idx + 1,
-                            reg.contingent_name,
-                            reg.participant_name,
-                            reg.participant_gender === 'M' ? 'L' : (reg.participant_gender === 'F' ? 'P' : '-'),
-                            reg.age,
-                            reg.kelas,
-                            reg.sub_category_gender || '-',
-                            reg.team || '-',
-                            reg.team_name || '-',
-                            reg.min_age
-                        ]);
-
-                        const doc = new jsPDF('landscape');
-                        doc.setFontSize(10);
-                        doc.text('Laporan Peserta Terdaftar', 14, 15);
-
-                        doc.autoTable({
-                            startY: 20,
-                            head: [headers],
-                            body: body,
-                            styles: {
-                                fontSize: 7,
-                                cellPadding: 2,
-                            },
-                            headStyles: {
-                                fillColor: [66, 139, 202],
-                                textColor: 255,
-                                fontStyle: 'bold',
-                            },
-                        });
-
-                        doc.save('laporan_peserta.pdf');
-                    } catch (error) {
-                        console.error('Export error:', error);
-                        alert('Gagal mengekspor data');
-                    }
+                // Export PDF: Open dedicated print-ready PDF report view in new tab
+                document.getElementById('btn-export-pdf').addEventListener('click', function() {
+                    const params = new URLSearchParams(window.location.search);
+                    const pdfUrl = '{{ route('reports.participants.pdf') }}?' + params.toString();
+                    window.open(pdfUrl, '_blank');
                 });
             });
         </script>

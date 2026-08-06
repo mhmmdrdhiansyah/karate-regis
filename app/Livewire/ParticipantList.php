@@ -59,6 +59,7 @@ class ParticipantList extends Component
         }
 
         $query = $contingent->participants()
+            ->with('registrations')
             ->withCount(['registrations' => fn($q) => $q->whereNull('deleted_at')])
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {

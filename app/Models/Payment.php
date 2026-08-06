@@ -16,6 +16,7 @@ class Payment extends Model
         'contingent_id',
         'event_id',
         'total_amount',
+        'total_discount',
         'transfer_proof',
         'status',
         'rejection_reason',
@@ -27,6 +28,7 @@ class Payment extends Model
     {
         return [
             'total_amount' => 'decimal:2',
+            'total_discount' => 'decimal:2',
             'status' => PaymentStatus::class,
             'verified_at' => 'datetime',
         ];

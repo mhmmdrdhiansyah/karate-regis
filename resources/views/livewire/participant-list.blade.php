@@ -107,6 +107,15 @@
                                         <span class="badge badge-light-success d-flex align-items-center">
                                             <i class="bi bi-check-circle me-1"></i> Terverifikasi
                                         </span>
+                                    @elseif ($participant->rejection_reason)
+                                        <div>
+                                            <span class="badge badge-light-danger d-inline-flex align-items-center">
+                                                <i class="bi bi-x-circle me-1"></i> Ditolak
+                                            </span>
+                                            <div class="text-danger fs-8 fw-semibold mt-1" style="max-width: 200px; line-height: 1.2;">
+                                                <i class="bi bi-exclamation-triangle-fill fs-9 text-danger me-1"></i>{{ $participant->rejection_reason }}
+                                            </div>
+                                        </div>
                                     @else
                                         <span class="badge badge-light-warning">Belum</span>
                                     @endif
@@ -169,6 +178,8 @@
                                     @endif
                                     @if ($participant->is_verified)
                                         <span class="badge badge-light-success"><i class="bi bi-check-circle-fill"></i></span>
+                                    @elseif ($participant->rejection_reason)
+                                        <span class="badge badge-light-danger" title="Dokumen Ditolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
                                     @else
                                         <span class="badge badge-light-warning">Belum</span>
                                     @endif
@@ -178,6 +189,12 @@
                         </div>
 
                         <div class="p-card-bd" onclick="event.stopPropagation()">
+                            @if($participant->rejection_reason)
+                                <div class="alert alert-danger p-3 mb-3 fs-7">
+                                    <div class="fw-bold text-danger mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Alasan Ditolak:</div>
+                                    <div class="text-gray-800">{{ $participant->rejection_reason }}</div>
+                                </div>
+                            @endif
                             <div class="p-card-dt">
                                 <div class="p-card-row">
                                     <span class="p-card-lbl">NIK</span>

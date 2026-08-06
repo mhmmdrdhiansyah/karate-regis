@@ -117,10 +117,16 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage results');
     });
 
-    // Laporan (Reports) - butuh permission view reports (super-admin & panitia)
+    // Laporan Keuangan (Financial Reports)
     Route::get('reports', [ReportController::class, 'index'])
         ->middleware(['permission:view reports'])
         ->name('reports.index');
+    Route::get('reports/financial/export', [ReportController::class, 'financialExport'])
+        ->middleware(['permission:view reports'])
+        ->name('reports.financial.export');
+    Route::get('reports/financial/pdf', [ReportController::class, 'financialPdf'])
+        ->middleware(['permission:view reports'])
+        ->name('reports.financial.pdf');
 
     // Laporan Peserta
     Route::get('reports/participants', [ReportController::class, 'participants'])
@@ -129,6 +135,9 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/participants/export', [ReportController::class, 'participantsExport'])
         ->middleware(['permission:view reports'])
         ->name('reports.participants.export');
+    Route::get('reports/participants/pdf', [ReportController::class, 'participantsPdf'])
+        ->middleware(['permission:view reports'])
+        ->name('reports.participants.pdf');
 
     // Pendaftaran Event (User/Kontingen)
     Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {

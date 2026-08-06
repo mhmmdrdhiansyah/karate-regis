@@ -13,6 +13,8 @@ class EventCategoryRequest extends FormRequest
         return [
             'type' => ['required', Rule::enum(EventCategoryType::class)],
             'class_name' => ['required', 'string', 'max:255'],
+            'discount_type' => ['required', Rule::in(['percentage', 'fixed'])],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
             'min_birth_date' => ['required', 'date'],
             'max_birth_date' => ['required', 'date', 'after_or_equal:min_birth_date'],
         ];

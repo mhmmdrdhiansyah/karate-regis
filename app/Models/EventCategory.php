@@ -16,6 +16,8 @@ class EventCategory extends Model
         'event_id',
         'type',
         'class_name',
+        'discount_type',
+        'discount_value',
         'min_birth_date',
         'max_birth_date',
     ];
@@ -24,9 +26,23 @@ class EventCategory extends Model
     {
         return [
             'type' => EventCategoryType::class,
+            'discount_value' => 'decimal:2',
             'min_birth_date' => 'date',
             'max_birth_date' => 'date',
         ];
+    }
+
+    public function calculateDiscountAmount(float $subCategoryPrice): float
+    {
+        if ($this->discount_value <= 0) {
+            return 0;
+        }
+
+        if ($this->discount_type === 'percentage') {
+            return ($subCategoryPrice * (float) $this->discount_value) / 100;
+        }
+
+        return (float) $this->discount_value;
     }
 
     public function event(): BelongsTo
