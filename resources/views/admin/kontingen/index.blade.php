@@ -71,9 +71,13 @@
                                     <div class="d-flex align-items-center">
                                         <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
                                             <a href="{{ route('kontingen.show', $contingent) }}">
-                                                <div class="symbol-label fs-3 bg-light-warning text-warning">
-                                                    {{ substr($contingent->name, 0, 1) }}
-                                                </div>
+                                                @if($contingent->photo_url)
+                                                    <div class="symbol-label" style="background-image: url('{{ $contingent->photo_url }}'); background-size: cover; background-position: center; width: 100%; height: 100%;"></div>
+                                                @else
+                                                    <div class="symbol-label fs-3 bg-light-warning text-warning">
+                                                        {{ substr($contingent->name, 0, 1) }}
+                                                    </div>
+                                                @endif
                                             </a>
                                         </div>
                                         <div class="d-flex flex-column">
@@ -161,9 +165,13 @@
                 @forelse ($contingents as $contingent)
                     <div class="k-card" onclick="this.classList.toggle('open')">
                         <div class="k-card-hd">
-                            <div class="k-card-av bg-light-warning text-warning">
-                                {{ substr($contingent->name, 0, 1) }}
-                            </div>
+                            @if($contingent->photo_url)
+                                <div class="k-card-av" style="background-image: url('{{ $contingent->photo_url }}'); background-size: cover; background-position: center;"></div>
+                            @else
+                                <div class="k-card-av bg-light-warning text-warning">
+                                    {{ substr($contingent->name, 0, 1) }}
+                                </div>
+                            @endif
                             <div style="flex:1;min-width:0">
                                 <div class="k-card-nm">{{ $contingent->name }}</div>
                                 <div class="k-card-em">{{ $contingent->official_name }}</div>

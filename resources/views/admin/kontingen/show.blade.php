@@ -6,9 +6,13 @@
             <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
                 <div class="me-7 mb-4">
                     <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
-                        <div class="symbol-label fs-1 fw-bolder bg-light-warning text-warning">
-                            {{ substr($kontingen->name, 0, 1) }}
-                        </div>
+                        @if($kontingen->photo_url)
+                            <div class="symbol-label" style="background-image: url('{{ $kontingen->photo_url }}'); background-size: cover; background-position: center; width: 100%; height: 100%; border-radius: 0.475rem;"></div>
+                        @else
+                            <div class="symbol-label fs-1 fw-bolder bg-light-warning text-warning">
+                                {{ substr($kontingen->name, 0, 1) }}
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="flex-grow-1">

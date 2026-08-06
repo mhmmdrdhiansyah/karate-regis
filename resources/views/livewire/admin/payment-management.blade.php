@@ -27,19 +27,71 @@
         {{-- Filters & Search --}}
         <div class="card mb-7">
             <div class="card-body">
-                <div class="d-flex flex-wrap align-items-center gap-5">
-                    <div class="position-relative w-md-400px">
-                        <i class="bi bi-search position-absolute top-50 translate-middle-y ms-4 fs-4"></i>
-                        <input type="text" wire:model.live="search" class="form-control form-control-solid ps-12" placeholder="Cari kontingen atau ID invoice...">
+                <div class="row g-4">
+                    {{-- Search --}}
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Cari Invoice / Kontingen</label>
+                        <div class="position-relative">
+                            <i class="bi bi-search position-absolute top-50 translate-middle-y ms-4 fs-5 text-gray-500"></i>
+                            <input type="text" wire:model.live="search" class="form-control form-control-solid ps-12" placeholder="Nama kontingen / ID #...">
+                        </div>
                     </div>
 
-                    <div class="w-md-200px">
+                    {{-- Event Filter --}}
+                    <div class="col-md-4 col-lg-3">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Event</label>
+                        <select wire:model.live="eventId" class="form-select form-select-solid">
+                            <option value="">Semua Event</option>
+                            @foreach($this->events as $event)
+                                <option value="{{ $event->id }}">{{ $event->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Status Filter --}}
+                    <div class="col-md-4 col-lg-2">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Status</label>
                         <select wire:model.live="statusFilter" class="form-select form-select-solid">
                             <option value="">Semua Status</option>
                             <option value="pending">Pending</option>
                             <option value="verified">Verified</option>
                             <option value="rejected">Rejected</option>
                             <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    {{-- Type Filter (Open/Festival) --}}
+                    <div class="col-md-4 col-lg-2">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Tipe Kategori</label>
+                        <select wire:model.live="typeFilter" class="form-select form-select-solid">
+                            <option value="">Semua Tipe</option>
+                            @foreach($this->availableTypes as $type)
+                                <option value="{{ is_object($type) ? $type->value : $type }}">{{ is_object($type) ? $type->value : $type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Class Filter (Usia Dini, Cadet, etc.) --}}
+                    <div class="col-md-4 col-lg-2">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Class / Kelas Umur</label>
+                        <select wire:model.live="classFilter" class="form-select form-select-solid">
+                            <option value="">Semua Class</option>
+                            @foreach($this->availableClasses as $class)
+                                <option value="{{ $class }}">{{ $class }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Sub-Category Filter --}}
+                    <div class="col-md-8 col-lg-6">
+                        <label class="form-label fs-7 fw-bolder text-gray-700 text-uppercase">Sub-Kategori</label>
+                        <select wire:model.live="subCategoryFilter" class="form-select form-select-solid">
+                            <option value="">Semua Sub-Kategori</option>
+                            @foreach($this->availableSubCategories as $subCat)
+                                <option value="{{ $subCat->id }}">
+                                    [{{ $subCat->eventCategory?->type?->value ?? 'Category' }} - {{ $subCat->eventCategory?->class_name }}] {{ $subCat->name }} ({{ $subCat->gender->value === 'M' ? 'Putra' : ($subCat->gender->value === 'F' ? 'Putri' : 'Campuran') }})
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -195,11 +247,43 @@
                                                     <span class="text-muted fw-bold">Total:</span>
                                                     <span class="text-gray-800 fw-bolder">Rp {{ number_format($currentPayment->total_amount, 0, ',', '.') }}</span>
                                                 </div>
-                                                <div class="d-flex flex-stack">
+                                                <div class="d-flex flex-stack mb-2">
                                                     <span class="text-muted fw-bold">Status:</span>
                                                     <span class="badge badge-light-{{ $currentPayment->status->value === 'pending' ? 'warning' : ($currentPayment->status->value === 'verified' ? 'success' : 'danger') }} fw-bolder">
                                                         {{ ucfirst($currentPayment->status->value) }}
                                                     </span>
+                                                </div>
+
+                                                <div class="separator separator-dashed my-4"></div>
+                                                <h6 class="fw-bolder mb-2 text-uppercase fs-8 text-muted">Kategori Terdaftar:</h6>
+                                                <div class="max-h-200px overflow-y-auto pe-2">
+                                                    @php
+                                                        $currentPayment->loadMissing(['registrations.subCategory.eventCategory', 'registrations.participant', 'registrations.teamGroup']);
+                                                    @endphp
+                                                    @forelse($currentPayment->registrations as $reg)
+                                                        <div class="border-bottom border-gray-200 py-2 fs-7">
+                                                            @if($reg->subCategory)
+                                                                <div class="fw-bolder text-gray-800">
+                                                                    [{{ $reg->subCategory->eventCategory?->type?->value ?? 'Cat' }}] {{ $reg->subCategory->eventCategory?->class_name }}
+                                                                </div>
+                                                                <div class="text-muted fs-8">
+                                                                    Sub: <strong class="text-primary">{{ $reg->subCategory->name }}</strong>
+                                                                </div>
+                                                                <div class="text-gray-600 fs-8">
+                                                                    Peserta: {{ $reg->teamGroup?->name ?? $reg->participant?->name ?? '-' }}
+                                                                </div>
+                                                            @else
+                                                                <div class="fw-bolder text-info">
+                                                                    [Biaya Pelatih / Offical]
+                                                                </div>
+                                                                <div class="text-gray-600 fs-8">
+                                                                    Peserta: {{ $reg->participant?->name ?? '-' }}
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    @empty
+                                                        <div class="text-muted fs-8 italic">Tidak ada data rincian pendaftaran.</div>
+                                                    @endforelse
                                                 </div>
                                             </div>
                                         </div>

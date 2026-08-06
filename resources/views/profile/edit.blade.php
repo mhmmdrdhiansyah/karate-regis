@@ -6,9 +6,13 @@
             <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
                 <div class="me-7 mb-4">
                     <div class="symbol symbol-100px symbol-lg-160px symbol-fixed position-relative">
-                        <div class="symbol-label fs-1 fw-bolder bg-light-primary text-primary">
-                            {{ substr($user->name, 0, 1) }}
-                        </div>
+                        @if($user->avatar_url)
+                            <div class="symbol-label" style="background-image: url('{{ $user->avatar_url }}'); background-size: cover; background-position: center; width: 100%; height: 100%; border-radius: 0.475rem;"></div>
+                        @else
+                            <div class="symbol-label fs-1 fw-bolder bg-light-primary text-primary">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                        @endif
                         <div
                             class="position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-white h-20px w-20px">
                         </div>
@@ -71,11 +75,48 @@
             </div>
         </div>
         <div id="kt_account_kontingen_details" class="collapse show">
-            <form class="form" method="POST" action="{{ route('profile.update.kontingen') }}">
+            <form class="form" method="POST" action="{{ route('profile.update.kontingen') }}" enctype="multipart/form-data">
                 @csrf
                 @method('patch')
 
                 <div class="card-body border-top p-9">
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label fw-bold fs-6">Foto Profil / Logo Kontingen</label>
+                        <div class="col-lg-8 fv-row">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-100px symbol-lg-120px me-5 position-relative">
+                                    @if($contingent->photo_url)
+                                        <img id="photo-preview-img" src="{{ $contingent->photo_url }}" alt="Foto Kontingen" style="width:100%; height:100%; object-fit:cover; border-radius: 0.475rem;" />
+                                        <div id="photo-preview-placeholder" class="symbol-label fs-2x fw-bolder bg-light-primary text-primary" style="display:none; border-radius: 0.475rem;">
+                                            {{ substr($contingent->name, 0, 1) }}
+                                        </div>
+                                    @else
+                                        <div id="photo-preview-placeholder" class="symbol-label fs-2x fw-bolder bg-light-primary text-primary" style="border-radius: 0.475rem;">
+                                            {{ substr($contingent->name, 0, 1) }}
+                                        </div>
+                                        <img id="photo-preview-img" src="" alt="Foto Kontingen" style="width:100%; height:100%; object-fit:cover; display:none; border-radius: 0.475rem;" />
+                                    @endif
+                                </div>
+                                <div class="d-flex flex-column align-items-start gap-2">
+                                    <label class="btn btn-sm btn-primary text-white mb-0">
+                                        <i class="bi bi-upload me-1"></i> Pilih Foto
+                                        <input type="file" name="photo" id="kontingen-photo-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="d-none" />
+                                    </label>
+                                    <input type="hidden" name="remove_photo" id="remove-photo-input" value="0" />
+                                    @if($contingent->photo)
+                                        <button type="button" class="btn btn-sm btn-light-danger" id="btn-remove-photo">
+                                            <i class="bi bi-trash me-1"></i> Hapus Foto
+                                        </button>
+                                    @endif
+                                    <div class="form-text text-muted">Format: PNG, JPG, JPEG, WEBP. Maksimal 2MB.</div>
+                                </div>
+                            </div>
+                            @error('photo')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label required fw-bold fs-6">Nama Kontingen</label>
                         <div class="col-lg-8 fv-row">
@@ -178,11 +219,47 @@
             </div>
         </div>
         <div id="kt_account_profile_details" class="collapse show">
-            <form class="form" method="POST" action="{{ route('profile.update') }}">
+            <form class="form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
                 @method('patch')
 
                 <div class="card-body border-top p-9">
+                    <div class="row mb-6">
+                        <label class="col-lg-4 col-form-label fw-bold fs-6">Foto Profil / Avatar</label>
+                        <div class="col-lg-8 fv-row">
+                            <div class="d-flex align-items-center">
+                                <div class="symbol symbol-100px symbol-lg-120px me-5 position-relative">
+                                    @if($user->avatar_url)
+                                        <img id="user-avatar-preview-img" src="{{ $user->avatar_url }}" alt="Foto Profile" style="width:100%; height:100%; object-fit:cover; border-radius: 0.475rem;" />
+                                        <div id="user-avatar-preview-placeholder" class="symbol-label fs-2x fw-bolder bg-light-primary text-primary" style="display:none; border-radius: 0.475rem;">
+                                            {{ substr($user->name, 0, 1) }}
+                                        </div>
+                                    @else
+                                        <div id="user-avatar-preview-placeholder" class="symbol-label fs-2x fw-bolder bg-light-primary text-primary" style="border-radius: 0.475rem;">
+                                            {{ substr($user->name, 0, 1) }}
+                                        </div>
+                                        <img id="user-avatar-preview-img" src="" alt="Foto Profile" style="width:100%; height:100%; object-fit:cover; display:none; border-radius: 0.475rem;" />
+                                    @endif
+                                </div>
+                                <div class="d-flex flex-column align-items-start gap-2">
+                                    <label class="btn btn-sm btn-primary text-white mb-0">
+                                        <i class="bi bi-upload me-1"></i> Pilih Foto
+                                        <input type="file" name="avatar" id="user-avatar-input" accept="image/png, image/jpeg, image/jpg, image/webp" class="d-none" />
+                                    </label>
+                                    <input type="hidden" name="remove_avatar" id="remove-user-avatar-input" value="0" />
+                                    @if($user->avatar)
+                                        <button type="button" class="btn btn-sm btn-light-danger" id="btn-remove-user-avatar">
+                                            <i class="bi bi-trash me-1"></i> Hapus Foto
+                                        </button>
+                                    @endif
+                                    <div class="form-text text-muted">Format: PNG, JPG, JPEG, WEBP. Maksimal 2MB.</div>
+                                </div>
+                            </div>
+                            @error('avatar')
+                                <div class="text-danger mt-2 small">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
                     @if($user->isKontingen())
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">Username</label>
@@ -337,7 +414,49 @@
                 });
             });
 
+            $('#user-avatar-input').on('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#user-avatar-preview-img').attr('src', e.target.result).show();
+                        $('#user-avatar-preview-placeholder').hide();
+                        $('#remove-user-avatar-input').val('0');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            $('#btn-remove-user-avatar').on('click', function() {
+                $('#user-avatar-preview-img').attr('src', '').hide();
+                $('#user-avatar-preview-placeholder').show();
+                $('#user-avatar-input').val('');
+                $('#remove-user-avatar-input').val('1');
+                $(this).hide();
+            });
+
             @if($user->isKontingen() && $contingent)
+            $('#kontingen-photo-input').on('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#photo-preview-img').attr('src', e.target.result).show();
+                        $('#photo-preview-placeholder').hide();
+                        $('#remove-photo-input').val('0');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            $('#btn-remove-photo').on('click', function() {
+                $('#photo-preview-img').attr('src', '').hide();
+                $('#photo-preview-placeholder').show();
+                $('#kontingen-photo-input').val('');
+                $('#remove-photo-input').val('1');
+                $(this).hide();
+            });
+
             var pSelect = $('#profile-province-select');
             var rSelect = $('#profile-regency-select');
             var pH = $('#profile-province-hidden');

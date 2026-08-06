@@ -21,10 +21,16 @@
             <div class="d-flex align-items-stretch" id="kt_header_nav">
 
                 <div class="d-flex align-items-center ms-1 ms-lg-3">
-                    <div class="cursor-pointer symbol symbol-30px symbol-md-40px" data-kt-menu-trigger="click"
+                    <div class="d-flex align-items-center cursor-pointer me-n2 me-lg-0" data-kt-menu-trigger="click"
                         data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                        <span class="text-dark fw-bolder fs-6 me-2">{{ Auth::user()->name }}</span>
-                        <img src="{{ asset('assets/media/avatars/150-1.jpg') }}" alt="user" />
+                        <span class="text-gray-800 fw-bolder fs-6 me-3 d-none d-md-inline">{{ Auth::user()->name }}</span>
+                        <div class="symbol symbol-30px symbol-md-40px">
+                            @if(Auth::user()->avatar_url)
+                                <img src="{{ Auth::user()->avatar_url }}" alt="user" style="object-fit: cover;" />
+                            @else
+                                <div class="symbol-label fs-5 fw-bolder bg-light-primary text-primary">{{ substr(Auth::user()->name, 0, 1) }}</div>
+                            @endif
+                        </div>
                     </div>
 
                     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px"
@@ -32,7 +38,11 @@
                         <div class="menu-item px-3">
                             <div class="menu-content d-flex align-items-center px-3">
                                 <div class="symbol symbol-50px me-5">
-                                    <img alt="Logo" src="{{ asset('assets/media/avatars/150-1.jpg') }}" />
+                                    @if(Auth::user()->avatar_url)
+                                        <img alt="Logo" src="{{ Auth::user()->avatar_url }}" style="object-fit: cover;" />
+                                    @else
+                                        <div class="symbol-label fs-3 fw-bolder bg-light-primary text-primary">{{ substr(Auth::user()->name, 0, 1) }}</div>
+                                    @endif
                                 </div>
                                 <div class="d-flex flex-column">
                                     <div class="fw-bolder d-flex align-items-center fs-5">{{ Auth::user()->name }}

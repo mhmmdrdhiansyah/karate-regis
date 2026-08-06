@@ -13,6 +13,7 @@ class Result extends Model
 
     protected $fillable = [
         'registration_id',
+        'rank_name',
         'medal_type',
     ];
 

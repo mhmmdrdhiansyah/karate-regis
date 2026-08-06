@@ -20,6 +20,7 @@ class UpdateContingentProfileRequest extends FormRequest
             'address' => ['nullable', 'string'],
             'province' => ['required', 'string', 'max:255'],
             'regency' => ['required', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
     }
 
@@ -33,6 +34,9 @@ class UpdateContingentProfileRequest extends FormRequest
             'phone.max' => 'Nomor telepon maksimal 20 karakter',
             'province.required' => 'Provinsi wajib dipilih',
             'regency.required' => 'Kabupaten/Kota wajib dipilih',
+            'photo.image' => 'File foto profil harus berupa gambar',
+            'photo.mimes' => 'Format foto profil harus jpeg, png, jpg, atau webp',
+            'photo.max' => 'Ukuran foto profil maksimal 2MB',
         ];
     }
 }

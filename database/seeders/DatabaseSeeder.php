@@ -18,11 +18,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RolesAndPermissionsSeeder::class,
-            ContingentSeeder::class,
-            ParticipantSeeder::class,
-            Contingent6ParticipantSeeder::class,
             EventSeeder::class,
-            NewEventSeeder::class,
         ]);
     }
 }

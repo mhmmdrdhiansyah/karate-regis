@@ -303,6 +303,16 @@
                         </a>
                     </div>
                 @endcan
+
+                @can('manage results')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('admin.results.*') || request()->routeIs('admin.events.results.*') ? 'active' : '' }}"
+                           href="{{ route('admin.results.index') }}">
+                            <span class="menu-icon"><i class="bi bi-trophy fs-3"></i></span>
+                            <span class="menu-title">Hasil Pertandingan</span>
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
     </div>

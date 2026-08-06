@@ -20,13 +20,69 @@ class PaymentManagement extends Component
 
     public $search = '';
     public $statusFilter = '';
+    public $eventId = '';
+    public $typeFilter = '';
+    public $classFilter = '';
+    public $subCategoryFilter = '';
     public $rejectionReason = '';
     public ?int $selectedPaymentId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
         'statusFilter' => ['except' => ''],
+        'eventId' => ['except' => ''],
+        'typeFilter' => ['except' => ''],
+        'classFilter' => ['except' => ''],
+        'subCategoryFilter' => ['except' => ''],
     ];
+
+    #[Computed]
+    public function events()
+    {
+        return \App\Models\Event::orderBy('name', 'asc')->get();
+    }
+
+    #[Computed]
+    public function availableTypes()
+    {
+        $query = \App\Models\EventCategory::query();
+        if ($this->eventId) {
+            $query->where('event_id', $this->eventId);
+        }
+        return $query->pluck('type')->unique()->filter()->values();
+    }
+
+    #[Computed]
+    public function availableClasses()
+    {
+        $query = \App\Models\EventCategory::query();
+        if ($this->eventId) {
+            $query->where('event_id', $this->eventId);
+        }
+        if ($this->typeFilter) {
+            $query->where('type', $this->typeFilter);
+        }
+        return $query->pluck('class_name')->unique()->filter()->values();
+    }
+
+    #[Computed]
+    public function availableSubCategories()
+    {
+        return \App\Models\SubCategory::query()
+            ->whereHas('eventCategory', function ($query) {
+                if ($this->eventId) {
+                    $query->where('event_id', $this->eventId);
+                }
+                if ($this->typeFilter) {
+                    $query->where('type', $this->typeFilter);
+                }
+                if ($this->classFilter) {
+                    $query->where('class_name', $this->classFilter);
+                }
+            })
+            ->orderBy('name', 'asc')
+            ->get();
+    }
 
     #[Computed]
     public function payments()
@@ -34,15 +90,37 @@ class PaymentManagement extends Component
         return Payment::query()
             ->with(['contingent' => function ($query) {
                 $query->withTrashed(); // Include soft-deleted contingents
-            }, 'event'])
+            }, 'event', 'registrations.subCategory.eventCategory'])
             ->when($this->search, function ($query) {
-                $query->whereHas('contingent', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('official_name', 'like', '%' . $this->search . '%');
-                })->orWhere('id', 'like', '%' . $this->search . '%');
+                $query->where(function ($q) {
+                    $q->whereHas('contingent', function ($c) {
+                        $c->where('name', 'like', '%' . $this->search . '%')
+                            ->orWhere('official_name', 'like', '%' . $this->search . '%');
+                    })->orWhere('id', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->statusFilter, function ($query) {
                 $query->where('status', $this->statusFilter);
+            })
+            ->when($this->eventId, function ($query) {
+                $query->where('event_id', $this->eventId);
+            })
+            ->when($this->typeFilter || $this->classFilter || $this->subCategoryFilter, function ($query) {
+                $query->whereHas('registrations.subCategory', function ($q) {
+                    if ($this->subCategoryFilter) {
+                        $q->where('id', $this->subCategoryFilter);
+                    }
+                    if ($this->typeFilter || $this->classFilter) {
+                        $q->whereHas('eventCategory', function ($ec) {
+                            if ($this->typeFilter) {
+                                $ec->where('type', $this->typeFilter);
+                            }
+                            if ($this->classFilter) {
+                                $ec->where('class_name', $this->classFilter);
+                            }
+                        });
+                    }
+                });
             })
             ->orderByDesc('created_at')
             ->paginate(10);
@@ -189,6 +267,32 @@ class PaymentManagement extends Component
     }
 
     public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedEventId(): void
+    {
+        $this->typeFilter = '';
+        $this->classFilter = '';
+        $this->subCategoryFilter = '';
+        $this->resetPage();
+    }
+
+    public function updatedTypeFilter(): void
+    {
+        $this->classFilter = '';
+        $this->subCategoryFilter = '';
+        $this->resetPage();
+    }
+
+    public function updatedClassFilter(): void
+    {
+        $this->subCategoryFilter = '';
+        $this->resetPage();
+    }
+
+    public function updatedSubCategoryFilter(): void
     {
         $this->resetPage();
     }

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\SubCategory;
-use App\Enums\SubCategoryGender;
 use Illuminate\Database\Seeder;
 
 class EventSeeder extends Seeder
@@ -13,28 +12,7 @@ class EventSeeder extends Seeder
     public function run(): void
     {
         $events = [
-            [
-                'name' => 'Piala Karate Indonesia 2026',
-                'bank_name' => 'BCA',
-                'account_number' => '1234567890',
-                'account_holder' => 'Pengurus Pusat Karate Indonesia',
-                'event_date' => '2026-08-01',
-                'registration_deadline' => '2026-07-15 23:59:59',
-                'coach_fee' => 500000,
-                'event_fee' => 250000,
-                'status' => 'registration_open',
-            ],
-            [
-                'name' => 'Kejuaraan Nasional Karate 2026',
-                'bank_name' => 'Mandiri',
-                'account_number' => '0987654321',
-                'account_holder' => 'Pengurus Nasional Karate',
-                'event_date' => '2026-10-12',
-                'registration_deadline' => '2026-09-15 23:59:59',
-                'coach_fee' => 750000,
-                'event_fee' => 350000,
-                'status' => 'registration_open',
-            ],
+            // Registration Open
             [
                 'name' => 'Sabuk Hitam Championship 2026',
                 'bank_name' => 'BNI',
@@ -45,17 +23,193 @@ class EventSeeder extends Seeder
                 'coach_fee' => 600000,
                 'event_fee' => 300000,
                 'status' => 'registration_open',
+                'poster' => null,
             ],
+            [
+                'name' => 'Kejuaraan Karate Piala Presiden 2026',
+                'bank_name' => 'BCA',
+                'account_number' => '1234567890',
+                'account_holder' => 'Pengurus Pusat Karate Indonesia',
+                'event_date' => '2026-09-15',
+                'registration_deadline' => '2026-08-20 23:59:59',
+                'coach_fee' => 750000,
+                'event_fee' => 350000,
+                'status' => 'registration_open',
+                'poster' => 'events/posters/1.png',
+            ],
+            [
+                'name' => 'Jakarta Karate Open Championship 2026',
+                'bank_name' => 'Mandiri',
+                'account_number' => '0987654321',
+                'account_holder' => 'Jakarta Karate Association',
+                'event_date' => '2026-10-08',
+                'registration_deadline' => '2026-09-10 23:59:59',
+                'coach_fee' => 600000,
+                'event_fee' => 300000,
+                'status' => 'registration_open',
+                'poster' => 'events/posters/2.png',
+            ],
+            [
+                'name' => 'Bandung Karate Open 2026',
+                'bank_name' => 'BJB',
+                'account_number' => '111122223333',
+                'account_holder' => 'Bandung Karate League',
+                'event_date' => '2026-11-05',
+                'registration_deadline' => '2026-10-10 23:59:59',
+                'coach_fee' => 500000,
+                'event_fee' => 250000,
+                'status' => 'registration_open',
+                'poster' => 'events/posters/6.png',
+            ],
+            [
+                'name' => 'Surabaya Karate Cup 2026',
+                'bank_name' => 'Jatim',
+                'account_number' => '444455556666',
+                'account_holder' => 'Surabaya Karate Association',
+                'event_date' => '2026-12-15',
+                'registration_deadline' => '2026-11-20 23:59:59',
+                'coach_fee' => 600000,
+                'event_fee' => 300000,
+                'status' => 'registration_open',
+                'poster' => 'events/posters/7.png',
+            ],
+
+            // Registration Closed
+            [
+                'name' => 'Sumatera Open Championship 2026',
+                'bank_name' => 'Mandiri',
+                'account_number' => '222233334444',
+                'account_holder' => 'Sumatera Karate League',
+                'event_date' => '2026-10-25',
+                'registration_deadline' => '2026-10-01 23:59:59',
+                'coach_fee' => 500000,
+                'event_fee' => 250000,
+                'status' => 'registration_closed',
+                'poster' => null,
+            ],
+            [
+                'name' => 'Sulawesi Karate Cup 2026',
+                'bank_name' => 'BNI',
+                'account_number' => '333344445555',
+                'account_holder' => 'Sulawesi Karate League',
+                'event_date' => '2026-11-02',
+                'registration_deadline' => '2026-10-10 23:59:59',
+                'coach_fee' => 450000,
+                'event_fee' => 220000,
+                'status' => 'registration_closed',
+                'poster' => null,
+            ],
+
+            // Ongoing
             [
                 'name' => 'Karate Junior Cup 2026',
                 'bank_name' => 'BRI',
                 'account_number' => '888899994444',
                 'account_holder' => 'Junior Karate Cup',
-                'event_date' => '2026-12-05',
-                'registration_deadline' => '2026-11-10 23:59:59',
+                'event_date' => '2026-08-05',
+                'registration_deadline' => '2026-07-10 23:59:59',
                 'coach_fee' => 400000,
                 'event_fee' => 200000,
-                'status' => 'registration_open',
+                'status' => 'ongoing',
+                'poster' => null,
+            ],
+            [
+                'name' => 'National Dojo Battle 2026',
+                'bank_name' => 'BCA',
+                'account_number' => '999900001111',
+                'account_holder' => 'Dojo Battle League',
+                'event_date' => '2026-08-06',
+                'registration_deadline' => '2026-07-20 23:59:59',
+                'coach_fee' => 500000,
+                'event_fee' => 250000,
+                'status' => 'ongoing',
+                'poster' => null,
+            ],
+
+            // Completed
+            [
+                'name' => 'Piala Karate Indonesia 2026',
+                'bank_name' => 'BCA',
+                'account_number' => '1234567890',
+                'account_holder' => 'Pengurus Pusat Karate Indonesia',
+                'event_date' => '2026-05-01',
+                'registration_deadline' => '2026-04-15 23:59:59',
+                'coach_fee' => 500000,
+                'event_fee' => 250000,
+                'status' => 'completed',
+                'poster' => null,
+            ],
+            [
+                'name' => 'Kejuaraan Nasional Karate 2026',
+                'bank_name' => 'Mandiri',
+                'account_number' => '0987654321',
+                'account_holder' => 'Pengurus Nasional Karate',
+                'event_date' => '2026-06-12',
+                'registration_deadline' => '2026-05-15 23:59:59',
+                'coach_fee' => 750000,
+                'event_fee' => 350000,
+                'status' => 'completed',
+                'poster' => null,
+            ],
+            [
+                'name' => 'Regional Dojo League 2026',
+                'bank_name' => 'BCA',
+                'account_number' => '444455556666',
+                'account_holder' => 'Regional Dojo Committee',
+                'event_date' => '2026-07-20',
+                'registration_deadline' => '2026-07-01 23:59:59',
+                'coach_fee' => 300000,
+                'event_fee' => 150000,
+                'status' => 'completed',
+                'poster' => null,
+            ],
+            [
+                'name' => 'Kejuaraan Nasional Karate Yunior 2026',
+                'bank_name' => 'BNI',
+                'account_number' => '555566667777',
+                'account_holder' => 'Pengurus Nasional Karate',
+                'event_date' => '2026-04-12',
+                'registration_deadline' => '2026-03-15 23:59:59',
+                'coach_fee' => 500000,
+                'event_fee' => 250000,
+                'status' => 'completed',
+                'poster' => 'events/posters/3.png',
+            ],
+            [
+                'name' => 'Indonesia Karate Festival 2026',
+                'bank_name' => 'BRI',
+                'account_number' => '888899994444',
+                'account_holder' => 'Festival Karate Indonesia',
+                'event_date' => '2026-03-05',
+                'registration_deadline' => '2026-02-10 23:59:59',
+                'coach_fee' => 550000,
+                'event_fee' => 275000,
+                'status' => 'completed',
+                'poster' => 'events/posters/4.png',
+            ],
+            [
+                'name' => 'Piala KONI Karate Championship 2026',
+                'bank_name' => 'BSI',
+                'account_number' => '7000123456',
+                'account_holder' => 'KONIN Karate Division',
+                'event_date' => '2026-02-20',
+                'registration_deadline' => '2026-01-25 23:59:59',
+                'coach_fee' => 800000,
+                'event_fee' => 400000,
+                'status' => 'completed',
+                'poster' => 'events/posters/5.png',
+            ],
+            [
+                'name' => 'Veteran Karate League 2026',
+                'bank_name' => 'Mandiri',
+                'account_number' => '999988887777',
+                'account_holder' => 'Veteran Karate Indonesia',
+                'event_date' => '2026-01-10',
+                'registration_deadline' => '2025-12-15 23:59:59',
+                'coach_fee' => 400000,
+                'event_fee' => 200000,
+                'status' => 'completed',
+                'poster' => 'events/posters/8.png',
             ],
         ];
 
@@ -65,21 +219,15 @@ class EventSeeder extends Seeder
                 $eventData
             );
 
-            self::seedCategoriesForEvent($event);
+            $this->seedCategoriesForEvent($event);
         }
 
-        $this->command->info('EventSeeder: ' . count($events) . ' events created, each with Categories (Open/Festival) and SubCategories.');
+        $this->command->info('EventSeeder: ' . count($events) . ' events created, each with Categories and SubCategories.');
     }
 
-    /**
-     * Buat kategori (Open/Festival × kelas usia) beserta sub-kategori
-     * (KATA & KUMITE, individu & beregu) untuk sebuah event. Idempoten.
-     * Dipakai juga oleh NewEventSeeder agar tiap event punya kategori.
-     */
-    public static function seedCategoriesForEvent(Event $event): void
+    private function seedCategoriesForEvent(Event $event): void
     {
         $classes = [
-            // Usia di tahun 2026
             'JUNIOR' => ['min' => '2009-01-01', 'max' => '2010-12-31'],
             'U21' => ['min' => '2006-01-01', 'max' => '2008-12-31'],
             'DEWASA' => ['min' => '1996-01-01', 'max' => '2005-12-31'],

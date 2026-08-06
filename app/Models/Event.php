@@ -41,6 +41,11 @@ class Event extends Model
         return $this->hasMany(EventCategory::class);
     }
 
+    public function files(): HasMany
+    {
+        return $this->hasMany(EventFile::class);
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
@@ -108,21 +113,21 @@ class Event extends Model
     public function getImageUrlAttribute(): string
     {
         if ($this->poster) {
-            // If poster is stored as path in storage
+            // Jika poster sudah berupa URL penuh (misal dari seeder/faker)
             if (filter_var($this->poster, FILTER_VALIDATE_URL)) {
                 return $this->poster;
             }
-            // If poster is a storage path
-            if (Storage::disk('public')->exists($this->poster)) {
-                return Storage::disk('public')->url($this->poster);
-            }
-            // If poster is relative path in assets
+            // Jika ada di assets public langsung (legacy/seeder lokal)
             if (file_exists(public_path('assets/' . $this->poster))) {
                 return asset('assets/' . $this->poster);
             }
+            // Jika di-upload via sistem storage dan filenya benar-benar ada
+            if (file_exists(storage_path('app/public/' . $this->poster))) {
+                return asset('storage/' . $this->poster);
+            }
         }
 
-        // Default fallback image
-        return 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80';
+        // Default fallback image (menggunakan asset lokal yang sudah ada)
+        return asset('assets/media/karate-hero/screen.png');
     }
 }
