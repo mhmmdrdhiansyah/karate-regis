@@ -51,8 +51,8 @@
         </div>
     </div>
 
-    {{-- Kontingen Profile Section - Hanya untuk role kontingen --}}
-    @if($user->isKontingen() && $contingent)
+    {{-- Kontingen Profile Section --}}
+    @if($contingent)
     <div class="card mb-5 mb-xl-10">
         <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
             data-bs-target="#kt_account_kontingen_details" aria-expanded="true"
@@ -260,7 +260,7 @@
                             @enderror
                         </div>
                     </div>
-                    @if($user->isKontingen())
+                    @if($user->isKontingen() || $contingent)
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">Username</label>
                         <div class="col-lg-8 fv-row">
@@ -435,7 +435,7 @@
                 $(this).hide();
             });
 
-            @if($user->isKontingen() && $contingent)
+            @if($contingent)
             $('#kontingen-photo-input').on('change', function(e) {
                 var file = e.target.files[0];
                 if (file) {

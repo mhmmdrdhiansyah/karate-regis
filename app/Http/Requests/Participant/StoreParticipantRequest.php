@@ -27,6 +27,7 @@ class StoreParticipantRequest extends FormRequest
             'birth_date' => ['required_if:type,athlete', 'nullable', 'date', 'before:today'],
             'gender' => ['required_if:type,athlete', 'nullable', 'in:M,F'],
 
+            'sport_id' => 'nullable|exists:sports,id',
             'institusi' => 'nullable|string|max:255',
             'photo' => 'required|image|max:1024',
             'document' => ['required_if:type,athlete', 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],

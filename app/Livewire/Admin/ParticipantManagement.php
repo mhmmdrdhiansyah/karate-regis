@@ -141,6 +141,13 @@ class ParticipantManagement extends Component
                     'rejection_reason' => null,
                 ]);
 
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::Verified->value,
+                    'verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                    'rejection_reason' => null,
+                ]);
+
                 ActivityLog::create([
                     'user_id' => auth()->id(),
                     'action' => 'participant.verified',
@@ -172,6 +179,13 @@ class ParticipantManagement extends Component
             DB::transaction(function () use ($participant) {
                 $participant->update([
                     'is_verified' => false,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                    'rejection_reason' => $this->rejectionReason,
+                ]);
+
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::Rejected->value,
                     'verified_at' => null,
                     'verified_by' => null,
                     'rejection_reason' => $this->rejectionReason,
@@ -213,6 +227,13 @@ class ParticipantManagement extends Component
             DB::transaction(function () use ($participant) {
                 $participant->update([
                     'is_verified' => false,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                    'rejection_reason' => $this->rejectionReason,
+                ]);
+
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::PendingReview->value,
                     'verified_at' => null,
                     'verified_by' => null,
                     'rejection_reason' => $this->rejectionReason,

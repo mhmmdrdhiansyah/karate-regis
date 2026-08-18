@@ -106,3 +106,31 @@
     position: sticky;
     top: calc(var(--kt-header-height, 65px) + var(--kt-toolbar-height, 0px) + 16px);
 }
+
+/* ============================================
+   Sidebar Brand Logo — Minimize Toggle
+   ============================================ */
+
+/* Default: tampilkan "CombatPro", sembunyikan "CP" */
+.brand-minimize {
+    display: none !important;
+}
+.brand-full {
+    display: block !important;
+}
+
+/* Saat sidebar dikecilkan: tampilkan "CP", sembunyikan "CombatPro" */
+body.aside-minimize .brand-full {
+    display: none !important;
+}
+body.aside-minimize .brand-minimize {
+    display: block !important;
+}
+
+/* Saat sidebar di-hover (aside-hoverable): tampilkan kembali full logo */
+body.aside-minimize .aside-hoverable:hover .brand-full {
+    display: block !important;
+}
+body.aside-minimize .aside-hoverable:hover .brand-minimize {
+    display: none !important;
+}

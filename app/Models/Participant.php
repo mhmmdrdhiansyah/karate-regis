@@ -16,6 +16,7 @@ class Participant extends Model
 
     protected $fillable = [
         'contingent_id',
+        'sport_id',
         'type',
         'nik',
         'name',
@@ -45,6 +46,11 @@ class Participant extends Model
     public function contingent(): BelongsTo
     {
         return $this->belongsTo(Contingent::class);
+    }
+
+    public function sport(): BelongsTo
+    {
+        return $this->belongsTo(Sport::class);
     }
 
     public function verifiedBy(): BelongsTo

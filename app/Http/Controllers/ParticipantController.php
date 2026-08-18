@@ -27,7 +27,8 @@ class ParticipantController extends Controller
 
     public function create()
     {
-        return view('participants.create');
+        $sports = \App\Models\Sport::where('is_active', true)->with('perguruan')->get();
+        return view('participants.create', compact('sports'));
     }
 
     public function store(StoreParticipantRequest $request)
@@ -57,6 +58,7 @@ class ParticipantController extends Controller
         $this->authorizeParticipant($participant);
 
         $participant->load([
+            'sport',
             'registrations' => function ($query) {
                 $query->with([
                     'payment.event',
@@ -86,7 +88,9 @@ class ParticipantController extends Controller
             $lockReasons[$field] = $this->participantService->getLockReason($participant, $field);
         }
 
-        return view('participants.edit', compact('participant', 'lockedFields', 'canDelete', 'lockReasons'));
+        $sports = \App\Models\Sport::where('is_active', true)->with('perguruan')->get();
+
+        return view('participants.edit', compact('participant', 'lockedFields', 'canDelete', 'lockReasons', 'sports'));
     }
 
     public function update(UpdateParticipantRequest $request, Participant $participant)

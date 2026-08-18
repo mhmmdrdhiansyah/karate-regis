@@ -32,3 +32,6 @@ yarn-error.log
 # Storage Backups
 /storage/backup
 
+# Database Backups
+/database/backup
+

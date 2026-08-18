@@ -48,6 +48,7 @@ class UpdateParticipantRequest extends FormRequest
             'birth_date' => ['required_if:type,athlete', 'nullable', 'date', 'before:today'],
             'gender' => ['required_if:type,athlete', 'nullable', 'in:M,F'],
 
+            'sport_id' => 'nullable|exists:sports,id',
             'institusi' => 'nullable|string|max:255',
             'photo' => 'nullable|image|max:1024',
             'document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],

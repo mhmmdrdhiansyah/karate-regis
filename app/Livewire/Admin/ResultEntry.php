@@ -71,6 +71,13 @@ class ResultEntry extends Component
     public function removeSlot($subCategoryId, $index)
     {
         if (isset($this->slots[$subCategoryId][$index])) {
+            $slot = $this->slots[$subCategoryId][$index];
+
+            // Jika slot sudah punya registration_id, hapus juga dari database
+            if (!empty($slot['registration_id'])) {
+                Result::where('registration_id', $slot['registration_id'])->delete();
+            }
+
             unset($this->slots[$subCategoryId][$index]);
             // Re-index array so Livewire doesn't break
             $this->slots[$subCategoryId] = array_values($this->slots[$subCategoryId]);

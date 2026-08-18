@@ -1,15 +1,11 @@
 <x-app-layout>
     @section('title', 'Dashboard')
 
-    @role('super-admin')
+    @if(($role ?? '') === 'super-admin')
         @include('dashboard.components.super-admin')
-    @endrole
-
-    @role('panitia')
+    @elseif(($role ?? '') === 'panitia')
         @include('dashboard.components.panitia')
-    @endrole
-
-    @role('kontingen')
+    @else
         @include('dashboard.components.kontingen')
-    @endrole
+    @endif
 </x-app-layout>

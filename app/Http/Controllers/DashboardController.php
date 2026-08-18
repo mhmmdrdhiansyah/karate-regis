@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->isSuperAdmin()) {
+        if ($user->isSuperAdmin() || $user->can('view users') || $user->can('manage settings')) {
             $eventCharts = $this->getEventChartData();
 
             return view('dashboard.index', [
@@ -36,33 +36,35 @@ class DashboardController extends Controller
             ]);
         }
 
-        if ($user->isPanitia()) {
-            $eventCharts = $this->getEventChartData();
-
+        // Check if user is a Kontingen (or has a contingent)
+        if ($user->hasRole('kontingen') || $user->contingent || $user->can('edit own kontingen')) {
             return view('dashboard.index', [
-                'role' => 'panitia',
-                'totalKontingen' => Contingent::count(),
-                'totalAthletes' => Participant::athletes()->count(),
-                'totalCoaches' => Participant::coaches()->count(),
-                'totalOfficials' => Participant::where('type', ParticipantType::Official)->count(),
-                'totalVerified' => Participant::where('is_verified', true)->count(),
-                'totalPending' => Participant::where('is_verified', false)->count(),
-                'topKontingen' => Contingent::withCount('participants')
-                    ->orderByDesc('participants_count')
-                    ->take(10)
-                    ->get(),
-                'eventCharts' => $eventCharts,
+                'role' => 'kontingen',
+                'user' => $user,
+                'contingent' => $user->contingent,
+                'totalAthletes' => $user->contingent?->participants()->athletes()->count() ?? 0,
+                'totalCoaches' => $user->contingent?->participants()->coaches()->count() ?? 0,
+                'totalOfficials' => $user->contingent?->participants()->where('type', 'official')->count() ?? 0,
+                'totalVerified' => $user->contingent?->participants()->where('is_verified', true)->count() ?? 0,
             ]);
         }
 
+        // Fallback for Panitia or Observer/Viewer roles (shows general charts and totals)
+        $eventCharts = $this->getEventChartData();
+
         return view('dashboard.index', [
-            'role' => 'kontingen',
-            'user' => $user,
-            'contingent' => $user->contingent,
-            'totalAthletes' => $user->contingent?->participants()->athletes()->count() ?? 0,
-            'totalCoaches' => $user->contingent?->participants()->coaches()->count() ?? 0,
-            'totalOfficials' => $user->contingent?->participants()->where('type', 'official')->count() ?? 0,
-            'totalVerified' => $user->contingent?->participants()->where('is_verified', true)->count() ?? 0,
+            'role' => 'panitia',
+            'totalKontingen' => Contingent::count(),
+            'totalAthletes' => Participant::athletes()->count(),
+            'totalCoaches' => Participant::coaches()->count(),
+            'totalOfficials' => Participant::where('type', ParticipantType::Official)->count(),
+            'totalVerified' => Participant::where('is_verified', true)->count(),
+            'totalPending' => Participant::where('is_verified', false)->count(),
+            'topKontingen' => Contingent::withCount('participants')
+                ->orderByDesc('participants_count')
+                ->take(10)
+                ->get(),
+            'eventCharts' => $eventCharts,
         ]);
     }
 

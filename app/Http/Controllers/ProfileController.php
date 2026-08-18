@@ -22,7 +22,7 @@ class ProfileController extends Controller
 
         return view('profile.edit', [
             'user' => $user,
-            'contingent' => $user->isKontingen() ? $user->contingent : null,
+            'contingent' => $user->contingent,
         ]);
     }
 

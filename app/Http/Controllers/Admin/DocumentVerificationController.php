@@ -67,7 +67,15 @@ class DocumentVerificationController extends Controller
                     'rejection_reason' => null,
                 ]);
 
-                // 2. Log Activity
+                // 2. Update Registrations
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::Verified->value,
+                    'verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                    'rejection_reason' => null,
+                ]);
+
+                // 3. Log Activity
                 ActivityLog::create([
                     'user_id' => auth()->id(),
                     'action' => 'participant.verified',
@@ -98,6 +106,14 @@ class DocumentVerificationController extends Controller
                 // Pastikan participant unverified & simpan alasan penolakan
                 $participant->update([
                     'is_verified' => false,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                    'rejection_reason' => $request->rejection_reason,
+                ]);
+
+                // Update Registrations
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::Rejected->value,
                     'verified_at' => null,
                     'verified_by' => null,
                     'rejection_reason' => $request->rejection_reason,
@@ -142,7 +158,15 @@ class DocumentVerificationController extends Controller
                     'rejection_reason' => $request->rejection_reason,
                 ]);
 
-                // 2. Log Activity
+                // 2. Reset Registrations status
+                Registration::where('participant_id', $participant->id)->update([
+                    'status_berkas' => RegistrationStatus::PendingReview->value,
+                    'verified_at' => null,
+                    'verified_by' => null,
+                    'rejection_reason' => $request->rejection_reason,
+                ]);
+
+                // 3. Log Activity
                 ActivityLog::create([
                     'user_id' => auth()->id(),
                     'action' => 'participant.revoked',

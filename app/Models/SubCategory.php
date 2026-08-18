@@ -86,8 +86,8 @@ class SubCategory extends Model
         }
 
         return match ((string) $this->gender) {
-            'M' => 'Pria',
-            'F' => 'Perempuan',
+            'M' => 'Putra',
+            'F' => 'Putri',
             'Mixed' => 'Campuran',
             default => (string) $this->gender,
         };

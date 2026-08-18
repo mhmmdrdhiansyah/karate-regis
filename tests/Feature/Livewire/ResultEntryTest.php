@@ -61,9 +61,9 @@ class ResultEntryTest extends TestCase
     {
         Livewire::test(ResultEntry::class, ['event' => $this->event])
             ->assertSee('Kata Perorangan Male')
-            ->assertSee('(Pria)')
+            ->assertSee('(Putra)')
             ->assertSee('Kata Perorangan Female')
-            ->assertSee('(Perempuan)');
+            ->assertSee('(Putri)');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
