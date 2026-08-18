@@ -23,6 +23,11 @@ Route::post('/check-status', [LandingController::class, 'checkStatus'])->name('c
 
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'provinces']);
 Route::get('/api/wilayah/regencies/{provinceCode}', [WilayahController::class, 'regencies']);
+Route::get('/api/sports/{sport}/perguruan', function (\App\Models\Sport $sport) {
+    return response()->json([
+        'data' => $sport->perguruan()->where('is_active', true)->orderBy('name')->get()
+    ]);
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -53,9 +58,11 @@ Route::middleware('auth')->group(function () {
 
     // Kontingen Management
     Route::middleware(['permission:view kontingen|create kontingen|edit kontingen'])->group(function () {
+        Route::resource('kontingen', KontingenManagementController::class);
+    });
+    Route::middleware(['permission:delete kontingen'])->group(function () {
         Route::post('kontingen/{kontingen}/restore', [KontingenManagementController::class, 'restore'])->name('kontingen.restore');
         Route::delete('kontingen/{kontingen}/force-delete', [KontingenManagementController::class, 'forceDelete'])->name('kontingen.forceDelete');
-        Route::resource('kontingen', KontingenManagementController::class);
     });
 
     // Peserta / Bank Peserta (Role Kontingen)
@@ -73,7 +80,13 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware(['permission:view events|create events|edit events|delete events'])->group(function () {
             Route::resource('events', EventController::class);
+        });
+
+        Route::middleware(['permission:transition events'])->group(function () {
             Route::patch('events/{event}/transition', [EventController::class, 'transition'])->name('events.transition');
+        });
+
+        Route::middleware(['permission:manage event files'])->group(function () {
             Route::post('events/{event}/files', [EventFileController::class, 'store'])->name('events.files.store');
             Route::delete('events/{event}/files/{eventFile}', [EventFileController::class, 'destroy'])->name('events.files.destroy');
         });
@@ -122,10 +135,10 @@ Route::middleware('auth')->group(function () {
         ->middleware(['permission:view reports'])
         ->name('reports.index');
     Route::get('reports/financial/export', [ReportController::class, 'financialExport'])
-        ->middleware(['permission:view reports'])
+        ->middleware(['permission:export reports'])
         ->name('reports.financial.export');
     Route::get('reports/financial/pdf', [ReportController::class, 'financialPdf'])
-        ->middleware(['permission:view reports'])
+        ->middleware(['permission:export reports'])
         ->name('reports.financial.pdf');
 
     // Laporan Peserta
@@ -133,14 +146,14 @@ Route::middleware('auth')->group(function () {
         ->middleware(['permission:view reports'])
         ->name('reports.participants');
     Route::get('reports/participants/export', [ReportController::class, 'participantsExport'])
-        ->middleware(['permission:view reports'])
+        ->middleware(['permission:export reports'])
         ->name('reports.participants.export');
     Route::get('reports/participants/pdf', [ReportController::class, 'participantsPdf'])
-        ->middleware(['permission:view reports'])
+        ->middleware(['permission:export reports'])
         ->name('reports.participants.pdf');
 
     // Pendaftaran Event (User/Kontingen)
-    Route::middleware(['permission:create registrations', 'role:super-admin|panitia|kontingen'])->group(function () {
+    Route::middleware(['permission:create registrations'])->group(function () {
         Route::get('registration', function () {
             return view('registration.index');
         })->name('registration.index');

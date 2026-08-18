@@ -268,6 +268,8 @@ class ReportController extends Controller
                 'event_categories.min_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
+                'participants.is_verified',
+                'participants.rejection_reason',
             ]);
 
         // Apply filters
@@ -288,7 +290,19 @@ class ReportController extends Controller
         }
 
         if ($request->filled('status_berkas')) {
-            $query->where('registrations.status_berkas', $request->status_berkas);
+            if ($request->status_berkas === 'verified') {
+                $query->where('participants.is_verified', true);
+            } elseif ($request->status_berkas === 'rejected') {
+                $query->where('participants.is_verified', false)
+                      ->whereNotNull('participants.rejection_reason')
+                      ->where('participants.rejection_reason', '!=', '');
+            } elseif ($request->status_berkas === 'pending') {
+                $query->where('participants.is_verified', false)
+                      ->where(function ($q) {
+                          $q->whereNull('participants.rejection_reason')
+                            ->orWhere('participants.rejection_reason', '=', '');
+                      });
+            }
         }
 
         if ($request->filled('search')) {
@@ -317,8 +331,8 @@ class ReportController extends Controller
         $contingents = Contingent::orderBy('name')->get(['id', 'name']);
         $categoryTypes = SubCategory::distinct()->orderBy('category_type')->pluck('category_type');
         $genders = [
-            'M' => 'Laki-laki',
-            'F' => 'Perempuan',
+            'M' => 'Putra',
+            'F' => 'Putri',
             'Mixed' => 'Campuran',
         ];
         $statusBerkasOptions = [
@@ -369,6 +383,8 @@ class ReportController extends Controller
                 'event_categories.min_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
+                'participants.is_verified',
+                'participants.rejection_reason',
             ]);
 
         // Apply filters (same as participants method)
@@ -389,7 +405,19 @@ class ReportController extends Controller
         }
 
         if ($request->filled('status_berkas')) {
-            $query->where('registrations.status_berkas', $request->status_berkas);
+            if ($request->status_berkas === 'verified') {
+                $query->where('participants.is_verified', true);
+            } elseif ($request->status_berkas === 'rejected') {
+                $query->where('participants.is_verified', false)
+                      ->whereNotNull('participants.rejection_reason')
+                      ->where('participants.rejection_reason', '!=', '');
+            } elseif ($request->status_berkas === 'pending') {
+                $query->where('participants.is_verified', false)
+                      ->where(function ($q) {
+                          $q->whereNull('participants.rejection_reason')
+                            ->orWhere('participants.rejection_reason', '=', '');
+                      });
+            }
         }
 
         if ($request->filled('search')) {
@@ -443,6 +471,8 @@ class ReportController extends Controller
                 'event_categories.min_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
+                'participants.is_verified',
+                'participants.rejection_reason',
             ]);
 
         // Selected filter models for PDF Header Context
@@ -467,7 +497,19 @@ class ReportController extends Controller
         }
 
         if ($request->filled('status_berkas')) {
-            $query->where('registrations.status_berkas', $request->status_berkas);
+            if ($request->status_berkas === 'verified') {
+                $query->where('participants.is_verified', true);
+            } elseif ($request->status_berkas === 'rejected') {
+                $query->where('participants.is_verified', false)
+                      ->whereNotNull('participants.rejection_reason')
+                      ->where('participants.rejection_reason', '!=', '');
+            } elseif ($request->status_berkas === 'pending') {
+                $query->where('participants.is_verified', false)
+                      ->where(function ($q) {
+                          $q->whereNull('participants.rejection_reason')
+                            ->orWhere('participants.rejection_reason', '=', '');
+                      });
+            }
         }
 
         if ($request->filled('search')) {
@@ -549,8 +591,8 @@ class ReportController extends Controller
             : $registration->sub_category_gender;
 
         $subGenderLabel = match ((string) $registration->category_gender) {
-            'M' => 'Pria',
-            'F' => 'Perempuan',
+            'M' => 'Putra',
+            'F' => 'Putri',
             'Mixed' => 'Campuran',
             default => (string) $registration->category_gender,
         };
@@ -571,6 +613,16 @@ class ReportController extends Controller
         $registration->min_age = $registration->min_birth_date
             ? \Carbon\Carbon::parse($registration->min_birth_date)->age
             : '-';
+
+        // 13. Status Berkas (verified / rejected / pending)
+        $rawStatus = is_object($registration->status_berkas) ? $registration->status_berkas->value : (string) $registration->status_berkas;
+        if ($registration->is_verified || $rawStatus === 'verified') {
+            $registration->status_berkas = 'verified';
+        } elseif (!empty($registration->rejection_reason) || $rawStatus === 'rejected') {
+            $registration->status_berkas = 'rejected';
+        } else {
+            $registration->status_berkas = 'pending';
+        }
 
         return $registration;
     }

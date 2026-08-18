@@ -173,16 +173,20 @@
                                         <span class="text-muted fs-7">{{ $payment->created_at->translatedFormat('j F Y, H:i') }}</span>
                                     </td>
                                     <td class="text-end">
-                                        @if($payment->transfer_proof)
-                                            <button wire:click="selectPayment({{ $payment->id }})" 
-                                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#kt_modal_proof">
-                                                <i class="bi bi-eye-fill fs-3"></i>
-                                            </button>
-                                        @else
-                                            <span class="text-muted fs-8 italic">No proof</span>
-                                        @endif
+                                        <button wire:click="selectPayment({{ $payment->id }})" 
+                                                class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#kt_modal_proof"
+                                                title="Detail & Verifikasi">
+                                            <i class="bi bi-eye-fill fs-3"></i>
+                                        </button>
+                                        <button type="button"
+                                                wire:click="deletePayment({{ $payment->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin menghapus pembayaran ID #{{ $payment->id }} ini? Data pendaftaran terkait juga akan dihapus."
+                                                class="btn btn-icon btn-bg-light btn-active-color-danger btn-sm"
+                                                title="Hapus Pembayaran">
+                                            <i class="bi bi-trash-fill fs-3"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @empty

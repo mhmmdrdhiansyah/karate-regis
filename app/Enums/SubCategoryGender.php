@@ -11,8 +11,8 @@ enum SubCategoryGender: string
     public function label(): string
     {
         return match ($this) {
-            self::Male => 'Pria',
-            self::Female => 'Perempuan',
+            self::Male => 'Putra',
+            self::Female => 'Putri',
             self::Mixed => 'Campuran',
         };
     }

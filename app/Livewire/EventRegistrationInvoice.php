@@ -244,8 +244,8 @@ class EventRegistrationInvoice extends Component
             return;
         }
 
-        if ($registrationService->hasExistingPayment($contingent->id, $event->id)) {
-            $this->errorMessage = 'Anda sudah memiliki invoice aktif untuk event ini.';
+        if ($registrationService->hasVerifiedPayment($contingent->id, $event->id)) {
+            $this->errorMessage = 'Anda sudah memiliki pembayaran terverifikasi untuk event ini.';
             return;
         }
 
@@ -300,8 +300,9 @@ class EventRegistrationInvoice extends Component
 
         $registeredCoachIds = Registration::query()
             ->whereNull('sub_category_id')
-            ->whereHas('payment', function ($query) use ($event) {
+            ->whereHas('payment', function ($query) use ($event, $contingent) {
                 $query->where('event_id', $event->id)
+                    ->where('contingent_id', '!=', $contingent->id)
                     ->where('status', '!=', PaymentStatus::Cancelled->value);
             })
             ->pluck('participant_id')
@@ -310,7 +311,7 @@ class EventRegistrationInvoice extends Component
 
         $duplicateCoachIds = array_intersect($registeredCoachIds, $this->selectedCoachIds);
         if (count($duplicateCoachIds) > 0) {
-            $this->errorMessage = 'Sebagian pelatih sudah terdaftar di event ini.';
+            $this->errorMessage = 'Sebagian pelatih sudah terdaftar oleh kontingen lain di event ini.';
             return;
         }
 
@@ -326,31 +327,48 @@ class EventRegistrationInvoice extends Component
 
         try {
             DB::transaction(function () use ($contingent, $event) {
-                $payment = Payment::create([
-                    'contingent_id' => $contingent->id,
-                    'event_id' => $event->id,
-                    'total_amount' => $this->totalAmount,
-                    'total_discount' => $this->totalDiscount,
-                    'status' => PaymentStatus::Pending->value,
-                ]);
+                // Reuse existing pending payment if available, otherwise create new
+                $payment = Payment::where('contingent_id', $contingent->id)
+                    ->where('event_id', $event->id)
+                    ->where('status', PaymentStatus::Pending)
+                    ->first();
+
+                if ($payment) {
+                    $payment->update([
+                        'total_amount' => $this->totalAmount,
+                        'total_discount' => $this->totalDiscount,
+                    ]);
+
+                    // Clear old registrations under this pending payment
+                    Registration::where('payment_id', $payment->id)->delete();
+                } else {
+                    $payment = Payment::create([
+                        'contingent_id' => $contingent->id,
+                        'event_id' => $event->id,
+                        'total_amount' => $this->totalAmount,
+                        'total_discount' => $this->totalDiscount,
+                        'status' => PaymentStatus::Pending->value,
+                    ]);
+                }
 
                 $athleteRegistrations = [];
-            foreach ($this->athleteSelections as $selection) {
-                foreach ($selection['athletes'] as $athleteData) {
-                    $athlete = $athleteData['participant'];
-                    $athleteRegistrations[] = [
-                        'participant_id' => $athlete->id,
-                        'payment_id' => $payment->id,
-                        'sub_category_id' => $selection['subCategory']->id,
-                        'team_group_id' => $athleteData['team_group_id'] ?? null,
-                        'status_berkas' => RegistrationStatus::Unsubmitted->value,
-                        'verified_at' => null,
-                        'verified_by' => null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                foreach ($this->athleteSelections as $selection) {
+                    foreach ($selection['athletes'] as $athleteData) {
+                        $athlete = $athleteData['participant'];
+                        $isVerified = $athlete->is_verified;
+                        $athleteRegistrations[] = [
+                            'participant_id' => $athlete->id,
+                            'payment_id' => $payment->id,
+                            'sub_category_id' => $selection['subCategory']->id,
+                            'team_group_id' => $athleteData['team_group_id'] ?? null,
+                            'status_berkas' => $isVerified ? RegistrationStatus::Verified->value : RegistrationStatus::Unsubmitted->value,
+                            'verified_at' => $isVerified ? $athlete->verified_at : null,
+                            'verified_by' => $isVerified ? $athlete->verified_by : null,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
                 }
-            }
 
                 $coachRegistrations = $this->coaches->map(fn ($coach) => [
                     'participant_id' => $coach->id,

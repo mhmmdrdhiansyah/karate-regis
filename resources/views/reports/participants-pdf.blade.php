@@ -328,7 +328,7 @@
                 <div class="badge-item">Jenis: <strong>{{ ucfirst(request('category_type')) }}</strong></div>
             @endif
             @if(request('gender'))
-                <div class="badge-item">Gender: <strong>{{ request('gender') == 'M' ? 'Laki-laki' : (request('gender') == 'F' ? 'Perempuan' : 'Campuran') }}</strong></div>
+                <div class="badge-item">Gender: <strong>{{ request('gender') == 'M' ? 'Putra' : (request('gender') == 'F' ? 'Putri' : 'Campuran') }}</strong></div>
             @endif
             @if(request('status_berkas'))
                 <div class="badge-item">Status Berkas: <strong>{{ ucfirst(request('status_berkas')) }}</strong></div>

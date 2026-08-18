@@ -157,8 +157,19 @@ class PaymentManagement extends Component
                 // Status berkas: unsubmitted -> pending_review
                 Registration::where('payment_id', $payment->id)
                     ->where('status_berkas', RegistrationStatus::Unsubmitted->value)
+                    ->whereHas('participant', fn ($q) => $q->where('is_verified', false))
                     ->update([
                         'status_berkas' => RegistrationStatus::PendingReview->value,
+                    ]);
+
+                // Atlet yang berkasnya sudah terverifikasi langsung jadi verified
+                Registration::where('payment_id', $payment->id)
+                    ->where('status_berkas', RegistrationStatus::Unsubmitted->value)
+                    ->whereHas('participant', fn ($q) => $q->where('is_verified', true))
+                    ->update([
+                        'status_berkas' => RegistrationStatus::Verified->value,
+                        'verified_at' => now(),
+                        'verified_by' => auth()->id(),
                     ]);
             });
 
@@ -258,6 +269,50 @@ class PaymentManagement extends Component
 
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function deletePayment(int $paymentId): void
+    {
+        $payment = Payment::findOrFail($paymentId);
+
+        if ($payment->status === PaymentStatus::Verified) {
+            $this->dispatch('swal:error', message: 'Pembayaran berstatus Verified tidak dapat langsung dihapus. Silakan Revoke statusnya terlebih dahulu jika benar-benar ingin menghapus.');
+            return;
+        }
+
+        try {
+            DB::transaction(function () use ($payment) {
+                // Restore participants to draft before they are deleted
+                app(\App\Services\RegistrationService::class)->restoreParticipantsToDraft($payment);
+
+                // Delete linked registrations permanently to avoid foreign key constraint on payments
+                Registration::where('payment_id', $payment->id)->forceDelete();
+
+                ActivityLog::create([
+                    'user_id' => auth()->id(),
+                    'action' => 'payment.deleted_by_admin',
+                    'subject_type' => 'Payment',
+                    'subject_id' => $payment->id,
+                    'description' => "Admin menghapus pembayaran #{$payment->id} milik kontingen {$payment->contingent?->name}",
+                    'properties' => [
+                        'payment_id' => $payment->id,
+                        'total_amount' => $payment->total_amount,
+                        'status' => $payment->status->value,
+                    ],
+                ]);
+
+                $payment->delete();
+            });
+
+            if ($this->selectedPaymentId === $paymentId) {
+                $this->selectedPaymentId = null;
+            }
+
+            session()->flash('success', 'Pembayaran berhasil dihapus.');
+            $this->dispatch('payment-processed');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menghapus pembayaran: ' . $e->getMessage());
         }
     }
 

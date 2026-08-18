@@ -107,6 +107,9 @@ class PaymentList extends Component
                     'status' => PaymentStatus::Cancelled,
                 ]);
 
+                // Restore participants to draft before they are deleted
+                app(\App\Services\RegistrationService::class)->restoreParticipantsToDraft($payment);
+
                 // 2. Soft-delete all associated registrations
                 $payment->registrations()->delete();
 

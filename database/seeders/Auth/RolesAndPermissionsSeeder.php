@@ -51,6 +51,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete events',
             'transition events',
             'manage events',
+            'manage event files',
             'manage event categories',
             'manage sub-categories',
             'manage participants',
@@ -64,6 +65,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete registrations',
             // Reports Permissions
             'view reports',
+            'export reports',
             'manage results',
         ];
 
@@ -107,6 +109,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete events',
             'transition events',
             'manage events',
+            'manage event files',
             'manage event categories',
             'manage sub-categories',
             'manage participants',
@@ -117,6 +120,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'edit registrations',
             'delete registrations',
             'view reports',
+            'export reports',
             'manage results',
         ]);
 

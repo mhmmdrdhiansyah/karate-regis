@@ -5,7 +5,14 @@
 
     <div class="aside-logo flex-column-auto" id="kt_aside_logo">
         <a href="{{ route('dashboard') }}">
-            <h1 class="text-white fs-3">APP NAME</h1>
+            {{-- Full logo (normal sidebar) --}}
+            <h1 class="fs-3 fw-bolder mb-0 brand-full" style="letter-spacing: 0.5px;">
+                <span style="color: #ffffff;">Combat</span><span style="color: #f1416c;">Pro</span>
+            </h1>
+            {{-- Short logo (minimized sidebar) --}}
+            <h1 class="fs-3 fw-bolder mb-0 brand-minimize" style="letter-spacing: 0.5px; display: none;">
+                <span style="color: #ffffff;">C</span><span style="color: #f1416c;">P</span>
+            </h1>
             {{-- <img alt="Logo" src="{{ asset('assets/media/logos/logo-1-dark.svg') }}" class="h-25px logo" /> --}}
         </a>
 
@@ -151,7 +158,7 @@
                         : 0;
                 @endphp
 
-                @role('kontingen')
+                @if(Auth::user()->contingent || Auth::user()->can('edit own kontingen') || Auth::user()->isKontingen())
                     <div class="menu-item">
                         <a class="menu-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
                             href="{{ route('profile.edit') }}">
@@ -159,9 +166,9 @@
                             <span class="menu-title">Profil Kontingen</span>
                         </a>
                     </div>
-                @endrole
+                @endif
 
-                @role('kontingen')
+                @can('view participants')
                     <div class="menu-item">
                         <a class="menu-link {{ request()->routeIs('participants.*') ? 'active' : '' }}"
                             href="{{ route('participants.index') }}">
@@ -172,7 +179,7 @@
                             @endif
                         </a>
                     </div>
-                @endrole
+                @endcan
 
                 @can('create registrations')
                     <div data-kt-menu-trigger="click"

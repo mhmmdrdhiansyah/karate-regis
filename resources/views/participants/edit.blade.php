@@ -227,10 +227,26 @@
                     </div>
 
                     <div class="row mb-7">
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-7">
+                            <div class="fv-row">
+                                <label class="form-label">Cabang Olahraga (Cabor)</label>
+                                <select name="sport_id" id="edit_sport_select" class="form-select form-select-solid" data-placeholder="Pilih Cabor...">
+                                    @foreach($sports as $sport)
+                                        <option value="{{ $sport->id }}" {{ old('sport_id', $participant->sport_id ?? $sports->firstWhere('code', 'karate')?->id) == $sport->id ? 'selected' : '' }}>
+                                            {{ $sport->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('sport_id')
+                                    <span class="text-danger small">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-7">
                             <div class="fv-row">
                                 <label class="form-label">
-                                    Perguruan
+                                    Perguruan / Organisasi
                                     @if (in_array('institusi', $lockedFields))
                                         <i class="bi bi-lock-fill text-warning ms-1" data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -242,40 +258,18 @@
                                         value="{{ $participant->institusi }}" readonly />
                                     <input type="hidden" name="institusi" value="{{ $participant->institusi }}" />
                                 @else
-                                    <select name="institusi" class="form-select form-select-solid select-institusi" data-placeholder="Pilih perguruan...">
+                                    <select name="institusi" id="edit_institusi_select" class="form-select form-select-solid select-institusi" data-placeholder="Pilih perguruan...">
                                         <option value="">-- Pilih Perguruan --</option>
-                                        <option value="ASKI" {{ old('institusi', $participant->institusi) == 'ASKI' ? 'selected' : '' }}>ASKI</option>
-                                        <option value="BUDOKAI" {{ old('institusi', $participant->institusi) == 'BUDOKAI' ? 'selected' : '' }}>BUDOKAI</option>
-                                        <option value="BKC" {{ old('institusi', $participant->institusi) == 'BKC' ? 'selected' : '' }}>BKC</option>
-                                        <option value="BLACK PANTHER" {{ old('institusi', $participant->institusi) == 'BLACK PANTHER' ? 'selected' : '' }}>BLACK PANTHER</option>
-                                        <option value="FUNAKOSHI" {{ old('institusi', $participant->institusi) == 'FUNAKOSHI' ? 'selected' : '' }}>FUNAKOSHI</option>
-                                        <option value="GABDIKA" {{ old('institusi', $participant->institusi) == 'GABDIKA' ? 'selected' : '' }}>GABDIKA</option>
-                                        <option value="GOJUKAI" {{ old('institusi', $participant->institusi) == 'GOJUKAI' ? 'selected' : '' }}>GOJUKAI</option>
-                                        <option value="GOJU ASS" {{ old('institusi', $participant->institusi) == 'GOJU ASS' ? 'selected' : '' }}>GOJU ASS</option>
-                                        <option value="GOKASI" {{ old('institusi', $participant->institusi) == 'GOKASI' ? 'selected' : '' }}>GOKASI</option>
-                                        <option value="INKADO" {{ old('institusi', $participant->institusi) == 'INKADO' ? 'selected' : '' }}>INKADO</option>
-                                        <option value="INKAI" {{ old('institusi', $participant->institusi) == 'INKAI' ? 'selected' : '' }}>INKAI</option>
-                                        <option value="INKANAS" {{ old('institusi', $participant->institusi) == 'INKANAS' ? 'selected' : '' }}>INKANAS</option>
-                                        <option value="KALA HITAM" {{ old('institusi', $participant->institusi) == 'KALA HITAM' ? 'selected' : '' }}>KALA HITAM</option>
-                                        <option value="KEI SHIN KAN" {{ old('institusi', $participant->institusi) == 'KEI SHIN KAN' ? 'selected' : '' }}>KEI SHIN KAN</option>
-                                        <option value="KKNSI" {{ old('institusi', $participant->institusi) == 'KKNSI' ? 'selected' : '' }}>KKNSI</option>
-                                        <option value="KKI" {{ old('institusi', $participant->institusi) == 'KKI' ? 'selected' : '' }}>KKI</option>
-                                        <option value="KYOKUSHINKAI" {{ old('institusi', $participant->institusi) == 'KYOKUSHINKAI' ? 'selected' : '' }}>KYOKUSHINKAI</option>
-                                        <option value="LEMKARI" {{ old('institusi', $participant->institusi) == 'LEMKARI' ? 'selected' : '' }}>LEMKARI</option>
-                                        <option value="SHOKAIDO" {{ old('institusi', $participant->institusi) == 'SHOKAIDO' ? 'selected' : '' }}>SHOKAIDO</option>
-                                        <option value="SHOTOKAI" {{ old('institusi', $participant->institusi) == 'SHOTOKAI' ? 'selected' : '' }}>SHOTOKAI</option>
-                                        <option value="PORBIKAWA" {{ old('institusi', $participant->institusi) == 'PORBIKAWA' ? 'selected' : '' }}>PORBIKAWA</option>
-                                        <option value="SHINDOKA" {{ old('institusi', $participant->institusi) == 'SHINDOKA' ? 'selected' : '' }}>SHINDOKA</option>
-                                        <option value="SHIROITE" {{ old('institusi', $participant->institusi) == 'SHIROITE' ? 'selected' : '' }}>SHIROITE</option>
-                                        <option value="TAKO" {{ old('institusi', $participant->institusi) == 'TAKO' ? 'selected' : '' }}>TAKO</option>
-                                        <option value="WADOKAI" {{ old('institusi', $participant->institusi) == 'WADOKAI' ? 'selected' : '' }}>WADOKAI</option>
                                     </select>
+                                    @error('institusi')
+                                        <span class="text-danger small">{{ $message }}</span>
+                                    @enderror
                                 @endif
-                                @error('institusi')
-                                    <span class="text-danger small">{{ $message }}</span>
-                                @enderror
                             </div>
                         </div>
+                    </div>
+
+                    <div class="row mb-7">
                         <div class="col-md-6">
                             <div class="fv-row">
                                 <label class="form-label">
@@ -329,13 +323,42 @@
                     new bootstrap.Tooltip(el);
                 });
 
-                // Initialize Select2 for Perguruan dropdown with search
+                $('#edit_sport_select').select2({
+                    dropdownParent: $('#kt_participant_form'),
+                    placeholder: 'Pilih Cabor...',
+                    width: '100%'
+                });
+
                 $('.select-institusi').select2({
                     dropdownParent: $('#kt_participant_form'),
                     placeholder: 'Pilih perguruan...',
                     allowClear: true,
                     width: '100%'
                 });
+
+                const editSportsData = @json($sports->keyBy('id'));
+
+                function updateEditPerguruanOptions(sportId, selectedInstitusi = '') {
+                    const $instSelect = $('#edit_institusi_select');
+                    if (!$instSelect.length) return;
+
+                    $instSelect.empty().append('<option value="">-- Pilih Perguruan --</option>');
+
+                    const sport = editSportsData[sportId];
+                    if (sport && sport.perguruan) {
+                        sport.perguruan.forEach(p => {
+                            const isSelected = selectedInstitusi === p.name ? true : false;
+                            $instSelect.append(new Option(p.name, p.name, false, isSelected));
+                        });
+                    }
+                    $instSelect.trigger('change');
+                }
+
+                $('#edit_sport_select').on('change', function() {
+                    updateEditPerguruanOptions($(this).val());
+                });
+
+                updateEditPerguruanOptions($('#edit_sport_select').val(), @json(old('institusi', $participant->institusi)));
 
                 document.getElementById('photo_input').addEventListener('change', function(e) {
                     const file = e.target.files[0];

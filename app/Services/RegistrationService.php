@@ -89,4 +89,74 @@ class RegistrationService
             ->where('status', '!=', PaymentStatus::Cancelled)
             ->exists();
     }
+
+    /**
+     * Cek apakah kontingen sudah punya payment TERVERIFIKASI untuk event ini.
+     */
+    public function hasVerifiedPayment(int $contingentId, int $eventId): bool
+    {
+        return Payment::where('contingent_id', $contingentId)
+            ->where('event_id', $eventId)
+            ->where('status', PaymentStatus::Verified)
+            ->exists();
+    }
+
+    /**
+     * Ambil payment pending untuk event ini jika ada.
+     */
+    public function getExistingPendingPayment(int $contingentId, int $eventId): ?Payment
+    {
+        return Payment::where('contingent_id', $contingentId)
+            ->where('event_id', $eventId)
+            ->where('status', PaymentStatus::Pending)
+            ->first();
+    }
+
+    /**
+     * Kembalikan peserta dari invoice yang dibatalkan/dihapus ke keranjang (draft).
+     */
+    public function restoreParticipantsToDraft(Payment $payment, $registrations = null): void
+    {
+        $regs = $registrations ?? $payment->registrations;
+        if ($regs->isEmpty()) {
+            return;
+        }
+
+        $draft = \App\Models\RegistrationDraft::firstOrCreate(
+            [
+                'event_id' => $payment->event_id,
+                'contingent_id' => $payment->contingent_id,
+            ],
+            [
+                'status' => 'draft',
+            ]
+        );
+
+        if ($draft->status !== 'draft') {
+            $draft->update(['status' => 'draft']);
+        }
+
+        $draftItems = [];
+        foreach ($regs as $reg) {
+            $exists = \App\Models\RegistrationDraftItem::where('registration_draft_id', $draft->id)
+                ->where('participant_id', $reg->participant_id)
+                ->where('sub_category_id', $reg->sub_category_id)
+                ->exists();
+
+            if (!$exists) {
+                $draftItems[] = [
+                    'registration_draft_id' => $draft->id,
+                    'participant_id' => $reg->participant_id,
+                    'sub_category_id' => $reg->sub_category_id,
+                    'team_group_id' => $reg->team_group_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        if (!empty($draftItems)) {
+            \App\Models\RegistrationDraftItem::insert($draftItems);
+        }
+    }
 }
