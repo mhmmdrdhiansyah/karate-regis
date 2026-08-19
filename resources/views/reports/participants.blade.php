@@ -487,7 +487,12 @@
                         // Build CSV rows
                         const csvRows = [headers.join(',')];
                         data.forEach((reg) => {
-                            const escapeCsv = (val) => `"${(val !== null && val !== undefined ? String(val) : '').replace(/"/g, '""')}"`;
+                            const escapeCsv = (val) => `"${String(val ?? '')
+                                .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+                                .replace(/\s+/g, ' ')
+                                .trim()
+                                .toLowerCase()
+                                .replace(/"/g, '""')}"`;
                             const row = [
                                 escapeCsv(reg.full_name_kontingen),
                                 escapeCsv(reg.short_name_kontingen),

@@ -266,6 +266,7 @@ class ReportController extends Controller
                 'event_categories.type',
                 'event_categories.class_name',
                 'event_categories.min_birth_date',
+                'event_categories.max_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
                 'participants.is_verified',
@@ -381,6 +382,7 @@ class ReportController extends Controller
                 'event_categories.type',
                 'event_categories.class_name',
                 'event_categories.min_birth_date',
+                'event_categories.max_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
                 'participants.is_verified',
@@ -469,6 +471,7 @@ class ReportController extends Controller
                 'event_categories.type',
                 'event_categories.class_name',
                 'event_categories.min_birth_date',
+                'event_categories.max_birth_date',
                 'events.name as event_name',
                 'team_groups.team_name',
                 'participants.is_verified',
@@ -609,9 +612,9 @@ class ReportController extends Controller
         // 11. Name Team (Nama team jika team = 't', else '')
         $registration->name_team = $registration->team === 't' ? ($registration->team_name ?? '') : '';
 
-        // 12. Min Age (Usia min dihitung dari min_birth_date event_categories ke tanggal laporan digenerate)
-        $registration->min_age = $registration->min_birth_date
-            ? \Carbon\Carbon::parse($registration->min_birth_date)->age
+        // 12. Min Age (usia termuda = usia dari max_birth_date; min_birth_date = usia tertua)
+        $registration->min_age = $registration->max_birth_date
+            ? \Carbon\Carbon::parse($registration->max_birth_date)->age
             : '-';
 
         // 13. Status Berkas (verified / rejected / pending)
