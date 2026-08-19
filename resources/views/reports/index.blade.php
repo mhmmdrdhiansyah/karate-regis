@@ -424,7 +424,12 @@
 
                         const csvRows = [headers.join(',')];
                         data.forEach((p) => {
-                            const escapeCsv = (val) => `"${(val !== null && val !== undefined ? String(val) : '').replace(/"/g, '""')}"`;
+                            const escapeCsv = (val) => `"${String(val ?? '')
+                                .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+                                .replace(/\s+/g, ' ')
+                                .trim()
+                                .toLowerCase()
+                                .replace(/"/g, '""')}"`;
                             const row = [
                                 escapeCsv(p.invoice_number),
                                 escapeCsv(p.date_formatted),
