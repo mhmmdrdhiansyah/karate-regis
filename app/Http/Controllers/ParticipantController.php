@@ -72,8 +72,9 @@ class ParticipantController extends Controller
         $hasActiveRegistration = $this->participantService->hasActiveRegistration($participant);
 
         $registrations = $participant->registrations;
+        $certificates = app(\App\Services\CertificateService::class)->forParticipant($participant);
 
-        return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration', 'registrations'));
+        return view('participants.show', compact('participant', 'canDelete', 'deleteReason', 'hasActiveRegistration', 'registrations', 'certificates'));
     }
 
     public function edit(Participant $participant)

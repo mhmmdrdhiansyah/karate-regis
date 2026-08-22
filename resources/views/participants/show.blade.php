@@ -381,6 +381,63 @@
         </div>
     </div>
 
+    @can('manage participants')
+        <div class="card mb-5 mb-xl-8">
+            <div class="card-header border-0 pt-5">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bolder fs-3 mb-1">Sertifikat</span>
+                    <span class="text-muted mt-1 fw-semibold fs-7">Satu sertifikat per kategori yang diikuti (pendaftaran terverifikasi & pembayaran lunas)</span>
+                </h3>
+            </div>
+            <div class="card-body pt-3">
+                @if ($certificates->isEmpty())
+                    <div class="text-center text-muted py-10">
+                        <i class="bi bi-award fs-2x d-block mb-3 text-gray-400"></i>
+                        <p class="fw-semibold text-gray-500 mb-0">Belum ada sertifikat.</p>
+                    </div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-row-dashed table-row-gray-300 align-middle gs-2 gy-3">
+                            <thead>
+                                <tr class="fw-bold text-muted fs-7 text-uppercase">
+                                    <th class="min-w-150px">Event</th>
+                                    <th class="min-w-180px">Kategori</th>
+                                    <th class="min-w-120px">Status</th>
+                                    <th class="min-w-110px text-end">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($certificates as $cert)
+                                    <tr>
+                                        <td class="text-gray-800 fw-bold">{{ $cert['event']->name }}</td>
+                                        <td class="text-gray-600">{{ $cert['category'] }}</td>
+                                        <td>
+                                            @if ($cert['scope']->value === 'champion_gold')
+                                                <span class="badge badge-light-warning"><i class="bi bi-medal-fill me-1"></i>{{ $cert['status'] }}</span>
+                                            @elseif($cert['scope']->value === 'champion_silver')
+                                                <span class="badge badge-light-info"><i class="bi bi-medal-fill me-1"></i>{{ $cert['status'] }}</span>
+                                            @elseif($cert['scope']->value === 'champion_bronze' || $cert['scope']->value === 'champion_other')
+                                                <span class="badge badge-light-danger"><i class="bi bi-medal-fill me-1"></i>{{ $cert['status'] }}</span>
+                                            @else
+                                                <span class="badge badge-light-success">{{ $cert['status'] }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ route('certificates.public.pdf', $cert['registration']) }}"
+                                               class="btn btn-sm btn-light-primary" target="_blank">
+                                                <i class="bi bi-download"></i> Unduh PDF
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endcan
+
     @push('scripts')
         <script>
             document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {

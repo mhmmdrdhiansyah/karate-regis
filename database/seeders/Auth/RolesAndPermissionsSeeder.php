@@ -67,6 +67,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view reports',
             'export reports',
             'manage results',
+            'manage certificate templates',
         ];
 
         foreach ($permissions as $permission) {
@@ -122,6 +123,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view reports',
             'export reports',
             'manage results',
+            'manage certificate templates',
         ]);
 
         // --- Role: Kontingen (Contingent/Team Representative) ---

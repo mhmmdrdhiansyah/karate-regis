@@ -65,6 +65,7 @@
         <!-- Desktop Links -->
         <div class="hidden md:flex gap-lg items-center">
             <a class="font-label-bold text-label-bold text-primary border-b-4 border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#events">TOURNAMENTS</a>
+            <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="{{ route('certificates.public.index') }}">CEK SERTIFIKAT</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#about">ABOUT</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#contact">CONTACT</a>
         </div>
