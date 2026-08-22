@@ -236,12 +236,12 @@ class EventSeeder extends Seeder
         $types = ['Open', 'Festival'];
 
         $subCategories = [
-            ['name' => 'KATA Individu Putra', 'category_type' => 'individu', 'gender' => 'M', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
-            ['name' => 'KATA Individu Putri', 'category_type' => 'individu', 'gender' => 'F', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
-            ['name' => 'KATA Beregu Putra', 'category_type' => 'beregu', 'gender' => 'M', 'price' => 500000, 'min' => 3, 'max' => 3, 'max_teams' => 2],
-            ['name' => 'KATA Beregu Putri', 'category_type' => 'beregu', 'gender' => 'F', 'price' => 500000, 'min' => 3, 'max' => 3, 'max_teams' => 2],
-            ['name' => 'KUMITE Individu Putra', 'category_type' => 'individu', 'gender' => 'M', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
-            ['name' => 'KUMITE Individu Putri', 'category_type' => 'individu', 'gender' => 'F', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
+            ['name' => 'KATA Individu Putra', 'category_type' => 'individu', 'discipline' => 'kata', 'gender' => 'M', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
+            ['name' => 'KATA Individu Putri', 'category_type' => 'individu', 'discipline' => 'kata', 'gender' => 'F', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
+            ['name' => 'KATA Beregu Putra', 'category_type' => 'beregu', 'discipline' => 'kata', 'gender' => 'M', 'price' => 500000, 'min' => 3, 'max' => 3, 'max_teams' => 2],
+            ['name' => 'KATA Beregu Putri', 'category_type' => 'beregu', 'discipline' => 'kata', 'gender' => 'F', 'price' => 500000, 'min' => 3, 'max' => 3, 'max_teams' => 2],
+            ['name' => 'KUMITE Individu Putra', 'category_type' => 'individu', 'discipline' => 'kumite', 'gender' => 'M', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
+            ['name' => 'KUMITE Individu Putri', 'category_type' => 'individu', 'discipline' => 'kumite', 'gender' => 'F', 'price' => 250000, 'min' => 1, 'max' => 1, 'max_teams' => 1],
         ];
 
         foreach ($types as $type) {
@@ -266,6 +266,7 @@ class EventSeeder extends Seeder
                         ],
                         [
                             'category_type' => $subCategory['category_type'],
+                            'discipline' => $subCategory['discipline'],
                             'gender' => $subCategory['gender'],
                             'price' => $subCategory['price'],
                             'min_participants' => $subCategory['min'],

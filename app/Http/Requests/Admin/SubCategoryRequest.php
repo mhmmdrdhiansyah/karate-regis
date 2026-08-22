@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\Discipline;
 use App\Enums\SubCategoryGender;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -13,6 +14,7 @@ class SubCategoryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'category_type' => ['required', Rule::in(['individu', 'beregu'])],
+            'discipline' => ['required', Rule::enum(Discipline::class)],
             'gender' => ['required', Rule::enum(SubCategoryGender::class)],
             'price' => ['required', 'numeric', 'min:0'],
             'min_participants' => ['required', 'integer', 'min:1'],

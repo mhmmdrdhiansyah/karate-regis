@@ -57,6 +57,7 @@ class TestDataSeeder extends Seeder
                 'event_category_id' => $eventCategory->id,
                 'name' => 'Kata Perorangan Senior Putra',
                 'category_type' => 'individu',
+                'discipline' => 'kata',
                 'gender' => 'M',
                 'price' => 150000,
                 'min_participants' => 1,

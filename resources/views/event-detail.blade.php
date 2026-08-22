@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $event->name }} — {{ config('app.name', 'Combat Pro') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/media/logos/logo3.png') }}" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -193,6 +194,61 @@
                     Detail teknis, peraturan, dan informasi penyelenggaraan akan diperbarui oleh panitia menjelang hari pertandingan. Pastikan akunmu aktif agar menerima pembaruan terkini.
                 </p>
             </div>
+
+            <!-- Statistik Pendaftaran -->
+            @if ($stats['total'] > 0)
+            <div>
+                <h2 class="font-display-lg text-display-lg-mobile border-l-8 border-primary pl-md mb-md uppercase">
+                    Statistik Pendaftaran
+                </h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-md mb-md">
+                    <!-- Total Entri -->
+                    <div class="border-2 border-on-background p-md bg-on-background text-white hard-shadow flex flex-col justify-center">
+                        <span class="material-symbols-outlined text-accent mb-xs" style="font-size:36px">group</span>
+                        <p class="font-label-bold text-label-sm uppercase tracking-widest text-surface-variant">Total Entri</p>
+                        <p class="font-display-lg text-5xl leading-none mt-xs">{{ $stats['total'] }}</p>
+                        <p class="font-label-sm text-surface-variant mt-xs">peserta terdaftar</p>
+                    </div>
+
+                    @foreach ($stats['by_type'] as $type => $data)
+                        @if ($type === 'Open' && !empty($data['splits']))
+                            <!-- Total Open -->
+                            <div class="border-2 border-on-background p-md bg-white hard-shadow">
+                                <div class="flex items-center justify-between mb-xs">
+                                    <span class="bg-primary text-white px-sm py-0.5 font-display-lg text-label-sm uppercase">{{ $type }}</span>
+                                    <span class="font-headline-md uppercase">Total</span>
+                                </div>
+                                <p class="font-display-lg text-4xl leading-none text-on-background mt-sm">{{ $data['total'] }}</p>
+                                <p class="font-label-sm text-secondary mt-xs">entri terdaftar</p>
+                            </div>
+                            <!-- Open: pecah Kata / Kumite / Beregu -->
+                            @foreach ($data['splits'] as $split => $splitData)
+                                <div class="border-2 border-on-background p-md bg-white hard-shadow">
+                                    <div class="flex items-center justify-between mb-xs">
+                                        <span class="bg-primary text-white px-sm py-0.5 font-display-lg text-label-sm uppercase">{{ $type }}</span>
+                                        <span class="font-headline-md uppercase">{{ $split }}</span>
+                                    </div>
+                                    <p class="font-display-lg text-4xl leading-none text-on-background mt-sm">{{ $splitData['entries'] }}</p>
+                                    <p class="font-label-sm text-secondary mt-xs">
+                                        {{ $split === 'Beregu' && $splitData['teams'] > 0 ? $splitData['teams'] . ' tim · ' : '' }}entri terdaftar
+                                    </p>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="border-2 border-on-background p-md bg-white hard-shadow">
+                                <div class="flex items-center justify-between mb-xs">
+                                    <span class="bg-primary text-white px-sm py-0.5 font-display-lg text-label-sm uppercase">{{ $type }}</span>
+                                </div>
+                                <p class="font-display-lg text-4xl leading-none text-on-background mt-sm">{{ $data['total'] }}</p>
+                                <p class="font-label-sm text-secondary mt-xs">entri terdaftar</p>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+                <p class="font-label-sm text-secondary italic">*Jumlah berdasarkan seluruh pendaftaran masuk (termasuk menunggu verifikasi pembayaran).</p>
+            </div>
+            @endif
 
             <!-- Kategori Pertandingan (data-driven) -->
             <div>

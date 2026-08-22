@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\EventStatus;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Services\EventStatsService;
 use App\Services\StandingsService;
 
 class LandingController extends Controller
@@ -63,7 +64,9 @@ class LandingController extends Controller
 
         $groupedCategories = $event->categories->groupBy(fn ($category) => $category->type->value);
 
-        return view('event-detail', compact('event', 'groupedCategories'));
+        $stats = app(EventStatsService::class)->forEvent($event);
+
+        return view('event-detail', compact('event', 'groupedCategories', 'stats'));
     }
 
     /**
