@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Discipline;
 use App\Enums\SubCategoryGender;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ class SubCategory extends Model
         'event_category_id',
         'name',
         'category_type',
+        'discipline',
         'gender',
         'price',
         'min_participants',
@@ -27,6 +29,7 @@ class SubCategory extends Model
     {
         return [
             'gender' => SubCategoryGender::class,
+            'discipline' => Discipline::class,
             'price' => 'decimal:2',
             'min_participants' => 'integer',
             'max_participants' => 'integer',
