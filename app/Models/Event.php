@@ -51,6 +51,11 @@ class Event extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function certificateTemplates(): HasMany
+    {
+        return $this->hasMany(CertificateTemplate::class);
+    }
+
     public function allowedStatusTransitions(): array
     {
         return [

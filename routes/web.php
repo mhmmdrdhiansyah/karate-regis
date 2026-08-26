@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KontingenManagementController;
 use App\Http\Controllers\LandingController;
@@ -20,6 +21,13 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::get('/events/{event}', [LandingController::class, 'show'])->name('events.show');
 Route::get('/events/{event}/klasemen', [LandingController::class, 'klasemen'])->name('events.klasemen');
 Route::post('/check-status', [LandingController::class, 'checkStatus'])->name('check-status');
+
+// Sertifikat publik — lookup via NIK, PDF on-the-fly
+Route::get('/sertifikat', [CertificateController::class, 'index'])->name('certificates.public.index');
+Route::post('/sertifikat', [CertificateController::class, 'lookup'])->middleware('throttle:6,1')->name('certificates.public.lookup');
+Route::get('/sertifikat/{registration}/pdf', [CertificateController::class, 'pdf'])
+    ->middleware('throttle:10,1')
+    ->name('certificates.public.pdf');
 
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'provinces']);
 Route::get('/api/wilayah/regencies/{provinceCode}', [WilayahController::class, 'regencies']);
@@ -128,6 +136,10 @@ Route::middleware('auth')->group(function () {
         Route::get('events/{event}/results', \App\Livewire\Admin\ResultEntry::class)
             ->name('events.results.entry')
             ->middleware('permission:manage results');
+
+        Route::get('events/{event}/certificate-templates', \App\Livewire\Admin\CertificateTemplateManagement::class)
+            ->name('events.certificate-templates.index')
+            ->middleware('permission:manage certificate templates');
     });
 
     // Laporan Keuangan (Financial Reports)

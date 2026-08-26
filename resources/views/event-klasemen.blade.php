@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Klasemen | {{ $event->name }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/media/logos/logo3.png') }}" />
     <!-- Use Tailwind CDN as requested by the original HTML template to ensure perfect matching -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Hanken+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet" />
@@ -135,6 +136,7 @@
             </div>
             <nav class="hidden md:flex gap-md items-center">
                 <a class="text-on-surface dark:text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="{{ route('landing') }}#events">Tournaments</a>
+                <a class="text-on-surface dark:text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="{{ route('certificates.public.index') }}">Cek Sertifikat</a>
                 <a class="text-on-surface dark:text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="{{ route('landing') }}#about">About</a>
                 <a class="text-on-surface dark:text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="{{ route('landing') }}#contact">Contact</a>
             </nav>

@@ -253,16 +253,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 chartInstances[id].destroy();
             }
             var chart = new ApexCharts(document.querySelector('#' + id), {
-                series: [{ name: 'Terdaftar', data: cat.series }],
-                chart: { type: 'bar', height: Math.max(cat.labels.length * 32, 120), fontFamily: 'inherit', toolbar: { show: false } },
-                plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: '70%', distributed: true } },
-                colors: barColors,
-                dataLabels: { enabled: true, style: { fontSize: '11px', colors: ['#333'] } },
+                series: [
+                    { name: 'Fix (terverifikasi)', data: cat.seriesFix },
+                    { name: 'Masih mendaftar', data: cat.seriesPending }
+                ],
+                chart: { type: 'bar', height: Math.max(cat.labels.length * 32, 120), stacked: true, fontFamily: 'inherit', toolbar: { show: false } },
+                plotOptions: { bar: { horizontal: true, borderRadius: 4, barHeight: '70%' } },
+                colors: ['#3699FF', 'rgba(177,177,184,0.45)'],
+                stroke: { show: true, colors: ['transparent'], width: 0 },
+                fill: {
+                    type: ['solid', 'pattern'],
+                    pattern: { style: 'verticalLines', width: 4, height: 4, strokeWidth: 1.5, strokeOpacity: 0.35, fillColor: '#B1B1B8' }
+                },
+                dataLabels: { enabled: false },
                 xaxis: { categories: cat.labels, labels: { style: { fontSize: '11px' } } },
                 yaxis: { labels: { style: { fontSize: '11px' } } },
-                legend: { show: false },
+                legend: { show: true, fontSize: '11px', position: 'top', markers: { size: 8 } },
                 grid: { borderColor: '#E5E5E5', strokeDashArray: 4 },
-                tooltip: { y: { formatter: function(val) { return val + ' peserta (pembayaran terkonfirmasi)'; } } }
+                tooltip: { y: { formatter: function(val, opts) { return val + ' peserta (' + opts.w.globals.seriesNames[opts.seriesIndex] + ')'; } } }
             });
             chart.render();
             chartInstances[id] = chart;

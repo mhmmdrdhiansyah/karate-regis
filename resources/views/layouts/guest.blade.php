@@ -4,6 +4,7 @@
 <head>
     <base href="">
     <title>Combat Pro | Official Tournament Platform</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/media/logos/logo3.png') }}" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">

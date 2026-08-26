@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'Combat Pro') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/media/logos/logo3.png') }}" />
 
     <!-- Tailwind + app assets, compiled by Vite (theme tokens live in tailwind.config.js) -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -65,6 +66,7 @@
         <!-- Desktop Links -->
         <div class="hidden md:flex gap-lg items-center">
             <a class="font-label-bold text-label-bold text-primary border-b-4 border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#events">TOURNAMENTS</a>
+            <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="{{ route('certificates.public.index') }}">CEK SERTIFIKAT</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#about">ABOUT</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out active:translate-y-0.5 px-xs" href="#contact">CONTACT</a>
         </div>
@@ -495,12 +497,12 @@
                 <div class="text-center">
                     <span class="material-symbols-outlined text-accent text-5xl mb-md">phone</span>
                     <h4 class="font-headline-md uppercase mb-xs text-white">Telepon</h4>
-                    <p class="font-label-sm text-surface-variant">+62 21 1234 5678</p>
+                    <p class="font-label-sm text-surface-variant">+62 877-3921-6627</p>
                 </div>
                 <div class="text-center">
                     <span class="material-symbols-outlined text-accent text-5xl mb-md">location_on</span>
                     <h4 class="font-headline-md uppercase mb-xs text-white">Alamat</h4>
-                    <p class="font-label-sm text-surface-variant">Jakarta, Indonesia</p>
+                    <p class="font-label-sm text-surface-variant">Bangka Belitung, Indonesia</p>
                 </div>
             </div>
         </div>

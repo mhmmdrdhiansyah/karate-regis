@@ -31,6 +31,11 @@
                                     <a href="{{ route('admin.events.results.entry', $event) }}" class="btn btn-primary btn-sm">
                                         <i class="bi bi-pencil-square"></i> Input Hasil
                                     </a>
+                                    @can('manage certificate templates')
+                                        <a href="{{ route('admin.events.certificate-templates.index', $event) }}" class="btn btn-light-primary btn-sm">
+                                            <i class="bi bi-award"></i> Template Sertifikat
+                                        </a>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty
