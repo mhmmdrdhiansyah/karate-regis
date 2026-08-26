@@ -182,6 +182,17 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
+                <div class="col-md-2">
+                    <label class="required form-label">Discipline</label>
+                    <select name="discipline" class="form-select form-select-solid">
+                        @foreach (\App\Enums\Discipline::cases() as $case)
+                            <option value="{{ $case->value }}">{{ $case->label() }}</option>
+                        @endforeach
+                    </select>
+                    @error('discipline')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
                 <div class="col-md-1">
                     <label class="required form-label">Gender</label>
                     <select name="gender" class="form-select form-select-solid">

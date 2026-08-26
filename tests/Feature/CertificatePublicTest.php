@@ -58,6 +58,30 @@ class CertificatePublicTest extends TestCase
         $this->get("/sertifikat/{$reg->id}/pdf")->assertNotFound();
     }
 
+    #[Test]
+    public function pdf_with_custom_flexible_texts_renders(): void
+    {
+        $reg = $this->makeEligibleRegistration('1234567890123456');
+
+        Storage::fake('public');
+        $path = Storage::disk('public')->putFile('certificate-templates', UploadedFile::fake()->image('tpl2.png'));
+
+        CertificateTemplate::create([
+            'name' => 'Custom 2 Teks',
+            'scope' => CertificateScope::Fallback,
+            'image_path' => $path,
+            'texts' => [
+                ['content' => '{nama}', 'x' => 50, 'y' => 40, 'font_size' => 5, 'bold' => true, 'font_family' => 'greatvibes', 'color' => '#1a5276'],
+                ['content' => 'Festival {event} — {kontingen}', 'x' => 50, 'y' => 60, 'font_size' => 3, 'bold' => false, 'font_family' => 'dancingscript', 'color' => '#000000'],
+            ],
+        ]);
+
+        $response = $this->get("/sertifikat/{$reg->id}/pdf");
+
+        $response->assertOk();
+        $this->assertSame('application/pdf', $response->headers->get('Content-Type'));
+    }
+
     /**
      * Buat peserta verified+paid dgn NIK tertentu + result Gold + template fallback global.
      */

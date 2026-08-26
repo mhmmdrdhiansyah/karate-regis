@@ -25,10 +25,8 @@ class CertificateTemplateManagement extends Component
     public $image = null; // TemporaryUpload
     public ?string $existingImagePath = null;
 
-    // Posisi teks (persen 0-100)
-    public float $name_x = 50, $name_y = 45, $name_font_size = 5;
-    public float $category_x = 50, $category_y = 58, $category_font_size = 2.8;
-    public float $status_x = 50, $status_y = 65, $status_font_size = 3.5;
+    // Daftar blok teks fleksibel: [{content, x, y, font_size, bold}] (persen 0-100)
+    public array $texts = [];
 
     public function mount(Event $event)
     {
@@ -60,10 +58,29 @@ class CertificateTemplateManagement extends Component
         $this->orientation = $template->orientation;
         $this->existingImagePath = $template->image_path;
         $this->image = null;
-        foreach (['name_x', 'name_y', 'name_font_size', 'category_x', 'category_y',
-                  'category_font_size', 'status_x', 'status_y', 'status_font_size'] as $field) {
-            $this->{$field} = (float) $template->{$field};
-        }
+        $this->texts = array_map(
+            fn (array $t) => [
+                'content' => $t['content'],
+                'x' => (float) $t['x'],
+                'y' => (float) $t['y'],
+                'font_size' => (float) $t['font_size'],
+                'bold' => (bool) ($t['bold'] ?? false),
+                'font_family' => $t['font_family'] ?? 'times',
+                'color' => $t['color'] ?? '#000000',
+            ],
+            $template->texts,
+        );
+    }
+
+    public function addText(): void
+    {
+        $this->texts[] = ['content' => '{nama}', 'x' => 50, 'y' => 50, 'font_size' => 3, 'bold' => false, 'font_family' => 'times', 'color' => '#000000'];
+    }
+
+    public function removeText(int $index): void
+    {
+        unset($this->texts[$index]);
+        $this->texts = array_values($this->texts);
     }
 
     public function save(): void
@@ -73,15 +90,14 @@ class CertificateTemplateManagement extends Component
             'scope' => ['required', 'in:' . collect(CertificateScope::cases())->pluck('value')->implode(',')],
             'orientation' => ['required', 'in:portrait,landscape'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:5120'],
-            'name_x' => ['numeric', 'between:0,100'],
-            'name_y' => ['numeric', 'between:0,100'],
-            'name_font_size' => ['numeric', 'between:0,100'],
-            'category_x' => ['numeric', 'between:0,100'],
-            'category_y' => ['numeric', 'between:0,100'],
-            'category_font_size' => ['numeric', 'between:0,100'],
-            'status_x' => ['numeric', 'between:0,100'],
-            'status_y' => ['numeric', 'between:0,100'],
-            'status_font_size' => ['numeric', 'between:0,100'],
+            'texts' => ['required', 'array', 'min:1'],
+            'texts.*.content' => ['required', 'string', 'max:255'],
+            'texts.*.x' => ['numeric', 'between:0,100'],
+            'texts.*.y' => ['numeric', 'between:0,100'],
+            'texts.*.font_size' => ['numeric', 'between:0,100'],
+            'texts.*.bold' => ['boolean'],
+            'texts.*.font_family' => ['nullable', 'in:times,helvetica,arial,courier,greatvibes,dancingscript,caveat'],
+            'texts.*.color' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
         ]);
 
         if ($this->image) {
@@ -109,6 +125,7 @@ class CertificateTemplateManagement extends Component
         }
 
         $this->resetForm();
+        $this->dispatch('close-modal');
     }
 
     public function toggleActive(int $id): void
@@ -136,8 +153,6 @@ class CertificateTemplateManagement extends Component
         $this->orientation = 'landscape';
         $this->image = null;
         $this->existingImagePath = null;
-        $this->name_x = 50; $this->name_y = 45; $this->name_font_size = 5;
-        $this->category_x = 50; $this->category_y = 58; $this->category_font_size = 2.8;
-        $this->status_x = 50; $this->status_y = 65; $this->status_font_size = 3.5;
+        $this->texts = CertificateTemplate::DEFAULT_TEXTS;
     }
 }

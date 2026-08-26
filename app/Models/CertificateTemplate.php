@@ -18,15 +18,7 @@ class CertificateTemplate extends Model
         'scope',
         'image_path',
         'orientation',
-        'name_x',
-        'name_y',
-        'name_font_size',
-        'category_x',
-        'category_y',
-        'category_font_size',
-        'status_x',
-        'status_y',
-        'status_font_size',
+        'texts',
         'is_active',
     ];
 
@@ -36,16 +28,28 @@ class CertificateTemplate extends Model
             'event_id' => 'integer',
             'scope' => CertificateScope::class,
             'is_active' => 'boolean',
-            'name_x' => 'decimal:2',
-            'name_y' => 'decimal:2',
-            'name_font_size' => 'decimal:2',
-            'category_x' => 'decimal:2',
-            'category_y' => 'decimal:2',
-            'category_font_size' => 'decimal:2',
-            'status_x' => 'decimal:2',
-            'status_y' => 'decimal:2',
-            'status_font_size' => 'decimal:2',
+            'texts' => 'array',
         ];
+    }
+
+    public const DEFAULT_TEXTS = [
+        ['content' => '{nama}', 'x' => 50, 'y' => 45, 'font_size' => 5, 'bold' => true, 'font_family' => 'times', 'color' => '#000000'],
+        ['content' => '{kategori}', 'x' => 50, 'y' => 58, 'font_size' => 2.8, 'bold' => false, 'font_family' => 'helvetica', 'color' => '#000000'],
+        ['content' => '{status}', 'x' => 50, 'y' => 65, 'font_size' => 3.5, 'bold' => true, 'font_family' => 'times', 'color' => '#000000'],
+    ];
+
+    public function getTextsAttribute(): array
+    {
+        $raw = json_decode($this->attributes['texts'] ?? 'null', true);
+        if (! $raw) {
+            return static::DEFAULT_TEXTS;
+        }
+
+        // Isi default utk baris lama yang belum punya font/warna
+        return array_map(
+            fn (array $t) => $t + ['font_family' => 'times', 'color' => '#000000'],
+            $raw,
+        );
     }
 
     public function event(): BelongsTo
@@ -55,6 +59,6 @@ class CertificateTemplate extends Model
 
     public function getImageUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->image_path);
+        return asset('storage/' . ltrim($this->image_path, '/'));
     }
 }

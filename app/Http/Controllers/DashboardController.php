@@ -70,7 +70,10 @@ class DashboardController extends Controller
 
     private function getEventChartData(): \Illuminate\Support\Collection
     {
-        return Event::with(['categories.subCategories.registrations' => fn($q) => $q->whereHas('payment', fn($p) => $p->where('status', 'verified'))])
+        // Event completed tidak ditampilkan lagi di dashboard (issue user)
+        return Event::query()
+            ->where('status', '!=', \App\Enums\EventStatus::Completed)
+            ->with(['categories.subCategories.registrations.payment'])
             ->orderByDesc('created_at')
             ->get()
             ->map(fn($event) => (object) [
@@ -78,7 +81,11 @@ class DashboardController extends Controller
                 'categories' => $event->categories->map(fn($cat) => (object) [
                     'name' => $cat->class_name,
                     'labels' => $cat->subCategories->pluck('name'),
-                    'series' => $cat->subCategories->map(fn($sub) => $sub->registrations->count()),
+                    // fix = berkas verified + pembayaran verified (solid); pending = sisanya (shadow)
+                    'seriesFix' => $cat->subCategories->map(fn($sub) => $sub->registrations
+                        ->filter(fn($r) => $r->status_berkas === 'verified' && $r->payment?->status === 'verified')->count()),
+                    'seriesPending' => $cat->subCategories->map(fn($sub) => $sub->registrations
+                        ->reject(fn($r) => $r->status_berkas === 'verified' && $r->payment?->status === 'verified')->count()),
                 ]),
             ]);
     }

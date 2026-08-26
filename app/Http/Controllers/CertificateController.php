@@ -65,9 +65,13 @@ class CertificateController extends Controller
         $pdf = Pdf::loadView('certificates.pdf', [
             'template' => $template,
             'imageRealPath' => $imageRealPath,
-            'participantName' => $registration->participant->name,
-            'category' => $entry['category'],
-            'status' => $entry['status'],
+            'replacements' => [
+                '{nama}' => $registration->participant->name,
+                '{kategori}' => $entry['category'],
+                '{status}' => $entry['status'],
+                '{event}' => $entry['event']->name,
+                '{kontingen}' => $registration->participant->contingent?->name ?? '',
+            ],
         ])->setPaper('a4', $template->orientation);
 
         return $pdf->download(Str::slug($registration->participant->name) . '-sertifikat.pdf');
