@@ -73,6 +73,7 @@ class CertificatePublicTest extends TestCase
             'texts' => [
                 ['content' => '{nama}', 'x' => 50, 'y' => 40, 'font_size' => 5, 'bold' => true, 'font_family' => 'greatvibes', 'color' => '#1a5276'],
                 ['content' => 'Festival {event} — {kontingen}', 'x' => 50, 'y' => 60, 'font_size' => 3, 'bold' => false, 'font_family' => 'dancingscript', 'color' => '#000000'],
+                ['content' => 'No. apr/7yh652/260829/{xxx}', 'x' => 50, 'y' => 90, 'font_size' => 2, 'bold' => false, 'font_family' => 'helvetica', 'color' => '#000000'],
             ],
         ]);
 

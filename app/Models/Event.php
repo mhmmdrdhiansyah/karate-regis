@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use App\Enums\EventStatus;
+use App\Models\Scopes\ManagedEventScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
+#[ScopedBy(ManagedEventScope::class)]
 class Event extends Model
 {
     use HasFactory;
@@ -54,6 +58,11 @@ class Event extends Model
     public function certificateTemplates(): HasMany
     {
         return $this->hasMany(CertificateTemplate::class);
+    }
+
+    public function panitia(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'event_user');
     }
 
     public function allowedStatusTransitions(): array

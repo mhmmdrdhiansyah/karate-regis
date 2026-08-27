@@ -69,4 +69,15 @@ class RegistrationDraft extends Model
     {
         return $this->hasMany(RegistrationDraftItem::class);
     }
+
+    public function scopeForManagedEvents($query)
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->hasRole('panitia')) {
+            return $query;
+        }
+
+        return $query->whereIn('event_id', $user->managedEvents()->pluck('events.id'));
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Enums\ParticipantType;
 use App\Enums\RegistrationStatus;
+use App\Enums\EventStatus;
 use App\Models\ActivityLog;
 use App\Models\Participant;
 use App\Models\Registration;
@@ -81,6 +82,13 @@ class ParticipantManagement extends Component
             ->when($this->verificationFilter !== '', function ($q) {
                 $q->where('is_verified', $this->verificationFilter === 'verified');
             })
+            // Panitia hanya melihat peserta yang mendaftar event yang dipegangnya
+            ->when(auth()->user()->hasRole('panitia'), function ($q) {
+                $q->whereHas(
+                    'registrations',
+                    fn ($r) => $r->forManagedEvents()
+                );
+            })
             ->when($this->provinceFilter, function ($q) {
                 $q->whereHas('contingent', fn($c) => $c->where('province', $this->provinceFilter));
             })
@@ -121,12 +129,32 @@ class ParticipantManagement extends Component
         $this->resetErrorBag();
     }
 
+    /**
+     * True bila peserta punya registrasi di event completed yang dipegang
+     * panitia ini — aksi tulis harus ditolak (super-admin lolos).
+     */
+    private function touchesCompletedEvent(Participant $participant): bool
+    {
+        if (auth()->user()->hasRole('super-admin')) {
+            return false;
+        }
+
+        return $participant->registrations
+            ->filter(fn ($r) => $r->payment?->event?->status === EventStatus::Completed)
+            ->isNotEmpty();
+    }
+
     public function approve()
     {
         if (!$this->selectedParticipantId) return;
 
-        $participant = Participant::findOrFail($this->selectedParticipantId);
-        
+        $participant = Participant::with('registrations.payment.event')->findOrFail($this->selectedParticipantId);
+
+        if ($this->touchesCompletedEvent($participant)) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
+
         if ($participant->is_verified) {
             $this->dispatch('swal:error', message: 'Peserta ini sudah diverifikasi.');
             return;
@@ -141,7 +169,7 @@ class ParticipantManagement extends Component
                     'rejection_reason' => null,
                 ]);
 
-                Registration::where('participant_id', $participant->id)->update([
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::Verified->value,
                     'verified_at' => now(),
                     'verified_by' => auth()->id(),
@@ -173,7 +201,12 @@ class ParticipantManagement extends Component
             'rejectionReason' => 'required|min:5',
         ]);
 
-        $participant = Participant::findOrFail($this->selectedParticipantId);
+        $participant = Participant::with('registrations.payment.event')->findOrFail($this->selectedParticipantId);
+
+        if ($this->touchesCompletedEvent($participant)) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         try {
             DB::transaction(function () use ($participant) {
@@ -184,7 +217,7 @@ class ParticipantManagement extends Component
                     'rejection_reason' => $this->rejectionReason,
                 ]);
 
-                Registration::where('participant_id', $participant->id)->update([
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::Rejected->value,
                     'verified_at' => null,
                     'verified_by' => null,
@@ -216,7 +249,12 @@ class ParticipantManagement extends Component
             'rejectionReason' => 'required|min:5',
         ]);
 
-        $participant = Participant::findOrFail($this->selectedParticipantId);
+        $participant = Participant::with('registrations.payment.event')->findOrFail($this->selectedParticipantId);
+
+        if ($this->touchesCompletedEvent($participant)) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         if (!$participant->is_verified) {
             $this->dispatch('swal:error', message: 'Hanya peserta terverifikasi yang bisa di-revoke.');
@@ -232,7 +270,7 @@ class ParticipantManagement extends Component
                     'rejection_reason' => $this->rejectionReason,
                 ]);
 
-                Registration::where('participant_id', $participant->id)->update([
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::PendingReview->value,
                     'verified_at' => null,
                     'verified_by' => null,

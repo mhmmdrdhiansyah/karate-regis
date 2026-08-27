@@ -6,6 +6,8 @@ use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\EventRequest;
 use App\Models\Event;
+use App\Models\Scopes\ManagedEventScope;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +25,9 @@ class EventController extends Controller
 
     public function index()
     {
-        $events = Event::query()
+        // Panitia tetap melihat semua event di daftar; tombol "Kelola"
+        // dikontrol policy (Tahap 4).
+        $events = Event::withoutGlobalScope(ManagedEventScope::class)
             ->select(['id', 'poster', 'name', 'status', 'event_fee'])
             ->orderByDesc('event_date')
             ->paginate(10)
@@ -49,6 +53,9 @@ class EventController extends Controller
 
         $event = Event::create($validated);
 
+        // Pembuat event otomatis tercatat sebagai panitia event itu (Tahap 5).
+        $event->panitia()->attach(auth()->id());
+
         return redirect()->route('admin.events.show', $event)->with('success', 'Event berhasil dibuat.');
     }
 
@@ -61,11 +68,20 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        return view('admin.events.edit', compact('event'));
+        $this->authorize('manage', $event);
+
+        // Daftar panitia untuk penugasan hanya relevan bagi yang boleh assign
+        $panitiaUsers = auth()->user()->can('assign event panitia')
+            ? User::role('panitia')->orderBy('name')->pluck('name', 'id')
+            : collect();
+
+        return view('admin.events.edit', compact('event', 'panitiaUsers'));
     }
 
     public function update(EventRequest $request, Event $event)
     {
+        $this->authorize('manage', $event);
+
         $validated = $request->validated();
 
         if ($request->hasFile('poster')) {
@@ -88,6 +104,8 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        $this->authorize('manage', $event);
+
         if ($event->categories()->exists() || $event->payments()->exists()) {
             return back()->withErrors([
                 'delete' => 'Event tidak dapat dihapus karena sudah memiliki kategori atau pembayaran.',
@@ -103,6 +121,8 @@ class EventController extends Controller
 
     public function transition(Request $request, Event $event)
     {
+        $this->authorize('manage', $event);
+
         $validated = $request->validate([
             'status' => ['required', Rule::enum(EventStatus::class)],
         ]);
@@ -118,6 +138,21 @@ class EventController extends Controller
         $event->update(['status' => $nextStatus]);
 
         return back()->with('success', 'Status event berhasil diubah.');
+    }
+
+    public function assignPanitia(Request $request, Event $event)
+    {
+        $this->authorize('manage', $event);
+        $this->authorize('assign event panitia');
+
+        $validated = $request->validate([
+            'panitia_ids' => ['array'],
+            'panitia_ids.*' => ['integer', 'exists:users,id'],
+        ]);
+
+        $event->panitia()->sync($validated['panitia_ids'] ?? []);
+
+        return back()->with('success', 'Penugasan panitia berhasil disimpan.');
     }
 
     private function storePoster(UploadedFile $file): string

@@ -63,19 +63,26 @@
                                             aria-label="Detail">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.events.edit', $event) }}"
-                                            class="btn btn-icon btn-light-warning btn-sm" title="Edit"
-                                            aria-label="Edit">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                            onsubmit="return confirm('Hapus event ini?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-icon btn-light-danger btn-sm"
-                                                title="Hapus" aria-label="Hapus">
-                                                <i class="bi bi-trash"></i>
+                                        @can('manage', $event)
+                                            <a href="{{ route('admin.events.edit', $event) }}"
+                                                class="btn btn-icon btn-light-warning btn-sm" title="Edit"
+                                                aria-label="Edit">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
+                                                onsubmit="return confirm('Hapus event ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-icon btn-light-danger btn-sm"
+                                                    title="Hapus" aria-label="Hapus">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <button type="button" class="btn btn-icon btn-light btn-sm" disabled
+                                                title="Bukan event yang ditugaskan / event selesai" aria-label="Kelola">
+                                                <i class="bi bi-lock"></i>
                                             </button>
-                                        </form>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -114,18 +121,25 @@
                                     class="btn btn-icon btn-light-primary" title="Detail" aria-label="Detail">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('admin.events.edit', $event) }}"
-                                    class="btn btn-icon btn-light-warning" title="Edit" aria-label="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
-                                    onsubmit="return confirm('Hapus event ini?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-icon btn-light-danger" title="Hapus"
-                                        aria-label="Hapus">
-                                        <i class="bi bi-trash"></i>
+                                @can('manage', $event)
+                                    <a href="{{ route('admin.events.edit', $event) }}"
+                                        class="btn btn-icon btn-light-warning" title="Edit" aria-label="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
+                                        onsubmit="return confirm('Hapus event ini?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-icon btn-light-danger" title="Hapus"
+                                            aria-label="Hapus">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <button type="button" class="btn btn-icon btn-light" disabled
+                                        title="Bukan event yang ditugaskan / event selesai" aria-label="Kelola">
+                                        <i class="bi bi-lock"></i>
                                     </button>
-                                </form>
+                                @endcan
                             </div>
                         </div>
                     </div>

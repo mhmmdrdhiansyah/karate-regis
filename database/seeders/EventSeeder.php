@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\SubCategory;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class EventSeeder extends Seeder
@@ -222,7 +223,23 @@ class EventSeeder extends Seeder
             $this->seedCategoriesForEvent($event);
         }
 
+        $this->seedPanitiaAssignments();
+
         $this->command->info('EventSeeder: ' . count($events) . ' events created, each with Categories and SubCategories.');
+    }
+
+    /**
+     * Demo penugasan panitia (Tahap 10 event-scoping): panitia demo pertama
+     * ditugaskan ke event demo pertama. Idempoten via syncWithoutDetaching.
+     */
+    private function seedPanitiaAssignments(): void
+    {
+        $event = Event::first();
+        $panitia = User::role('panitia')->first();
+
+        if ($event && $panitia) {
+            $event->panitia()->syncWithoutDetaching([$panitia->id]);
+        }
     }
 
     private function seedCategoriesForEvent(Event $event): void

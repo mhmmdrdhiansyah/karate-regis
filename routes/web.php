@@ -92,6 +92,7 @@ Route::middleware('auth')->group(function () {
 
         Route::middleware(['permission:transition events'])->group(function () {
             Route::patch('events/{event}/transition', [EventController::class, 'transition'])->name('events.transition');
+            Route::put('events/{event}/panitia', [EventController::class, 'assignPanitia'])->name('events.panitia.assign');
         });
 
         Route::middleware(['permission:manage event files'])->group(function () {

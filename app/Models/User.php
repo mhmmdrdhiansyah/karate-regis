@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -52,6 +53,16 @@ class User extends Authenticatable
     public function contingent(): HasOne
     {
         return $this->hasOne(Contingent::class);
+    }
+
+    public function managedEvents(): BelongsToMany
+    {
+        return $this->belongsToMany(Event::class, 'event_user');
+    }
+
+    public function managesEvent(Event $event): bool
+    {
+        return $this->managedEvents()->where('event_id', $event->id)->exists();
     }
 
     public function verifiedParticipants(): HasMany

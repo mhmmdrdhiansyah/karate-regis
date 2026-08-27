@@ -133,7 +133,7 @@
                                 </button>
                             </div>
                             <div class="fs-8 text-muted mb-3">
-                                Placeholder: <code>{nama}</code> <code>{kategori}</code> <code>{status}</code> <code>{event}</code> <code>{kontingen}</code> — dicampur teks bebas.
+                                Placeholder: <code>{nama}</code> <code>{kategori}</code> <code>{kelas}</code> <code>{subkategori}</code> <code>{status}</code> <code>{event}</code> <code>{kontingen}</code> — dicampur teks bebas. Nomor sertifikat: tulis format bebas lalu sisipkan <code>{xxx}</code> untuk nomor urut, mis. <code>apr/7yh652/260829/{xxx}</code>.
                             </div>
                             @foreach ($texts as $i => $t)
                                 <div class="border rounded p-3 mb-3">
@@ -207,7 +207,10 @@
                                         @php
                                             $sample = strtr($t['content'], [
                                                 '{nama}' => 'CONTOH NAMA PESERTA',
-                                                '{kategori}' => 'Kelas — Sub Kategori',
+                                                '{kategori}' => 'Open',
+                                        '{kelas}' => 'DEWASA',
+                                        '{subkategori}' => 'KATA Individu Putra',
+                                        '{xxx}' => '001',
                                                 '{status}' => 'JUARA 1',
                                                 '{event}' => $event->name,
                                                 '{kontingen}' => 'Nama Kontingen',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\ParticipantType;
 use App\Enums\RegistrationStatus;
+use App\Enums\EventStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Participant;
@@ -15,6 +16,30 @@ use App\Http\Requests\Admin\RejectDocumentRequest;
 
 class DocumentVerificationController extends Controller
 {
+    /**
+     * Tolak aksi tulis bila panitia tidak mengelola event peserta ini,
+     * atau bila event peserta sudah completed (read-only).
+     */
+    private function guardScoped(Participant $participant): void
+    {
+        if (auth()->user()->hasRole('super-admin')) {
+            return;
+        }
+
+        $registrations = $participant->registrations()
+            ->forManagedEvents()
+            ->with('payment.event')
+            ->get();
+
+        abort_if($registrations->isEmpty(), 403, 'Peserta tidak ada di event yang ditugaskan.');
+
+        abort_if(
+            $registrations->contains(fn ($r) => $r->payment?->event?->status === EventStatus::Completed),
+            403,
+            'Event selesai, data read-only.'
+        );
+    }
+
     public function index(Request $request)
     {
         $query = Participant::with('contingent')
@@ -42,6 +67,11 @@ class DocumentVerificationController extends Controller
             });
         }
 
+        // Panitia hanya melihat peserta yang mendaftar event yang dipegangnya
+        if (auth()->user()->hasRole('panitia')) {
+            $query->whereHas('registrations', fn ($r) => $r->forManagedEvents());
+        }
+
         // Urutkan: Belum terverifikasi paling atas
         $query->orderBy('is_verified', 'asc')
               ->latest();
@@ -53,6 +83,8 @@ class DocumentVerificationController extends Controller
 
     public function approve(Request $request, Participant $participant)
     {
+        $this->guardScoped($participant);
+
         if ($participant->is_verified) {
             return response()->json(['message' => 'Peserta ini sudah diverifikasi sebelumnya.'], 400);
         }
@@ -68,7 +100,7 @@ class DocumentVerificationController extends Controller
                 ]);
 
                 // 2. Update Registrations
-                Registration::where('participant_id', $participant->id)->update([
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::Verified->value,
                     'verified_at' => now(),
                     'verified_by' => auth()->id(),
@@ -100,6 +132,7 @@ class DocumentVerificationController extends Controller
 
     public function reject(RejectDocumentRequest $request, Participant $participant)
     {
+        $this->guardScoped($participant);
 
         try {
             DB::transaction(function () use ($request, $participant) {
@@ -112,7 +145,7 @@ class DocumentVerificationController extends Controller
                 ]);
 
                 // Update Registrations
-                Registration::where('participant_id', $participant->id)->update([
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::Rejected->value,
                     'verified_at' => null,
                     'verified_by' => null,
@@ -143,6 +176,7 @@ class DocumentVerificationController extends Controller
 
     public function revoke(RejectDocumentRequest $request, Participant $participant)
     {
+        $this->guardScoped($participant);
 
         if (!$participant->is_verified) {
             return response()->json(['message' => 'Hanya peserta yang sudah terverifikasi yang bisa di-revoke.'], 400);
@@ -158,8 +192,8 @@ class DocumentVerificationController extends Controller
                     'rejection_reason' => $request->rejection_reason,
                 ]);
 
-                // 2. Reset Registrations status
-                Registration::where('participant_id', $participant->id)->update([
+                // 2. Reset Registrations status (hanya event yang dipegang panitia)
+                Registration::forManagedEvents()->where('participant_id', $participant->id)->update([
                     'status_berkas' => RegistrationStatus::PendingReview->value,
                     'verified_at' => null,
                     'verified_by' => null,

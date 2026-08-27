@@ -51,6 +51,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete events',
             'transition events',
             'manage events',
+            'assign event panitia',
             'manage event files',
             'manage event categories',
             'manage sub-categories',

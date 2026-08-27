@@ -18,6 +18,7 @@ class Registration extends Model
         'payment_id',
         'sub_category_id',
         'status_berkas',
+        'certificate_no',
         'rejection_reason',
         'verified_at',
         'verified_by',
@@ -65,5 +66,19 @@ class Registration extends Model
     public function isForCoach(): bool
     {
         return $this->sub_category_id === null;
+    }
+
+    public function scopeForManagedEvents($query)
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->hasRole('panitia')) {
+            return $query;
+        }
+
+        return $query->whereHas(
+            'payment',
+            fn ($q) => $q->whereIn('event_id', $user->managedEvents()->pluck('events.id'))
+        );
     }
 }
