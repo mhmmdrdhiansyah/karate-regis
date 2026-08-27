@@ -28,8 +28,8 @@
                 </div>
             </form>
 
-            @if (auth()->user()->hasRole('super-admin'))
-                <div class="separator separator-dashed my-8"></div>
+            @can('assign event panitia')
+                <div class="separator separator-dashed my-8" id="panitia"></div>
 
                 <form action="{{ route('admin.events.panitia.assign', $event) }}" method="POST"
                     class="form">
@@ -40,14 +40,37 @@
                         <div class="col-lg-9">
                             <p class="text-muted fs-7 mb-3">Panitia yang ditugaskan bisa mengelola event ini
                                 (verifikasi pembayaran &amp; berkas, input hasil). Panitia lain hanya bisa melihat.</p>
-                            <select class="form-select" name="panitia_ids[]" multiple size="8">
+
+                            @if ($event->panitia->isNotEmpty())
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+                                    <span class="text-muted fs-7">Sudah ditugaskan ({{ $event->panitia->count() }}):</span>
+                                    @foreach ($event->panitia as $p)
+                                        <span class="badge badge-light-primary fs-7">
+                                            <i class="bi bi-person-check fs-8 me-1"></i>{{ $p->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-muted fs-7 mb-4">
+                                    <i class="bi bi-info-circle me-1"></i>Belum ada panitia yang ditugaskan.
+                                </div>
+                            @endif
+
+                            <div class="border rounded p-4" style="max-height: 260px; overflow-y: auto">
                                 @foreach ($panitiaUsers as $id => $name)
-                                    <option value="{{ $id }}"
-                                        {{ $event->panitia->contains('id', $id) ? 'selected' : '' }}>
-                                        {{ $name }}
-                                    </option>
+                                    <label class="d-flex align-items-center py-2 {{ !$loop->last ? 'border-bottom' : '' }} cursor-pointer">
+                                        <input type="checkbox" name="panitia_ids[]" value="{{ $id }}"
+                                            class="form-check-input me-3"
+                                            {{ $event->panitia->contains('id', $id) ? 'checked' : '' }}>
+                                        <span class="fs-6">{{ $name }}</span>
+                                        @if ($event->panitia->contains('id', $id))
+                                            <span class="badge badge-light-success ms-2">Aktif</span>
+                                        @endif
+                                    </label>
                                 @endforeach
-                            </select>
+                            </div>
+                            <div class="form-text fs-8 mt-2">Centang = ditugaskan. Simpan untuk menerapkan perubahan.</div>
+
                             <div class="mt-6">
                                 <button type="submit" class="btn btn-light-primary">
                                     <i class="bi bi-people"></i> Simpan Penugasan

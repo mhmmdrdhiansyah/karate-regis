@@ -196,6 +196,25 @@
                     <div class="fw-bold"><span
                             class="badge {{ $event->statusBadgeClass() }}">{{ $event->statusLabel() }}</span></div>
                 </div>
+                <div class="col-md-6">
+                    <div class="text-muted fs-7">Panitia Ditugaskan</div>
+                    @if ($event->panitia->isNotEmpty())
+                        <div class="d-flex flex-wrap gap-2 mt-1">
+                            @foreach ($event->panitia as $p)
+                                <span class="badge badge-light-primary">
+                                    <i class="bi bi-person-check me-1"></i>{{ $p->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="fw-bold text-muted">Belum ada — @can('assign event panitia')
+                            <a href="{{ route('admin.events.edit', $event) }}#panitia" class="fw-bolder">tugaskan sekarang</a>
+                        @else
+                            hubungi super-admin
+                        @endcan
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

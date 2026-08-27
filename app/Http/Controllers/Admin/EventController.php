@@ -70,7 +70,8 @@ class EventController extends Controller
     {
         $this->authorize('manage', $event);
 
-        $panitiaUsers = auth()->user()->hasRole('super-admin')
+        // Daftar panitia untuk penugasan hanya relevan bagi yang boleh assign
+        $panitiaUsers = auth()->user()->can('assign event panitia')
             ? User::role('panitia')->orderBy('name')->pluck('name', 'id')
             : collect();
 
@@ -142,7 +143,7 @@ class EventController extends Controller
     public function assignPanitia(Request $request, Event $event)
     {
         $this->authorize('manage', $event);
-        abort_unless(auth()->user()->hasRole('super-admin'), 403, 'Hanya super-admin yang bisa mengelola penugasan.');
+        $this->authorize('assign event panitia');
 
         $validated = $request->validate([
             'panitia_ids' => ['array'],

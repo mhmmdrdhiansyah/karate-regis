@@ -34,7 +34,8 @@ class EventScopingTest extends TestCase
         }
 
         // Samakan permission panitia dengan RolesAndPermissionsSeeder agar
-        // lolos middleware permission di route admin.
+        // lolos middleware permission di route admin. Catatan: 'assign event
+        // panitia' sengaja TIDAK diberikan — penugasan panitia hanya super-admin.
         $panitiaPermissions = [
             'view dashboard', 'view events', 'create events', 'edit events', 'delete events',
             'transition events', 'manage events', 'manage event categories', 'manage sub-categories',
@@ -201,13 +202,20 @@ class EventScopingTest extends TestCase
     }
 
     #[Test]
-    public function panitia_cannot_use_assign_endpoint(): void
+    public function panitia_cannot_assign_panitia(): void
     {
+        // Assign panitia hanya untuk pemegang permission 'assign event panitia'
+        // (praktisnya super-admin); panitia biasa ditolak meski di event sendiri.
         $this->actingAs($this->panitiaA)
             ->put(route('admin.events.panitia.assign', $this->event1), [
-                'panitia_ids' => [],
+                'panitia_ids' => [$this->panitiaA->id, $this->panitiaB->id],
             ])
             ->assertForbidden();
+
+        $this->assertSame(
+            [$this->panitiaA->id],
+            $this->event1->panitia()->pluck('user_id')->all()
+        );
     }
 
     #[Test]
