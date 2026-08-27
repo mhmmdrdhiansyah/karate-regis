@@ -12,8 +12,8 @@
                 <div class="alert alert-light d-flex align-items-center p-5 mb-0">
                     <i class="bi bi-info-circle-fill text-primary fs-3 me-4"></i>
                     <div class="d-flex flex-column">
-                        <span class="fw-bold">Ringkasan Data Event</span>
-                        <span class="text-muted fs-7">Berikut adalah statistik terkini peserta dan kontingen.</span>
+                        <span class="fw-bold">Ringkasan Data Event yang Ditugaskan</span>
+                        <span class="text-muted fs-7">Statistik berikut hanya mencakup event yang ditugaskan kepada Anda.</span>
                     </div>
                 </div>
             </div>

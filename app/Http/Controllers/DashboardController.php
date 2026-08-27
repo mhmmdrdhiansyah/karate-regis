@@ -50,17 +50,63 @@ class DashboardController extends Controller
         }
 
         // Fallback for Panitia or Observer/Viewer roles (shows general charts and totals)
-        $eventCharts = $this->getEventChartData();
+        // Event Scoping: statistik panitia dibatasi ke event yang dipegangnya.
+        $managedEvents = $user->managedEvents()->with(['categories.subCategories.registrations.payment'])->get();
+
+        if ($user->hasRole('panitia') && $managedEvents->isEmpty()) {
+            return view('dashboard.index', ['role' => 'panitia-empty']);
+        }
+
+        $eventIds = $managedEvents->pluck('id');
+
+        $managedPayments = \App\Models\Payment::whereIn('event_id', $eventIds)
+            ->where('status', 'pending')
+            ->with('registrations')
+            ->get();
+        $pendingRegistrationIds = $managedPayments->flatMap->registrations->pluck('participant_id')->unique();
+
+        $scopedAthletes = Participant::athletes()
+            ->whereHas('registrations.payment', fn ($q) => $q->whereIn('event_id', $eventIds))
+            ->count();
+        $scopedCoaches = Participant::coaches()
+            ->whereHas('registrations.payment', fn ($q) => $q->whereIn('event_id', $eventIds))
+            ->count();
+        $scopedOfficials = Participant::where('type', ParticipantType::Official)
+            ->whereHas('registrations.payment', fn ($q) => $q->whereIn('event_id', $eventIds))
+            ->count();
+        $scopedVerified = Participant::where('is_verified', true)
+            ->whereHas('registrations.payment', fn ($q) => $q->whereIn('event_id', $eventIds))
+            ->count();
+        $scopedKontingen = Contingent::whereHas('payments', fn ($q) => $q->whereIn('event_id', $eventIds))
+            ->count();
+
+        $eventCharts = $managedEvents
+            ->filter(fn ($event) => $event->status !== \App\Enums\EventStatus::Completed)
+            ->map(fn($event) => (object) [
+                'name' => $event->name,
+                'categories' => $event->categories->map(fn($cat) => (object) [
+                    'name' => $cat->class_name,
+                    'labels' => $cat->subCategories->pluck('name'),
+                    // fix = berkas verified + pembayaran verified (solid); pending = sisanya (shadow)
+                    'seriesFix' => $cat->subCategories->map(fn($sub) => $sub->registrations
+                        ->filter(fn($r) => $r->status_berkas === 'verified' && $r->payment?->status === 'verified')->count()),
+                    'seriesPending' => $cat->subCategories->map(fn($sub) => $sub->registrations
+                        ->reject(fn($r) => $r->status_berkas === 'verified' && $r->payment?->status === 'verified')->count()),
+                ]),
+            ])
+            ->values();
 
         return view('dashboard.index', [
             'role' => 'panitia',
-            'totalKontingen' => Contingent::count(),
-            'totalAthletes' => Participant::athletes()->count(),
-            'totalCoaches' => Participant::coaches()->count(),
-            'totalOfficials' => Participant::where('type', ParticipantType::Official)->count(),
-            'totalVerified' => Participant::where('is_verified', true)->count(),
-            'totalPending' => Participant::where('is_verified', false)->count(),
+            'totalKontingen' => $scopedKontingen,
+            'totalAthletes' => $scopedAthletes,
+            'totalCoaches' => $scopedCoaches,
+            'totalOfficials' => $scopedOfficials,
+            'totalVerified' => $scopedVerified,
+            'totalPending' => $pendingRegistrationIds->count(),
+            'pendingPayments' => $managedPayments->count(),
             'topKontingen' => Contingent::withCount('participants')
+                ->whereHas('payments', fn ($q) => $q->whereIn('event_id', $eventIds))
                 ->orderByDesc('participants_count')
                 ->take(10)
                 ->get(),

@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
+use App\Models\Event;
+use App\Policies\EventPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super-admin') ? true : null;
         });
+        Gate::policy(Event::class, EventPolicy::class);
         Paginator::useBootstrapFive();
 
         View::composer('participants.*', function ($view) {

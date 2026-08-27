@@ -28,9 +28,15 @@
                                 </td>
                                 <td>{{ $event->formatted_date }}</td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.events.results.entry', $event) }}" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-pencil-square"></i> Input Hasil
-                                    </a>
+                                    @can('manage', $event)
+                                        <a href="{{ route('admin.events.results.entry', $event) }}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-pencil-square"></i> Input Hasil
+                                        </a>
+                                    @else
+                                        <button type="button" class="btn btn-light btn-sm" disabled>
+                                            <i class="bi bi-lock"></i> Event Selesai / Bukan Tugas Anda
+                                        </button>
+                                    @endcan
                                     @can('manage certificate templates')
                                         <a href="{{ route('admin.events.certificate-templates.index', $event) }}" class="btn btn-light-primary btn-sm">
                                             <i class="bi bi-award"></i> Template Sertifikat

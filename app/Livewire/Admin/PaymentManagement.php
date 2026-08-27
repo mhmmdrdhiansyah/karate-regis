@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Enums\PaymentStatus;
+use App\Enums\EventStatus;
 use App\Enums\RegistrationStatus;
 use App\Models\Payment;
 use App\Models\Registration;
@@ -88,6 +89,7 @@ class PaymentManagement extends Component
     public function payments()
     {
         return Payment::query()
+            ->forManagedEvents()
             ->with(['contingent' => function ($query) {
                 $query->withTrashed(); // Include soft-deleted contingents
             }, 'event', 'registrations.subCategory.eventCategory'])
@@ -136,7 +138,12 @@ class PaymentManagement extends Component
     {
         if (!$this->selectedPaymentId) return;
 
-        $payment = Payment::findOrFail($this->selectedPaymentId);
+        $payment = Payment::forManagedEvents()->findOrFail($this->selectedPaymentId);
+
+        if ($payment->event->status === EventStatus::Completed && !auth()->user()->hasRole('super-admin')) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         if ($payment->status !== PaymentStatus::Pending) {
             $this->dispatch('swal:error', message: 'Hanya pembayaran berstatus pending yang bisa disetujui.');
@@ -191,7 +198,12 @@ class PaymentManagement extends Component
             'rejectionReason.min' => 'Alasan penolakan minimal 5 karakter.',
         ]);
 
-        $payment = Payment::findOrFail($this->selectedPaymentId);
+        $payment = Payment::forManagedEvents()->findOrFail($this->selectedPaymentId);
+
+        if ($payment->event->status === EventStatus::Completed && !auth()->user()->hasRole('super-admin')) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         if ($payment->status !== PaymentStatus::Pending) {
             $this->dispatch('swal:error', message: 'Hanya pembayaran berstatus pending yang bisa ditolak.');
@@ -219,7 +231,12 @@ class PaymentManagement extends Component
             'rejectionReason.min' => 'Alasan revoke minimal 5 karakter.',
         ]);
 
-        $payment = Payment::findOrFail($this->selectedPaymentId);
+        $payment = Payment::forManagedEvents()->findOrFail($this->selectedPaymentId);
+
+        if ($payment->event->status === EventStatus::Completed && !auth()->user()->hasRole('super-admin')) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         if ($payment->status !== PaymentStatus::Verified) {
             $this->dispatch('swal:error', message: 'Hanya pembayaran berstatus verified yang bisa di-revoke.');
@@ -274,7 +291,12 @@ class PaymentManagement extends Component
 
     public function deletePayment(int $paymentId): void
     {
-        $payment = Payment::findOrFail($paymentId);
+        $payment = Payment::forManagedEvents()->findOrFail($paymentId);
+
+        if ($payment->event->status === EventStatus::Completed && !auth()->user()->hasRole('super-admin')) {
+            $this->dispatch('swal:error', message: 'Event selesai, data read-only.');
+            return;
+        }
 
         if ($payment->status === PaymentStatus::Verified) {
             $this->dispatch('swal:error', message: 'Pembayaran berstatus Verified tidak dapat langsung dihapus. Silakan Revoke statusnya terlebih dahulu jika benar-benar ingin menghapus.');

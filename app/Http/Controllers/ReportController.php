@@ -13,7 +13,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Payment::with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
+        $query = Payment::forManagedEvents()->with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
 
         // Filter Event
         if ($request->filled('event')) {
@@ -106,7 +106,7 @@ class ReportController extends Controller
 
     public function financialExport(Request $request)
     {
-        $query = Payment::with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
+        $query = Payment::forManagedEvents()->with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
 
         if ($request->filled('event')) {
             $query->where('event_id', $request->event);
@@ -144,7 +144,7 @@ class ReportController extends Controller
 
     public function financialPdf(Request $request)
     {
-        $query = Payment::with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
+        $query = Payment::forManagedEvents()->with(['contingent', 'event', 'verifiedBy', 'registrations.subCategory']);
 
         $activeEvent = $request->filled('event') ? Event::find($request->event) : null;
         $activeContingent = $request->filled('contingent') ? Contingent::find($request->contingent) : null;
@@ -244,7 +244,7 @@ class ReportController extends Controller
     public function participants(Request $request)
     {
         // Build query with all necessary joins
-        $query = Registration::with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
+        $query = Registration::forManagedEvents()->with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
             ->whereNull('registrations.deleted_at')  // Exclude soft-deleted registrations
             ->whereNotNull('registrations.sub_category_id')  // Exclude coach registrations
             ->join('participants', 'participants.id', '=', 'registrations.participant_id')
@@ -360,7 +360,7 @@ class ReportController extends Controller
     public function participantsExport(Request $request)
     {
         // Build query with all necessary joins (same as participants method)
-        $query = Registration::with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
+        $query = Registration::forManagedEvents()->with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
             ->whereNull('registrations.deleted_at')
             ->whereNotNull('registrations.sub_category_id')
             ->join('participants', 'participants.id', '=', 'registrations.participant_id')
@@ -449,7 +449,7 @@ class ReportController extends Controller
     public function participantsPdf(Request $request)
     {
         // Build query with all necessary joins
-        $query = Registration::with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
+        $query = Registration::forManagedEvents()->with(['participant.contingent', 'subCategory.eventCategory.event', 'teamGroup'])
             ->whereNull('registrations.deleted_at')
             ->whereNotNull('registrations.sub_category_id')
             ->join('participants', 'participants.id', '=', 'registrations.participant_id')

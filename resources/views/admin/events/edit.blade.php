@@ -27,6 +27,36 @@
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </form>
+
+            @if (auth()->user()->hasRole('super-admin'))
+                <div class="separator separator-dashed my-8"></div>
+
+                <form action="{{ route('admin.events.panitia.assign', $event) }}" method="POST"
+                    class="form">
+                    @csrf
+                    @method('PUT')
+                    <div class="row mb-6">
+                        <label class="col-lg-3 col-form-label fw-semibold">Panitia Event</label>
+                        <div class="col-lg-9">
+                            <p class="text-muted fs-7 mb-3">Panitia yang ditugaskan bisa mengelola event ini
+                                (verifikasi pembayaran &amp; berkas, input hasil). Panitia lain hanya bisa melihat.</p>
+                            <select class="form-select" name="panitia_ids[]" multiple size="8">
+                                @foreach ($panitiaUsers as $id => $name)
+                                    <option value="{{ $id }}"
+                                        {{ $event->panitia->contains('id', $id) ? 'selected' : '' }}>
+                                        {{ $name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="mt-6">
+                                <button type="submit" class="btn btn-light-primary">
+                                    <i class="bi bi-people"></i> Simpan Penugasan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            @endif
         </div>
     </div>
 

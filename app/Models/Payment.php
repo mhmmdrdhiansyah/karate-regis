@@ -59,6 +59,17 @@ class Payment extends Model
         return $this->status !== PaymentStatus::Cancelled;
     }
 
+    public function scopeForManagedEvents($query)
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->hasRole('panitia')) {
+            return $query;
+        }
+
+        return $query->whereIn('event_id', $user->managedEvents()->pluck('events.id'));
+    }
+
     public function canUploadProof(): bool
     {
         return in_array($this->status, [PaymentStatus::Pending, PaymentStatus::Rejected]);

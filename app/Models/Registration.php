@@ -66,4 +66,18 @@ class Registration extends Model
     {
         return $this->sub_category_id === null;
     }
+
+    public function scopeForManagedEvents($query)
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $user->hasRole('panitia')) {
+            return $query;
+        }
+
+        return $query->whereHas(
+            'payment',
+            fn ($q) => $q->whereIn('event_id', $user->managedEvents()->pluck('events.id'))
+        );
+    }
 }

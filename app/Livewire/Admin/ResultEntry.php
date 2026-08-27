@@ -17,6 +17,9 @@ class ResultEntry extends Component
 
     public function mount(Event $event)
     {
+        // Panitia hanya bisa input hasil event yang dipegangnya & belum completed
+        abort_unless(auth()->user()->can('manage', $event), 403, 'Bukan event yang ditugaskan.');
+
         $this->event = $event;
         $this->event->load([
             'categories.subCategories.registrations' => function ($q) {
@@ -86,6 +89,8 @@ class ResultEntry extends Component
 
     public function save($subCategoryId)
     {
+        abort_unless(auth()->user()->can('manage', $this->event), 403, 'Event selesai, data read-only.');
+
         $slots = $this->slots[$subCategoryId] ?? [];
         
         // Validate duplicates
@@ -95,7 +100,7 @@ class ResultEntry extends Component
             return;
         }
 
-        $subCategoryRegIds = Registration::where('sub_category_id', $subCategoryId)->pluck('id');
+        $subCategoryRegIds = Registration::forManagedEvents()->where('sub_category_id', $subCategoryId)->pluck('id');
         
         // Delete existing results for this subcategory
         Result::whereIn('registration_id', $subCategoryRegIds)->delete();
