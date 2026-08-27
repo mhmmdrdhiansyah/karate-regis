@@ -410,7 +410,7 @@
                                 @foreach ($certificates as $cert)
                                     <tr>
                                         <td class="text-gray-800 fw-bold">{{ $cert['event']->name }}</td>
-                                        <td class="text-gray-600">{{ $cert['category'] }}</td>
+                                        <td class="text-gray-600">{{ $cert['class'] }} — {{ $cert['sub_category'] }}</td>
                                         <td>
                                             @if ($cert['scope']->value === 'champion_gold')
                                                 <span class="badge badge-light-warning"><i class="bi bi-medal-fill me-1"></i>{{ $cert['status'] }}</span>

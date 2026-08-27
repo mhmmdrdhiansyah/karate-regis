@@ -68,8 +68,11 @@ class CertificateController extends Controller
             'replacements' => [
                 '{nama}' => $registration->participant->name,
                 '{kategori}' => $entry['category'],
+                '{kelas}' => $entry['class'],
+                '{subkategori}' => $entry['sub_category'],
                 '{status}' => $entry['status'],
                 '{event}' => $entry['event']->name,
+                '{xxx}' => $this->service->sequenceNumber($registration),
                 '{kontingen}' => $registration->participant->contingent?->name ?? '',
             ],
         ])->setPaper('a4', $template->orientation);

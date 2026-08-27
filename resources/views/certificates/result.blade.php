@@ -116,7 +116,7 @@
                             <div class="flex items-start justify-between gap-sm">
                                 <div>
                                     <p class="font-label-bold text-primary uppercase mb-xs">{{ $cert['event']->name }}</p>
-                                    <p class="font-body-lg">{{ $cert['category'] }}</p>
+                                    <p class="font-body-lg">{{ $cert['class'] }} — {{ $cert['sub_category'] }}</p>
                                 </div>
                                 <span class="inline-flex items-center gap-xs border-2 border-on-background px-sm py-xs font-label-bold uppercase whitespace-nowrap">
                                     <span class="material-symbols-outlined text-lg" style="color: {{ $rail }};">military_tech</span>

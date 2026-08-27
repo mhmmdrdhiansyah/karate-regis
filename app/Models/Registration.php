@@ -18,6 +18,7 @@ class Registration extends Model
         'payment_id',
         'sub_category_id',
         'status_berkas',
+        'certificate_no',
         'rejection_reason',
         'verified_at',
         'verified_by',

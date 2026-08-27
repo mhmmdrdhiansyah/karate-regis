@@ -72,6 +72,7 @@
         <div class="hidden md:flex gap-lg items-center">
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out px-xs" href="{{ route('landing') }}#events">TOURNAMENTS</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out px-xs" href="{{ route('landing') }}#about">ABOUT</a>
+            <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out px-xs" href="{{ route('certificates.public.index') }}">CEK SERTIFIKAT</a>
             <a class="font-label-bold text-label-bold text-on-background hover:border-b-4 hover:border-accent transition-all duration-100 ease-in-out px-xs" href="{{ route('landing') }}#contact">CONTACT</a>
         </div>
         @guest
@@ -104,15 +105,19 @@
             <p class="font-headline-md text-primary mb-lg uppercase">
                 {{ $event->formatted_date }} <span class="text-surface-variant">· Lokasi akan diumumkan</span>
             </p>
-            <div class="flex flex-col sm:flex-row gap-md mt-lg">
+            <div class="flex flex-wrap gap-md mt-lg">
                 <a href="{{ $ctaHref }}"
-                   class="bg-primary text-on-primary font-display-lg text-headline-md px-lg py-sm h-16 hard-shadow-red hover:bg-white hover:text-on-background transition-all transform active:translate-y-1 flex items-center justify-center text-center">
+                   class="bg-primary text-on-primary font-display-lg text-lg uppercase tracking-wide px-xl py-sm rounded-lg border-2 border-on-background hover:bg-white hover:text-on-background transition-all flex items-center">
                     {{ $ctaLabel }}
                 </a>
                 <a href="{{ route('events.klasemen', $event->id) }}"
                    style="background-color: #FFD700;"
-                   class="text-black font-display-lg text-headline-md px-lg py-sm h-16 border-2 border-on-background hard-shadow hover:bg-on-background hover:text-white transition-all transform active:translate-y-1 flex items-center justify-center text-center uppercase">
-                    LIHAT KLASEMEN
+                   class="text-black font-display-lg text-lg uppercase tracking-wide px-xl py-sm rounded-lg border-2 border-on-background hover:bg-on-background hover:text-white transition-all flex items-center">
+                    Lihat Klasemen
+                </a>
+                <a href="{{ route('certificates.public.index') }}"
+                   class="bg-white text-on-background font-display-lg text-lg uppercase tracking-wide px-xl py-sm rounded-lg border-2 border-on-background hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center">
+                    Cek Sertifikat
                 </a>
             </div>
         </div>

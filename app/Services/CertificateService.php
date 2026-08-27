@@ -35,11 +35,46 @@ class CertificateService
             ->map(fn (Registration $r) => [
                 'registration' => $r,
                 'event'        => $r->subCategory->eventCategory->event,
-                'category'     => $r->subCategory->eventCategory->class_name . ' — ' . $r->subCategory->name,
+                'category'     => $r->subCategory->eventCategory->type->value,
+                'class'        => $r->subCategory->eventCategory->class_name,
+                'sub_category' => $r->subCategory->name,
                 'status'       => $this->statusText($r),
                 'scope'        => $this->scopeFor($r),
             ])
             ->values();
+    }
+
+    /**
+     * Nomor urut sertifikat dalam satu event — untuk placeholder {xxx} pada
+     * format nomor buatan panitia (mis. "apr/7yh652/260829/{xxx}" → 001, 002, …).
+     * Diisi SEKALI saat generate PDF pertama lalu disimpan ke kolom
+     * certificate_no — unduh ulang / hapus registration lain tidak menggeser
+     * nomor yang sudah tercetak.
+     */
+    public function sequenceNumber(Registration $r): string
+    {
+        if ($r->certificate_no) {
+            return str_pad((string) $r->certificate_no, 3, '0', STR_PAD_LEFT);
+        }
+
+        $event = $r->subCategory?->eventCategory?->event;
+
+        if (! $event) {
+            return '001';
+        }
+
+        $rank = Registration::query()
+            ->whereNotNull('sub_category_id')
+            ->whereHas('payment', fn ($q) => $q->where('status', 'verified'))
+            ->whereHas('subCategory.eventCategory', fn ($q) => $q->where('event_id', $event->id))
+            ->orderBy('id')
+            ->pluck('id')
+            ->search($r->id);
+
+        $r->certificate_no = $rank + 1;
+        $r->save();
+
+        return str_pad((string) $r->certificate_no, 3, '0', STR_PAD_LEFT);
     }
 
     public function statusText(Registration $r): string
