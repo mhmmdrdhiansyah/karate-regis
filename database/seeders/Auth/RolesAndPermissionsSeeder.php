@@ -69,6 +69,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'export reports',
             'manage results',
             'manage certificate templates',
+            'manage master data',
         ];
 
         foreach ($permissions as $permission) {
