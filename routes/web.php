@@ -143,6 +143,10 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:manage certificate templates');
     });
 
+    Route::middleware(['permission:manage master data'])->group(function () {
+        Route::get('master-data', \App\Livewire\Admin\MasterDataManagement::class)->name('master-data.index');
+    });
+
     // Laporan Keuangan (Financial Reports)
     Route::get('reports', [ReportController::class, 'index'])
         ->middleware(['permission:view reports'])

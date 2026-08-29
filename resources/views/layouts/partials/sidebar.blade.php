@@ -228,6 +228,16 @@
                 @endcan
 
                 {{-- 3. MENU SETTINGS (Terpisah/Single) --}}
+                @can('manage master data')
+                    <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('master-data.*') ? 'active' : '' }}"
+                            href="{{ route('master-data.index') }}">
+                            <span class="menu-icon"><i class="bi bi-collection fs-3"></i></span>
+                            <span class="menu-title">Master Data</span>
+                        </a>
+                    </div>
+                @endcan
+
                 @can('manage settings')
                     <div class="menu-item">
                         <a class="menu-link" href="#">
