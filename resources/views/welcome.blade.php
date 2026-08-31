@@ -502,7 +502,7 @@
                 <div class="text-center">
                     <span class="material-symbols-outlined text-accent text-5xl mb-md">location_on</span>
                     <h4 class="font-headline-md uppercase mb-xs text-white">Alamat</h4>
-                    <p class="font-label-sm text-surface-variant">Bangka Belitung, Indonesia</p>
+                    <p class="font-label-sm text-surface-variant">Jakarta, Indonesia</p>
                 </div>
             </div>
         </div>

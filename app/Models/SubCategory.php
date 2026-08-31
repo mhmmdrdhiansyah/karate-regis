@@ -107,6 +107,6 @@ class SubCategory extends Model
             return $this->name;
         }
 
-        return "{$this->name} ({$label})";
+        return "{$this->name} {$label}";
     }
 }

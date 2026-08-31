@@ -22,9 +22,15 @@ Route::get('/events/{event}', [LandingController::class, 'show'])->name('events.
 Route::get('/events/{event}/klasemen', [LandingController::class, 'klasemen'])->name('events.klasemen');
 Route::post('/check-status', [LandingController::class, 'checkStatus'])->name('check-status');
 
-// Sertifikat publik — lookup via NIK, PDF on-the-fly
+// Sertifikat publik — lookup via NIK/Nama, PDF on-the-fly
 Route::get('/sertifikat', [CertificateController::class, 'index'])->name('certificates.public.index');
 Route::post('/sertifikat', [CertificateController::class, 'lookup'])->middleware('throttle:6,1')->name('certificates.public.lookup');
+Route::post('/sertifikat/nama', [CertificateController::class, 'lookupByName'])
+    ->middleware('throttle:6,1')
+    ->name('certificates.public.lookupByName');
+Route::get('/sertifikat/peserta/{participant}', [CertificateController::class, 'show'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('certificates.public.show');
 Route::get('/sertifikat/{registration}/pdf', [CertificateController::class, 'pdf'])
     ->middleware('throttle:10,1')
     ->name('certificates.public.pdf');

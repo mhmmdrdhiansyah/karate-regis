@@ -153,8 +153,10 @@ class RolesAndPermissionsSeeder extends Seeder
         // 4. SETUP USER DEFAULT (Aman dijalankan berulang)
         // =================================================================
 
+        // firstOrCreate: user sudah ada (match by email) → dibiarkan apa adanya.
+        // Password/name/username TIDAK ditimpa — ganti password lewat profil tetap aman saat re-seed.
         // --- User: Super Admin ---
-        $admin = User::updateOrCreate(
+        $admin = User::firstOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'name' => 'Super Admin',
@@ -166,7 +168,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin->assignRole($superAdminRole);
 
         // --- User: Panitia ---
-        $panitia = User::updateOrCreate(
+        $panitia = User::firstOrCreate(
             ['email' => 'panitia@admin.com'],
             [
                 'name' => 'Panitia',
@@ -178,7 +180,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $panitia->assignRole($panitiaRole);
 
         // --- User: Kontingen ---
-        $kontingen = User::updateOrCreate(
+        $kontingen = User::firstOrCreate(
             ['email' => 'kontingen@admin.com'],
             [
                 'name' => 'Kontingen',

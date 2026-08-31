@@ -73,7 +73,7 @@
                         AMBIL <span class="text-primary">SERTIFIKATMU</span>
                     </h1>
                     <p class="font-body-lg text-surface-variant max-w-md mb-lg">
-                        Turun arena, buktikan hasilnya. Masukkan NIK yang terdaftar pada pendaftaran untuk melihat dan mengunduh sertifikat keikutsertaan maupun kemenanganmu.
+                        Turun arena, buktikan hasilnya. Cari dengan NIK, atau dengan nama lengkap + tanggal lahir yang terdaftar, untuk melihat dan mengunduh sertifikatmu.
                     </p>
                     <div class="hidden lg:flex items-center gap-sm text-surface-variant font-label-sm uppercase tracking-widest">
                         <span class="material-symbols-outlined text-accent text-xl">workspace_premium</span>
@@ -81,24 +81,55 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('certificates.public.lookup') }}"
-                      class="bg-white border-2 border-on-background p-lg hard-shadow flex flex-col gap-md">
-                    @csrf
-                    <label for="nik" class="font-label-bold text-on-background uppercase">NIK Peserta</label>
-                    <input id="nik" name="nik" type="text" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" required
-                           value="{{ old('nik') }}"
-                           placeholder="0000000000000000"
-                           class="w-full border-2 border-on-background px-md py-sm font-body-lg font-bold tracking-[0.3em] focus:outline-none focus:border-primary" />
-                    @error('nik')
-                        <p class="text-primary font-bold font-body-md">{{ $message }}</p>
-                    @enderror
-                    <p class="font-label-sm text-secondary">16 digit angka, tanpa spasi — sama seperti saat mendaftar.</p>
-                    <button type="submit"
-                            class="bg-primary text-on-primary font-headline-md uppercase px-lg py-sm border-2 border-on-background hard-shadow hover:bg-on-background transition-all inline-flex items-center justify-center gap-xs">
-                        <span class="material-symbols-outlined text-lg">search</span>
-                        Cari Sertifikat
-                    </button>
-                </form>
+                <div class="bg-white border-2 border-on-background p-lg hard-shadow flex flex-col gap-md">
+                    <div class="grid grid-cols-2 gap-sm">
+                        <button type="button" data-tab="nik" class="certificate-tab bg-primary text-on-primary border-2 border-on-background px-sm py-xs font-label-bold uppercase">Cari dengan NIK</button>
+                        <button type="button" data-tab="nama" class="certificate-tab border-2 border-on-background px-sm py-xs font-label-bold uppercase">Cari dengan Nama</button>
+                    </div>
+
+                    <form method="POST" action="{{ route('certificates.public.lookup') }}" data-panel="nik" class="certificate-panel flex flex-col gap-md">
+                        @csrf
+                        <label for="nik" class="font-label-bold text-on-background uppercase">NIK Peserta</label>
+                        <input id="nik" name="nik" type="text" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" required
+                               value="{{ old('nik') }}"
+                               placeholder="0000000000000000"
+                               class="w-full border-2 border-on-background px-md py-sm font-body-lg font-bold tracking-[0.3em] focus:outline-none focus:border-primary" />
+                        @error('nik')
+                            <p class="text-primary font-bold font-body-md">{{ $message }}</p>
+                        @enderror
+                        <p class="font-label-sm text-secondary">16 digit angka, tanpa spasi — sama seperti saat mendaftar.</p>
+                        <button type="submit"
+                                class="bg-primary text-on-primary font-headline-md uppercase px-lg py-sm border-2 border-on-background hard-shadow hover:bg-on-background transition-all inline-flex items-center justify-center gap-xs">
+                            <span class="material-symbols-outlined text-lg">search</span>
+                            Cari Sertifikat
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('certificates.public.lookupByName') }}" data-panel="nama" class="certificate-panel hidden flex-col gap-md">
+                        @csrf
+                        <label for="nama" class="font-label-bold text-on-background uppercase">Nama Lengkap</label>
+                        <input id="nama" name="nama" type="text" required value="{{ old('nama') }}"
+                               placeholder="Nama sesuai pendaftaran"
+                               class="w-full border-2 border-on-background px-md py-sm font-body-lg focus:outline-none focus:border-primary" />
+                        @error('nama')
+                            <p class="text-primary font-bold font-body-md">{{ $message }}</p>
+                        @enderror
+
+                        <label for="birth_date" class="font-label-bold text-on-background uppercase">Tanggal Lahir</label>
+                        <input id="birth_date" name="birth_date" type="date" required value="{{ old('birth_date') }}"
+                               class="w-full border-2 border-on-background px-md py-sm font-body-lg focus:outline-none focus:border-primary" />
+                        @error('birth_date')
+                            <p class="text-primary font-bold font-body-md">{{ $message }}</p>
+                        @enderror
+
+                        <p class="font-label-sm text-secondary">Nama harus sama persis (huruf besar/kecil tidak masalah) dengan data pendaftaran.</p>
+                        <button type="submit"
+                                class="bg-primary text-on-primary font-headline-md uppercase px-lg py-sm border-2 border-on-background hard-shadow hover:bg-on-background transition-all inline-flex items-center justify-center gap-xs">
+                            <span class="material-symbols-outlined text-lg">search</span>
+                            Cari Sertifikat
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
@@ -125,12 +156,12 @@
                     <span class="font-headline-lg text-headline-lg bg-accent text-on-accent border-2 border-on-background px-sm py-xs select-none">3</span>
                     <div>
                         <h3 class="font-headline-md uppercase mb-xs">Unduh Sertifikat</h3>
-                        <p class="font-body-md text-secondary">Masukkan NIK di atas — sertifikat langsung tersedia dalam format PDF.</p>
+                        <p class="font-body-md text-secondary">Masukkan NIK atau nama + tanggal lahir di atas — sertifikat langsung tersedia dalam format PDF.</p>
                     </div>
                 </div>
             </div>
             <p class="font-body-md text-secondary mt-lg text-center">
-                Peserta tanpa NIK? <span class="font-bold text-on-background">Hubungi panitia kontingenmu</span> untuk pencetakan sertifikat.
+                Jika data tidak ditemukan, pastikan nama dan tanggal lahir sesuai data pendaftaran.
             </p>
         </div>
     </section>
@@ -151,5 +182,37 @@
             <a class="font-label-sm text-label-sm uppercase tracking-widest text-secondary hover:text-accent opacity-80 hover:opacity-100 transition-all" href="{{ route('landing') }}#contact">Contact</a>
         </div>
     </footer>
+    <script>
+        (function () {
+            const tabs = document.querySelectorAll('.certificate-tab');
+            const panels = document.querySelectorAll('.certificate-panel');
+
+            const hasNameError = {{ ($errors->has('nama') || $errors->has('birth_date')) ? 'true' : 'false' }};
+            let active = hasNameError ? 'nama' : 'nik';
+
+            function render() {
+                tabs.forEach((tab) => {
+                    const isActive = tab.dataset.tab === active;
+                    tab.classList.toggle('bg-primary', isActive);
+                    tab.classList.toggle('text-on-primary', isActive);
+                });
+
+                panels.forEach((panel) => {
+                    const isActive = panel.dataset.panel === active;
+                    panel.classList.toggle('hidden', !isActive);
+                    panel.classList.toggle('flex', isActive);
+                });
+            }
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    active = tab.dataset.tab;
+                    render();
+                });
+            });
+
+            render();
+        })();
+    </script>
 </body>
 </html>

@@ -381,7 +381,9 @@
         </div>
     </div>
 
-    @can('manage participants')
+    {{-- Sertifikat: panitia/super-admin (manage participants) + kontingen (manage own
+       participants, scoped ke peserta sendiri oleh authorizeParticipant di controller) --}}
+    @if (auth()->user()->can('manage participants') || auth()->user()->can('manage own participants'))
         <div class="card mb-5 mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
@@ -436,7 +438,7 @@
                 @endif
             </div>
         </div>
-    @endcan
+    @endif
 
     @push('scripts')
         <script>

@@ -77,6 +77,12 @@
                                                                                  $select.on('change', function () {
                                                                                      model = $select.val();
                                                                                  });
+                                                                                 // Set nilai awal dari hasil yang sudah tersimpan —
+                                                                                 // $watch tidak fire saat init, jadi tanpa ini
+                                                                                 // Select2 selalu tampil kosong padahal data ada.
+                                                                                 if (model) {
+                                                                                     $select.val(model).trigger('change.select2');
+                                                                                 }
                                                                                  $watch('model', value => {
                                                                                      if ($select.val() != value) {
                                                                                          $select.val(value).trigger('change.select2');
