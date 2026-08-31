@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 class StandingsService
 {
     /**
-     * Ambil klasemen medali untuk satu event.
+     * Ambil klasemen medali untuk satu event — HANYA kategori bertipe Open.
+     * Medali tipe lain (Festival dst) tetap tersimpan di tabel results dan
+     * dipakai untuk status sertifikat, tapi tidak dihitung di klasemen publik.
      *
      * @param  Event  $event
      * @return array  — array of objects, masing-masing berisi:
@@ -33,6 +35,7 @@ class StandingsService
             WHERE ec.event_id = :event_id
               AND reg.deleted_at IS NULL
               AND reg.sub_category_id IS NOT NULL
+              AND ec.type = 'Open'
             GROUP BY c.id, c.name, c.official_name
             ORDER BY gold DESC, silver DESC, bronze DESC, c.name ASC
         ", ['event_id' => $event->id]);
