@@ -17,6 +17,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class ResultEntryTest extends TestCase
@@ -34,11 +35,14 @@ class ResultEntryTest extends TestCase
         parent::setUp();
 
         Permission::firstOrCreate(['name' => 'manage results', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'panitia', 'guard_name' => 'web']);
 
         $this->user = User::factory()->create();
         $this->user->givePermissionTo('manage results');
+        $this->user->assignRole('panitia'); // EventPolicy::manage butuh role panitia + penugasan event
 
         $this->event = Event::factory()->create(['name' => 'Kejuaraan Karate 2026']);
+        $this->event->panitia()->syncWithoutDetaching([$this->user->id]); // event-scoping: user harus ditugaskan
         $this->category = EventCategory::factory()->create(['event_id' => $this->event->id]);
 
         $this->subCategoryMale = SubCategory::factory()->create([
@@ -61,9 +65,58 @@ class ResultEntryTest extends TestCase
     {
         Livewire::test(ResultEntry::class, ['event' => $this->event])
             ->assertSee('Kata Perorangan Male')
-            ->assertSee('(Putra)')
-            ->assertSee('Kata Perorangan Female')
-            ->assertSee('(Putri)');
+            ->assertSee('Kata Perorangan Female');
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function it_groups_categories_by_type_with_open_first()
+    {
+        // Festival dibuat dulu di DB — Open tetap harus jadi tab pertama
+        $festival = EventCategory::factory()->create([
+            'event_id' => $this->event->id,
+            'type' => \App\Enums\EventCategoryType::Festival,
+            'class_name' => 'Pemula',
+        ]);
+        $open = EventCategory::factory()->create([
+            'event_id' => $this->event->id,
+            'type' => \App\Enums\EventCategoryType::Open,
+            'class_name' => 'U21',
+        ]);
+
+        $component = Livewire::test(ResultEntry::class, ['event' => $this->event]);
+
+        $grouped = $component->get('groupedCategories');
+        $types = array_keys($grouped);
+        $this->assertSame(['Open', 'Festival'], $types, 'Open harus jadi tipe pertama');
+
+        $classes = collect($grouped['Open'])->pluck('class_name')->toArray();
+        $this->assertContains('U21', $classes);
+        $this->assertContains($this->category->class_name, $classes);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function it_only_renders_subcategories_of_active_type_and_class()
+    {
+        EventCategory::factory()->create([
+            'event_id' => $this->event->id,
+            'type' => \App\Enums\EventCategoryType::Festival,
+            'class_name' => 'Pemula',
+        ]);
+        $festivalSub = SubCategory::factory()->create([
+            'event_category_id' => EventCategory::where('event_id', $this->event->id)
+                ->where('type', 'Festival')->first()->id,
+            'name' => 'Kumite Festival Khusus',
+        ]);
+
+        // Default: tipe pertama (kategori utama setUp = type default factory), kelas pertama alphabet
+        $component = Livewire::test(ResultEntry::class, ['event' => $this->event]);
+
+        // Sub-kategori Festival tidak boleh ikut dirender sebelum tipe Festival dipilih
+        $component->assertDontSee('Kumite Festival Khusus');
+
+        // Pindah ke tipe Festival → kini tampil
+        $component->call('selectType', 'Festival')
+            ->assertSee('Kumite Festival Khusus');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]

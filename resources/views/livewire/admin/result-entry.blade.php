@@ -9,16 +9,65 @@
         </div>
         
         <div class="card-body py-3">
-            <div class="accordion accordion-icon-toggle" id="categoriesAccordion">
-                @foreach ($event->categories as $index => $category)
-                    <div class="mb-5 border-bottom border-light">
-                        <div class="accordion-header py-3 d-flex cursor-pointer" data-bs-toggle="collapse" data-bs-target="#category_{{ $category->id }}">
-                            <span class="accordion-icon"><i class="bi bi-chevron-down fs-4"></i></span>
-                            <h4 class="text-dark fw-bolder mb-0 ms-3">{{ $category->class_name }}</h4>
+            {{-- Navigasi sidebar tree: tipe (collapsible, Open dulu) → kelas → konten kelas aktif --}}
+            @php $activeCategory = $this->activeCategory; @endphp
+
+            @if ($activeCategory)
+                <div class="d-flex flex-column flex-xl-row gap-6">
+                    {{-- Sidebar tree — sticky di desktop, collapse biasa di mobile --}}
+                    <div class="flex-shrink-0 width-250px">
+                        <div class="position-sticky top-20px">
+                            {{-- Toggle mobile: tampilkan kelas aktif, klik untuk buka tree --}}
+                            <button class="btn btn-sm btn-light-primary w-100 d-flex justify-content-between align-items-center d-xl-none mb-3"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#resultTree">
+                                <span class="fw-bold">
+                                    <i class="bi bi-diagram-3 me-1"></i>
+                                    {{ $activeType }} · {{ $activeCategory->class_name }}
+                                </span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+
+                            <div class="collapse d-xl-block" id="resultTree">
+                                <div class="border border-gray-300 rounded p-3">
+                                    @foreach ($groupedCategories as $type => $categoriesInType)
+                                        @php $isActiveType = $activeType === $type; @endphp
+                                        {{-- Header tipe: toggle collapse Bootstrap, bukan navigasi --}}
+                                        <a class="d-flex align-items-center justify-content-between py-2 px-2 text-dark fw-bolder text-hover-primary cursor-pointer
+                                                  {{ ! $loop->first ? 'border-top border-gray-300' : '' }}"
+                                           data-bs-toggle="collapse" data-bs-target="#treeType_{{ \Illuminate\Support\Str::slug($type) }}"
+                                           aria-expanded="{{ $isActiveType }}">
+                                            <span>
+                                                @if ($isActiveType)
+                                                    <i class="bi bi-folder2-open text-primary me-2"></i>
+                                                @else
+                                                    <i class="bi bi-folder2 text-muted me-2"></i>
+                                                @endif
+                                                {{ $type }}
+                                            </span>
+                                            <i class="bi bi-chevron-down fs-8 {{ $isActiveType ? '' : 'rotate-180' }}"></i>
+                                        </a>
+
+                                        {{-- Daftar kelas dalam tipe — tipe aktif terbuka --}}
+                                        <div class="collapse {{ $isActiveType ? 'show' : '' }}" id="treeType_{{ \Illuminate\Support\Str::slug($type) }}">
+                                            @foreach ($categoriesInType as $classCategory)
+                                                <a class="d-block py-2 px-4 ms-4 rounded fs-7 cursor-pointer
+                                                          {{ $activeClassId === $classCategory['id']
+                                                                ? 'bg-primary text-white fw-bold'
+                                                                : 'text-gray-700 text-hover-primary' }}"
+                                                   wire:click="selectClass('{{ $type }}', {{ $classCategory['id'] }})">
+                                                    <i class="bi bi-dot me-1"></i>{{ $classCategory['class_name'] }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
-                        <div id="category_{{ $category->id }}" class="collapse {{ $index === 0 ? 'show' : '' }}" data-bs-parent="#categoriesAccordion">
-                            <div class="pt-5 pb-5">
-                                @foreach ($category->subCategories as $subCategory)
+                    </div>
+
+                    {{-- Konten: sub-kategori kelas aktif --}}
+                    <div class="flex-grow-1 min-w-100px">
+                                @foreach ($activeCategory->subCategories as $subCategory)
                                     <div class="card card-bordered mb-7 shadow-sm">
                                         <div class="card-header bg-light-primary min-h-40px py-2">
                                             <h5 class="card-title text-primary m-0">
@@ -131,11 +180,9 @@
                                         </div>
                                     </div>
                                 @endforeach
-                            </div>
-                        </div>
                     </div>
-                @endforeach
-            </div>
+                </div>
+@endif
         </div>
     </div>
 </div>

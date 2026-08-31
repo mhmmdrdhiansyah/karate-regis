@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Event;
+use App\Models\EventCategory;
 use App\Models\Registration;
 use App\Models\Result;
 use App\Enums\MedalType;
@@ -14,6 +15,20 @@ class ResultEntry extends Component
 {
     public Event $event;
     public array $slots = []; // [subCategoryId => [ ['medal_type' => 'Gold', 'registration_id' => 1], ... ]]
+
+    /** Tab aktif: tipe kategori (mis. 'Open'/'Festival') — Open default. */
+    public string $activeType = '';
+
+    /** Tab aktif: EventCategory (kelas) dalam tipe terpilih. */
+    public int|null $activeClassId = null;
+
+    /**
+     * Kategori dikelompokkan per tipe untuk navigasi 2 level (tipe → kelas).
+     * Open selalu pertama, sisanya alphabet; kelas dalam tiap tipe alphabet.
+     *
+     * @var array<string, \Illuminate\Support\Collection<int, EventCategory>>
+     */
+    public array $groupedCategories = [];
 
     public function mount(Event $event)
     {
@@ -28,6 +43,23 @@ class ResultEntry extends Component
             'categories.subCategories.registrations.participant.contingent',
             'categories.subCategories.registrations.teamGroup.contingent',
         ]);
+
+        // Grup tipe → kelas (Open dulu, kelas alphabet) untuk tab navigasi
+        $this->groupedCategories = $this->event->categories
+            ->sortBy([['type', 'asc'], ['class_name', 'asc']])
+            ->groupBy(fn ($c) => $c->type->value)
+            ->map(fn ($group) => $group->values())
+            ->toArray();
+
+        // Letakkan grup Open di depan
+        uksort($this->groupedCategories, function ($a, $b) {
+            if ($a === 'Open') return -1;
+            if ($b === 'Open') return 1;
+            return strcmp($a, $b);
+        });
+
+        $this->activeType = array_key_first($this->groupedCategories) ?? '';
+        $this->activeClassId = $this->groupedCategories[$this->activeType][0]['id'] ?? null;
 
         foreach ($this->event->categories as $category) {
             foreach ($category->subCategories as $subCategory) {
@@ -55,6 +87,52 @@ class ResultEntry extends Component
                 }
             }
         }
+    }
+
+    /**
+     * Ganti tab tipe — kelas aktif direset ke kelas pertama tipe tersebut.
+     */
+    public function selectType(string $type): void
+    {
+        if (! isset($this->groupedCategories[$type])) {
+            return;
+        }
+
+        $this->activeType = $type;
+        $this->activeClassId = $this->groupedCategories[$type][0]['id'] ?? null;
+    }
+
+    /**
+     * Pilih kelas langsung dari sidebar tree — set tipe + kelas sekaligus
+     * (satu action, tanpa bergantung urutan dua update terpisah).
+     */
+    public function selectClass(string $type, int $classId): void
+    {
+        if (! isset($this->groupedCategories[$type])) {
+            return;
+        }
+
+        $valid = collect($this->groupedCategories[$type])->contains(fn ($c) => $c['id'] === $classId);
+        if (! $valid) {
+            return;
+        }
+
+        $this->activeType = $type;
+        $this->activeClassId = $classId;
+    }
+
+    /**
+     * Kategori (kelas) yang sedang aktif — konten tab.
+     */
+    public function getActiveCategoryProperty(): ?EventCategory
+    {
+        foreach ($this->groupedCategories[$this->activeType] ?? [] as $category) {
+            if ($category['id'] === $this->activeClassId) {
+                return $this->event->categories->firstWhere('id', $category['id']);
+            }
+        }
+
+        return null;
     }
 
     public function addSlot($subCategoryId)
