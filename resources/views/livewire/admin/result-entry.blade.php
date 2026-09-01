@@ -142,15 +142,24 @@
                                                                         >
                                                                             <select x-ref="select" class="form-select form-select-sm" data-placeholder="-- Pilih Peserta --">
                                                                                 <option value="">-- Pilih Peserta --</option>
-                                                                                @foreach ($subCategory->registrations as $reg)
-                                                                                    <option value="{{ $reg->id }}">
-                                                                                        @if($reg->participant)
-                                                                                            {{ $reg->participant->name }} ({{ optional($reg->participant->contingent)->name ?? '-' }})
-                                                                                        @elseif($reg->teamGroup)
-                                                                                            {{ $reg->teamGroup->name }} ({{ optional($reg->teamGroup->contingent)->name ?? '-' }})
-                                                                                        @endif
-                                                                                    </option>
-                                                                                @endforeach
+                                                                                @if ($subCategory->isTeam())
+                                                                                    {{-- Beregu: pilih TIM, bukan individu — semua anggota otomatis dapat status juara --}}
+                                                                                    @foreach ($subCategory->teamGroups->sortBy('team_name') as $team)
+                                                                                        <option value="team:{{ $team->id }}">
+                                                                                            {{ $team->team_name }} ({{ optional($team->contingent)->name ?? '-' }})
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @else
+                                                                                    @foreach ($subCategory->registrations as $reg)
+                                                                                        <option value="{{ $reg->id }}">
+                                                                                            @if($reg->participant)
+                                                                                                {{ $reg->participant->name }} ({{ optional($reg->participant->contingent)->name ?? '-' }})
+                                                                                            @elseif($reg->teamGroup)
+                                                                                                {{ $reg->teamGroup->name }} ({{ optional($reg->teamGroup->contingent)->name ?? '-' }})
+                                                                                            @endif
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @endif
                                                                             </select>
                                                                         </div>
                                                                     </td>

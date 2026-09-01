@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventCategory;
 use App\Models\Registration;
 use App\Models\Result;
+use App\Models\SubCategory;
 use App\Enums\MedalType;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -42,6 +43,7 @@ class ResultEntry extends Component
             },
             'categories.subCategories.registrations.participant.contingent',
             'categories.subCategories.registrations.teamGroup.contingent',
+            'categories.subCategories.teamGroups', // opsi tim untuk sub beregu
         ]);
 
         // Grup tipe → kelas (Open dulu, kelas alphabet) untuk tab navigasi
@@ -77,6 +79,23 @@ class ResultEntry extends Component
                 } else {
                     $this->slots[$subCategory->id] = [];
                     foreach ($results as $res) {
+                        // Beregu: kembalikan per TIM — Result anggota tim yang sama
+                        // (rank+medali identik) diwakilkan satu slot bertim tersebut.
+                        $teamId = $res->registration?->team_group_id;
+                        if ($subCategory->isTeam() && $teamId) {
+                            $alreadySlotted = collect($this->slots[$subCategory->id])
+                                ->contains(fn ($s) => $s['registration_id'] === 'team:' . $teamId);
+                            if (! $alreadySlotted) {
+                                $this->slots[$subCategory->id][] = [
+                                    'key' => uniqid('slot_'),
+                                    'rank_name' => $res->rank_name ?? '',
+                                    'medal_type' => $res->medal_type ? $res->medal_type->value : '',
+                                    'registration_id' => 'team:' . $teamId,
+                                ];
+                            }
+                            continue;
+                        }
+                        // Individu (atau Result lama tanpa tim): slot perorangan seperti biasa
                         $this->slots[$subCategory->id][] = [
                             'key' => uniqid('slot_'),
                             'rank_name' => $res->rank_name ?? '',
@@ -154,8 +173,12 @@ class ResultEntry extends Component
         if (isset($this->slots[$subCategoryId][$index])) {
             $slot = $this->slots[$subCategoryId][$index];
 
-            // Jika slot sudah punya registration_id, hapus juga dari database
-            if (!empty($slot['registration_id'])) {
+            // Slot tim: hapus Result SEMUA anggota tim tersebut
+            if (str_starts_with((string) $slot['registration_id'], 'team:')) {
+                $teamId = (int) substr($slot['registration_id'], 5);
+                $regIds = Registration::where('team_group_id', $teamId)->pluck('id');
+                Result::whereIn('registration_id', $regIds)->delete();
+            } elseif (!empty($slot['registration_id'])) {
                 Result::where('registration_id', $slot['registration_id'])->delete();
             }
 
@@ -170,7 +193,9 @@ class ResultEntry extends Component
         abort_unless(auth()->user()->can('manage', $this->event), 403, 'Event selesai, data read-only.');
 
         $slots = $this->slots[$subCategoryId] ?? [];
-        
+        $subCategory = $this->findSubCategory((int) $subCategoryId);
+        $isTeamCategory = $subCategory && $subCategory->isTeam();
+
         // Validate duplicates
         $regIds = collect($slots)->pluck('registration_id')->filter(fn($id) => $id !== '');
         if ($regIds->duplicates()->isNotEmpty()) {
@@ -179,13 +204,29 @@ class ResultEntry extends Component
         }
 
         $subCategoryRegIds = Registration::forManagedEvents()->where('sub_category_id', $subCategoryId)->pluck('id');
-        
+
         // Delete existing results for this subcategory
         Result::whereIn('registration_id', $subCategoryRegIds)->delete();
-        
+
         // Save new results
         foreach ($slots as $slot) {
             if (!empty($slot['registration_id']) && (!empty($slot['medal_type']) || !empty($slot['rank_name']))) {
+                // Slot TIM beregu: buat Result untuk semua anggota tim
+                if ($isTeamCategory && str_starts_with((string) $slot['registration_id'], 'team:')) {
+                    $teamId = (int) substr($slot['registration_id'], 5);
+                    $memberRegIds = Registration::where('team_group_id', $teamId)
+                        ->whereNull('deleted_at')
+                        ->pluck('id');
+                    foreach ($memberRegIds as $memberRegId) {
+                        Result::create([
+                            'registration_id' => $memberRegId,
+                            'rank_name' => !empty($slot['rank_name']) ? $slot['rank_name'] : null,
+                            'medal_type' => !empty($slot['medal_type']) ? $slot['medal_type'] : null,
+                        ]);
+                    }
+                    continue;
+                }
+                // Slot individu (kategori individu, atau fallback data lama)
                 Result::create([
                     'registration_id' => $slot['registration_id'],
                     'rank_name' => !empty($slot['rank_name']) ? $slot['rank_name'] : null,
@@ -193,8 +234,24 @@ class ResultEntry extends Component
                 ]);
             }
         }
-        
+
         session()->flash("success_{$subCategoryId}", 'Hasil berhasil disimpan!');
+    }
+
+    /**
+     * Cari SubCategory dari id di dalam event yang sedang dikelola.
+     */
+    private function findSubCategory(int $subCategoryId): ?SubCategory
+    {
+        foreach ($this->event->categories as $category) {
+            foreach ($category->subCategories as $subCategory) {
+                if ($subCategory->id === $subCategoryId) {
+                    return $subCategory;
+                }
+            }
+        }
+
+        return null;
     }
 
     public function render()

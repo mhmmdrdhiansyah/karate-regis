@@ -13,9 +13,11 @@ use App\Models\Payment;
 use App\Models\Registration;
 use App\Models\Result;
 use App\Models\SubCategory;
+use App\Models\TeamGroup;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -150,5 +152,122 @@ class ResultEntryTest extends TestCase
             'rank_name' => 'Juara 1',
             'medal_type' => 'Gold',
         ]);
+    }
+
+    #[Test]
+    public function it_saves_team_result_for_all_members_of_winning_team()
+    {
+        $contingent = Contingent::factory()->create(['user_id' => $this->user->id]);
+
+        // Sub-kategori beregu + 2 tim (Tim Alfa 3 orang, Tim Beta 2 orang)
+        $subBeregu = SubCategory::factory()->beregu()->create([
+            'event_category_id' => $this->category->id,
+        ]);
+        $timAlfa = TeamGroup::create([
+            'contingent_id' => $contingent->id,
+            'sub_category_id' => $subBeregu->id,
+            'team_name' => 'Tim Alfa',
+            'team_number' => 1,
+        ]);
+        $timBeta = TeamGroup::create([
+            'contingent_id' => $contingent->id,
+            'sub_category_id' => $subBeregu->id,
+            'team_name' => 'Tim Beta',
+            'team_number' => 2,
+        ]);
+        $regsAlfa = [];
+        foreach (['Andi', 'Budi', 'Citra'] as $nama) {
+            $participant = Participant::factory()->create(['contingent_id' => $contingent->id, 'name' => $nama]);
+            $payment = Payment::create([
+                'contingent_id' => $contingent->id,
+                'event_id' => $this->event->id,
+                'total_amount' => 150000,
+                'status' => PaymentStatus::Verified,
+            ]);
+            $regsAlfa[] = Registration::create([
+                'payment_id' => $payment->id,
+                'sub_category_id' => $subBeregu->id,
+                'participant_id' => $participant->id,
+                'team_group_id' => $timAlfa->id,
+            ])->id;
+        }
+        $participantBeta = Participant::factory()->create(['contingent_id' => $contingent->id, 'name' => 'Dewi']);
+        $paymentBeta = Payment::create([
+            'contingent_id' => $contingent->id,
+            'event_id' => $this->event->id,
+            'total_amount' => 150000,
+            'status' => PaymentStatus::Verified,
+        ]);
+        $regBeta = Registration::create([
+            'payment_id' => $paymentBeta->id,
+            'sub_category_id' => $subBeregu->id,
+            'participant_id' => $participantBeta->id,
+            'team_group_id' => $timBeta->id,
+        ]);
+
+        $component = Livewire::test(ResultEntry::class, ['event' => $this->event]);
+
+        // Slot pertama sub beregu diisi Tim Alfa (tim_id dipakai sebagai registration_id slot)
+        $slots = $component->get('slots.' . $subBeregu->id);
+        $slots[0]['registration_id'] = 'team:' . $timAlfa->id;
+        $component->set('slots.' . $subBeregu->id, $slots);
+
+        $component->call('save', $subBeregu->id)
+            ->assertSee('Hasil berhasil disimpan!');
+
+        // SEMUA anggota Tim Alfa dapat Result Juara 1 Gold
+        foreach ($regsAlfa as $regId) {
+            $this->assertDatabaseHas('results', [
+                'registration_id' => $regId,
+                'rank_name' => 'Juara 1',
+                'medal_type' => 'Gold',
+            ]);
+        }
+
+        // Anggota Tim Beta TIDAK dapat Result
+        $this->assertDatabaseMissing('results', [
+            'registration_id' => $regBeta->id,
+        ]);
+    }
+
+    #[Test]
+    public function it_rejects_duplicate_team_in_slots()
+    {
+        $contingent = Contingent::factory()->create(['user_id' => $this->user->id]);
+
+        $subBeregu = SubCategory::factory()->beregu()->create([
+            'event_category_id' => $this->category->id,
+        ]);
+        $tim = TeamGroup::create([
+            'contingent_id' => $contingent->id,
+            'sub_category_id' => $subBeregu->id,
+            'team_name' => 'Tim Satu',
+            'team_number' => 1,
+        ]);
+        $participant = Participant::factory()->create(['contingent_id' => $contingent->id, 'name' => 'Anggota Tim']);
+        $payment = Payment::create([
+            'contingent_id' => $contingent->id,
+            'event_id' => $this->event->id,
+            'total_amount' => 150000,
+            'status' => PaymentStatus::Verified,
+        ]);
+        Registration::create([
+            'payment_id' => $payment->id,
+            'sub_category_id' => $subBeregu->id,
+            'participant_id' => $participant->id,
+            'team_group_id' => $tim->id,
+        ]);
+
+        $component = Livewire::test(ResultEntry::class, ['event' => $this->event]);
+
+        $slots = $component->get('slots.' . $subBeregu->id);
+        $slots[0]['registration_id'] = 'team:' . $tim->id;
+        $slots[1]['registration_id'] = 'team:' . $tim->id;
+        $component->set('slots.' . $subBeregu->id, $slots);
+
+        $component->call('save', $subBeregu->id)
+            ->assertSee('Ada peserta yang sama dipilih lebih dari satu kali!');
+
+        $this->assertDatabaseCount('results', 0);
     }
 }
