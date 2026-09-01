@@ -154,11 +154,18 @@
                                         <span class="text-muted fs-7">{{ $participant->created_at->format('d/m/Y') }}</span>
                                     </td>
                                     <td class="text-end">
-                                        <button wire:click="selectParticipant({{ $participant->id }})" 
-                                                class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm"
-                                                data-bs-toggle="modal" data-bs-target="#kt_modal_verify">
-                                            <i class="bi bi-eye-fill fs-3"></i>
-                                        </button>
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a href="{{ route('participants.show', $participant->id) }}"
+                                               class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm"
+                                               title="Buka detail peserta">
+                                                <i class="bi bi-person-lines-fill fs-3"></i>
+                                            </a>
+                                            <button wire:click="selectParticipant({{ $participant->id }})"
+                                                    class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm"
+                                                    data-bs-toggle="modal" data-bs-target="#kt_modal_verify">
+                                                <i class="bi bi-eye-fill fs-3"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

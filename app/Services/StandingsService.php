@@ -8,7 +8,11 @@ use Illuminate\Support\Facades\DB;
 class StandingsService
 {
     /**
-     * Ambil klasemen medali untuk satu event.
+     * Ambil klasemen medali untuk satu event — HANYA kategori bertipe Open,
+     * 1 medali per TIM untuk beregu (COUNT DISTINCT team_group_id), 1 per
+     * hasil untuk individu.
+     * Medali tipe lain (Festival dst) tetap tersimpan di tabel results dan
+     * dipakai untuk status sertifikat, tapi tidak dihitung di klasemen publik.
      *
      * @param  Event  $event
      * @return array  — array of objects, masing-masing berisi:
@@ -20,9 +24,9 @@ class StandingsService
             SELECT c.id AS contingent_id,
                    c.name,
                    c.official_name,
-                   SUM(CASE WHEN r.medal_type = 'Gold'   THEN 1 ELSE 0 END) AS gold,
-                   SUM(CASE WHEN r.medal_type = 'Silver' THEN 1 ELSE 0 END) AS silver,
-                   SUM(CASE WHEN r.medal_type = 'Bronze' THEN 1 ELSE 0 END) AS bronze
+                   COUNT(DISTINCT CASE WHEN r.medal_type = 'Gold'   THEN COALESCE(reg.team_group_id, -reg.id) END) AS gold,
+                   COUNT(DISTINCT CASE WHEN r.medal_type = 'Silver' THEN COALESCE(reg.team_group_id, -reg.id) END) AS silver,
+                   COUNT(DISTINCT CASE WHEN r.medal_type = 'Bronze' THEN COALESCE(reg.team_group_id, -reg.id) END) AS bronze
             FROM results r
             JOIN registrations reg   ON reg.id = r.registration_id
             JOIN sub_categories sc   ON sc.id = reg.sub_category_id
@@ -33,6 +37,7 @@ class StandingsService
             WHERE ec.event_id = :event_id
               AND reg.deleted_at IS NULL
               AND reg.sub_category_id IS NOT NULL
+              AND ec.type = 'Open'
             GROUP BY c.id, c.name, c.official_name
             ORDER BY gold DESC, silver DESC, bronze DESC, c.name ASC
         ", ['event_id' => $event->id]);

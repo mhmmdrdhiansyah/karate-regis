@@ -8,6 +8,7 @@ use App\Models\CertificateTemplate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Concerns\BuildsCertificates;
 use Tests\TestCase;
@@ -37,6 +38,87 @@ class CertificatePublicTest extends TestCase
         $this->post('/sertifikat', ['nik' => '1234567890123456'])
             ->assertOk()
             ->assertSee('Atlet Publik');
+    }
+
+    #[Test]
+    public function lookup_by_name_requires_birth_date(): void
+    {
+        $this->post('/sertifikat/nama', ['nama' => 'Atlet Publik'])
+            ->assertSessionHasErrors('birth_date');
+    }
+
+    #[Test]
+    public function lookup_by_name_with_wrong_birth_date_returns_error(): void
+    {
+        $this->makeEligibleRegistration('1234567890123456');
+
+        $this->post('/sertifikat/nama', [
+            'nama' => 'Atlet Publik',
+            'birth_date' => '1990-01-01',
+        ])->assertSessionHasErrors('nama');
+    }
+
+    #[Test]
+    public function lookup_by_name_case_insensitive_finds_participant(): void
+    {
+        $reg = $this->makeEligibleRegistration('1234567890123456');
+        $reg->participant->update(['birth_date' => '2010-05-15']);
+
+        $this->post('/sertifikat/nama', [
+            'nama' => 'atlet publik',
+            'birth_date' => '2010-05-15',
+        ])->assertOk()->assertSee('Atlet Publik');
+    }
+
+    #[Test]
+    public function lookup_by_name_short_name_rejected(): void
+    {
+        $this->post('/sertifikat/nama', [
+            'nama' => 'Ab',
+            'birth_date' => '2010-05-15',
+        ])->assertSessionHasErrors('nama');
+    }
+
+    #[Test]
+    public function show_with_valid_signed_url_displays_result(): void
+    {
+        $reg = $this->makeEligibleRegistration('1234567890123456');
+        $url = URL::temporarySignedRoute(
+            'certificates.public.show',
+            now()->addMinutes(10),
+            ['participant' => $reg->participant_id]
+        );
+
+        $this->get($url)->assertOk()->assertSee('Atlet Publik');
+    }
+
+    #[Test]
+    public function show_without_signature_returns_403(): void
+    {
+        $reg = $this->makeEligibleRegistration('1234567890123456');
+
+        $this->get("/sertifikat/peserta/{$reg->participant_id}")->assertForbidden();
+    }
+
+    #[Test]
+    public function show_with_tampered_signature_returns_403(): void
+    {
+        $reg = $this->makeEligibleRegistration('1234567890123456');
+        $url = URL::temporarySignedRoute(
+            'certificates.public.show',
+            now()->addMinutes(10),
+            ['participant' => $reg->participant_id]
+        );
+
+        $parts = parse_url($url);
+        parse_str($parts['query'] ?? '', $query);
+        $query['signature'] = 'deadbeef';
+        $tampered = $parts['scheme'] . '://' . $parts['host']
+            . (isset($parts['port']) ? ':' . $parts['port'] : '')
+            . ($parts['path'] ?? '')
+            . '?' . http_build_query($query);
+
+        $this->get($tampered)->assertForbidden();
     }
 
     #[Test]

@@ -32,6 +32,9 @@ yarn-error.log
 # Storage Backups
 /storage/backup
 
+# dompdf font cache (di-generate otomatis)
+/storage/fonts
+
 # Database Backups
 /database/backup
 

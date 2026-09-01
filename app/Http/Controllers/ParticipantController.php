@@ -127,7 +127,7 @@ class ParticipantController extends Controller
 
     public function destroy(Participant $participant)
     {
-        $this->authorizeParticipant($participant);
+        $this->authorizeParticipantDeletion($participant);
 
         $this->participantService->cascadeDelete($participant);
 
@@ -136,7 +136,7 @@ class ParticipantController extends Controller
 
     public function deletePreview(Participant $participant)
     {
-        $this->authorizeParticipant($participant);
+        $this->authorizeParticipantDeletion($participant);
 
         return response()->json(
             $this->participantService->getDeleteImpact($participant)
@@ -164,12 +164,49 @@ class ParticipantController extends Controller
         ]);
     }
 
+    /**
+     * Aturan akses halaman detail peserta:
+     * - super-admin: semua peserta
+     * - panitia: peserta yang mendaftar minimal satu event yang dipegangnya
+     *   (status verifikasi apa pun)
+     * - lainnya (kontingen): hanya peserta milik kontingennya sendiri
+     */
     private function authorizeParticipant(Participant $participant): void
     {
+        $user = request()->user();
+
+        if ($user->hasRole('super-admin')) {
+            return;
+        }
+
+        if ($user->hasRole('panitia')) {
+            $inManagedEvent = Participant::where('id', $participant->id)
+                ->whereHas('registrations', fn ($r) => $r->forManagedEvents())
+                ->exists();
+
+            abort_unless($inManagedEvent, 403, 'Peserta tidak mendaftar event yang Anda kelola.');
+
+            return;
+        }
+
         abort_unless(
-            $participant->contingent_id === request()->user()->contingent?->id,
+            $participant->contingent_id === $user->contingent?->id,
             403,
             'Anda tidak memiliki akses ke peserta ini.'
+        );
+    }
+
+    /**
+     * Aksi hapus peserta beserta data turunannya hanya untuk non-panitia.
+     */
+    private function authorizeParticipantDeletion(Participant $participant): void
+    {
+        $this->authorizeParticipant($participant);
+
+        abort_if(
+            request()->user()->hasRole('panitia'),
+            403,
+            'Panitia tidak diizinkan menghapus peserta.'
         );
     }
 }
