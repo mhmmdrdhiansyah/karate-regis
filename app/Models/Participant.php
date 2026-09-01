@@ -134,6 +134,8 @@ class Participant extends Model
     public function canBeDeletedBy($user): bool
     {
         if (!$user) return false;
+        if ($user->hasRole('panitia')) return false;
+
         return $user->can('delete participants') || 
                $user->can('manage participants') || 
                ($user->can('manage own participants') && $this->contingent_id === $user->contingent?->id);

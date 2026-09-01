@@ -103,6 +103,7 @@ class RolesAndPermissionsSeeder extends Seeder
         // Catatan: User Management hanya untuk super-admin (route di-gate role:super-admin)
         $panitiaRole->syncPermissions([
             'view dashboard',
+            'view participants',
             'view kontingen',
             'create kontingen',
             'edit kontingen',
