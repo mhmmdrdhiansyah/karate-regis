@@ -96,6 +96,12 @@ class CertificateService
 
     public function scopeFor(Registration $r): \App\Enums\CertificateScope
     {
+        // Festival = pertandingan hiburan: sertifikat biasa seragam,
+        // apa pun hasil pertandingannya (juara maupun bukan)
+        if ($r->subCategory?->eventCategory?->type === \App\Enums\EventCategoryType::Festival) {
+            return \App\Enums\CertificateScope::Festival;
+        }
+
         $result = $r->result;
         if (! $result) {
             return \App\Enums\CertificateScope::Participant;

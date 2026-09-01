@@ -9,5 +9,6 @@ enum CertificateScope: string
     case ChampionBronze = 'champion_bronze';
     case ChampionOther = 'champion_other';
     case Participant = 'participant';
+    case Festival = 'festival';
     case Fallback = 'fallback';
 }

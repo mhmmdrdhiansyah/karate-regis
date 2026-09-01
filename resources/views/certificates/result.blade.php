@@ -106,6 +106,7 @@
                             'champion_silver' => '#a8a9ad',
                             'champion_bronze' => '#96502c',
                             'champion_other' => '#FFD700',
+                            'festival' => '#7c3aed',
                             default => '#b9001c',
                         };
                     @endphp

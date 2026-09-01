@@ -141,4 +141,70 @@ class CertificateServiceTest extends TestCase
 
         $this->assertNull(app(CertificateService::class)->resolveTemplate($event, CertificateScope::Participant));
     }
+
+    #[Test]
+    public function festival_dan_juara_tetap_scope_festival(): void
+    {
+        // Festival = pertandingan hiburan: apa pun hasilnya, sertifikat biasa seragam
+        $reg = $this->makeRegistration([
+            'rank_name' => 'Juara 1',
+            'medal_type' => MedalType::Gold,
+        ]);
+        // Default factory = Open; ubah event category-nya jadi Festival
+        $reg->subCategory->eventCategory->update(['type' => \App\Enums\EventCategoryType::Festival]);
+
+        $entries = app(CertificateService::class)->forParticipant($reg->participant);
+
+        $this->assertSame(CertificateScope::Festival, $entries[0]['scope']);
+        // Status teks tetap JUARA 1 — yang berubah hanya template-nya
+        $this->assertSame('JUARA 1', $entries[0]['status']);
+    }
+
+    #[Test]
+    public function festival_tanpa_result_juga_scope_festival(): void
+    {
+        $reg = $this->makeRegistration();
+        $reg->subCategory->eventCategory->update(['type' => \App\Enums\EventCategoryType::Festival]);
+
+        $entries = app(CertificateService::class)->forParticipant($reg->participant);
+
+        $this->assertSame(CertificateScope::Festival, $entries[0]['scope']);
+    }
+
+    #[Test]
+    public function open_tanpa_result_tetap_scope_participant(): void
+    {
+        // Non-Festival tanpa Result = Sertifikat Penghargaan — perilaku lama tidak berubah
+        $reg = $this->makeRegistration(); // default factory type = Open
+
+        $entries = app(CertificateService::class)->forParticipant($reg->participant);
+
+        $this->assertSame(CertificateScope::Participant, $entries[0]['scope']);
+    }
+
+    #[Test]
+    public function template_scope_festival_dipilih_untuk_registrasi_festival(): void
+    {
+        $reg = $this->makeRegistration([
+            'rank_name' => 'Juara 1',
+            'medal_type' => MedalType::Gold,
+        ]);
+        $reg->subCategory->eventCategory->update([
+            'type' => \App\Enums\EventCategoryType::Festival,
+        ]);
+        $event = $reg->subCategory->eventCategory->event;
+
+        $festivalTpl = \App\Models\CertificateTemplate::create([
+            'event_id' => $event->id,
+            'name' => 'Sertifikat Festival',
+            'scope' => CertificateScope::Festival,
+            'image_path' => 'certificate-templates/test.png',
+        ]);
+
+        $entries = app(CertificateService::class)->forParticipant($reg->participant);
+        $template = app(CertificateService::class)
+            ->resolveTemplate($entries[0]['event'], $entries[0]['scope']);
+
+        $this->assertTrue($template->is($festivalTpl));
+    }
 }
