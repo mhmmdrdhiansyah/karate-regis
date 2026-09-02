@@ -293,12 +293,14 @@
                     <select name="type" class="form-select form-select-solid">
                         <option value="Open" @selected(old('type') === 'Open')>Open</option>
                         <option value="Festival" @selected(old('type') === 'Festival')>Festival</option>
+                        <option value="TNI/Polri" @selected(old('type') === 'TNI/Polri')>TNI/Polri</option>
+                        <option value="Mahasiswa" @selected(old('type') === 'Mahasiswa')>Mahasiswa</option>
                     </select>
                     @error('type')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <label class="required form-label">Class Name</label>
                     <input type="text" name="class_name" class="form-control form-control-solid"
                         value="{{ old('class_name') }}">
@@ -316,8 +318,8 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-2">
-                    <label class="form-label">Nilai Diskon</label>
+                <div class="col-12 col-md-1">
+                    <label class="form-label">Nilai</label>
                     <input type="number" step="0.01" min="0" name="discount_value" class="form-control form-control-solid"
                         value="{{ old('discount_value', 0) }}">
                     @error('discount_value')

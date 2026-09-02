@@ -77,6 +77,9 @@ export default {
                 'tertiary-fixed': '#e2e2e2',
                 'accent': '#FFD700',
                 'on-accent': '#1b1c1c',
+                'medal-gold': '#FFD700',
+                'medal-silver': '#C0C0C0',
+                'medal-bronze': '#CD7F32',
             },
 
             // Sharp corners for the bold combat-sport look (only the named
