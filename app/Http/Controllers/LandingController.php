@@ -82,14 +82,33 @@ class LandingController extends Controller
 
     /**
      * Display the public standings page for an event.
+     * Satu section per tipe resmi (Open, TNI/Polri, Mahasiswa) — hanya
+     * tipe yang kategorinya ADA di event; Festival tidak pernah dihitung.
      */
     public function klasemen(Event $event)
     {
         // Jangan tampilkan klasemen untuk event draft
         abort_unless($event->status !== EventStatus::Draft, 404);
 
-        $standings = app(StandingsService::class)->forEvent($event);
+        $event->load('categories');
 
-        return view('event-klasemen', compact('event', 'standings'));
+        // Tipe resmi yang klasemennya ditampilkan, urutan section tetap
+        $jenisKlasemen = [
+            \App\Enums\EventCategoryType::Open,
+            \App\Enums\EventCategoryType::TniPolri,
+            \App\Enums\EventCategoryType::Mahasiswa,
+        ];
+        $tipeDiEvent = $event->categories->pluck('type')->unique();
+
+        $standingsPerTipe = [];
+        foreach ($jenisKlasemen as $tipe) {
+            if (! $tipeDiEvent->contains($tipe)) {
+                continue; // event tidak punya kategori tipe ini → tanpa section
+            }
+
+            $standingsPerTipe[$tipe->value] = app(StandingsService::class)->forEvent($event, $tipe);
+        }
+
+        return view('event-klasemen', compact('event', 'standingsPerTipe'));
     }
 }

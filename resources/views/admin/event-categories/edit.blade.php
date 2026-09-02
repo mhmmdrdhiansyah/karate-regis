@@ -18,6 +18,8 @@
                         <select name="type" class="form-select form-select-solid">
                             <option value="Open" @selected(old('type', $eventCategory->type->value) === 'Open')>Open</option>
                             <option value="Festival" @selected(old('type', $eventCategory->type->value) === 'Festival')>Festival</option>
+                            <option value="TNI/Polri" @selected(old('type', $eventCategory->type->value) === 'TNI/Polri')>TNI/Polri</option>
+                            <option value="Mahasiswa" @selected(old('type', $eventCategory->type->value) === 'Mahasiswa')>Mahasiswa</option>
                         </select>
                         @error('type')
                             <span class="text-danger small">{{ $message }}</span>
