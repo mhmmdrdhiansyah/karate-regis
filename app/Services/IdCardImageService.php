@@ -104,7 +104,7 @@ class IdCardImageService
      */
     public function dimensionsOf(string $relativePath): array
     {
-        $full = storage_path('app/public/' . $relativePath);
+        $full = Storage::disk('public')->path($relativePath);
         abort_unless(file_exists($full), 404, 'File template tidak ditemukan.');
 
         [$w, $h] = getimagesize($full);

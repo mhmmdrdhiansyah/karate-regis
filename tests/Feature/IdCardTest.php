@@ -10,6 +10,8 @@ use App\Models\Participant;
 use App\Models\User;
 use App\Services\IdCardService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
@@ -124,9 +126,13 @@ class IdCardTest extends TestCase
 
         $this->get($url)->assertNotFound();
 
+        // Template butuh file gambar nyata (dibaca dimensionsOf) — faker landscape 543x343
+        Storage::fake('public');
+        $path = Storage::disk('public')->putFile('id-card-templates', UploadedFile::fake()->image('global.png', 543, 343));
+
         IdCardTemplate::create([
             'name' => 'Global',
-            'image_path' => 'id-card-templates/global.png',
+            'image_path' => $path,
         ]);
 
         $this->get($url)->assertOk();
