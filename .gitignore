@@ -38,3 +38,9 @@ yarn-error.log
 # Database Backups
 /database/backup
 
+# Docker (deploy lokal, bukan bagian repo)
+/Dockerfile
+/docker
+/.dockerignore
+/.env.docker
+

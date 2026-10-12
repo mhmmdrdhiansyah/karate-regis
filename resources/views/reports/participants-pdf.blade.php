@@ -383,9 +383,9 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            @if($reg->status_berkas === 'verified')
+                            @if($reg->status_label === 'verified')
                                 <span class="tag-status-verified">Verified</span>
-                            @elseif($reg->status_berkas === 'rejected')
+                            @elseif($reg->status_label === 'rejected')
                                 <span class="tag-status-rejected">Rejected</span>
                             @else
                                 <span class="tag-status-pending">Pending</span>

@@ -70,6 +70,7 @@
                     '{kontingen}' => $participant->contingent?->name ?? '',
                     '{event}' => $card['event']->name,
                     '{kategori}' => $card['categories'],
+                    '{peran}' => ['athlete' => 'PESERTA', 'coach' => 'PELATIH', 'official' => 'OFFICIAL'][$participant->type?->value] ?? 'PESERTA',
                 ]) }}
             </div>
         @endforeach

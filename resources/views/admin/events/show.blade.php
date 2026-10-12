@@ -132,6 +132,16 @@
             <div class="card-toolbar d-flex gap-2 flex-wrap">
                 <a href="{{ route('admin.events.index') }}" class="btn btn-light btn-sm">← Kembali ke Daftar Event</a>
                 <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-light-warning btn-sm">Edit Event</a>
+                @can('manage certificate templates')
+                    <a href="{{ route('admin.events.certificate-templates.index', $event) }}" class="btn btn-light-primary btn-sm">
+                        <i class="bi bi-award"></i> Template Sertifikat
+                    </a>
+                @endcan
+                @can('manage event categories')
+                    <a href="{{ route('admin.events.id-card-templates.index', $event) }}" class="btn btn-light-info btn-sm">
+                        <i class="bi bi-person-badge"></i> Template ID Card
+                    </a>
+                @endcan
                 <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
                     onsubmit="return confirm('Hapus event ini?')">
                     @csrf @method('DELETE')

@@ -138,7 +138,7 @@
                                 </button>
                             </div>
                             <div class="fs-8 text-muted mb-3">
-                                Placeholder: <code>{nama}</code> <code>{nik}</code> <code>{kontingen}</code> <code>{event}</code> <code>{kategori}</code>.
+                                Placeholder: <code>{nama}</code> <code>{nik}</code> <code>{kontingen}</code> <code>{event}</code> <code>{kategori}</code> <code>{peran}</code>.
                             </div>
 
                             @foreach ($texts as $i => $t)
@@ -222,6 +222,7 @@
                                                     '{kontingen}' => 'Nama Kontingen',
                                                     '{event}' => $event->name,
                                                     '{kategori}' => 'Kata Putra, Kumite -55kg',
+                                                    '{peran}' => 'PESERTA',
                                                 ]);
 
                                                 $fontStacks = [

@@ -139,6 +139,34 @@ class IdCardTest extends TestCase
     }
 
     #[Test]
+    public function placeholder_peran_menampilkan_label_status(): void
+    {
+        $reg = $this->makeRegistration(null, 'verified', '3201234567890007');
+        $reg->participant->update(['type' => 'coach']);
+        $event = $reg->subCategory->eventCategory->event;
+        $template = IdCardTemplate::create([
+            'name' => 'Global',
+            'image_path' => 'id-card-templates/global.png',
+            'texts' => [['content' => '{peran}', 'x' => 50, 'y' => 50, 'font_size' => 4]],
+        ]);
+
+        $cards = app(IdCardService::class)->forParticipant($reg->participant);
+        $card = $cards->firstWhere('event.id', $event->id);
+
+        $html = view('id-cards.pdf', [
+            'template' => $template,
+            'imageRealPath' => '/fake.png',
+            'photoRealPath' => null,
+            'participant' => $reg->participant,
+            'card' => $card,
+            'cardW' => 85.6,
+            'cardH' => 54,
+        ])->render();
+
+        $this->assertStringContainsString('PELATIH', $html);
+    }
+
+    #[Test]
     public function pdf_kartu_tanpa_signature_ditolak(): void
     {
         $reg = $this->makeRegistration(null, 'verified', '3201234567890001');
