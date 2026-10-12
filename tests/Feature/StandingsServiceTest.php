@@ -173,4 +173,84 @@ class StandingsServiceTest extends TestCase
             'rank_name' => 'Juara 1',
         ]);
     }
+
+    #[Test]
+    public function klasemen_tipe_terpisah_antara_open_dan_tni_polri(): void
+    {
+        $event = Event::factory()->create();
+        $kontingenA = Contingent::factory()->create();
+        $kontingenB = Contingent::factory()->create();
+
+        // Kategori TNI/Polri: A dapat Gold
+        $tni = EventCategory::factory()->create([
+            'event_id' => $event->id,
+            'type' => EventCategoryType::TniPolri,
+        ]);
+        $subTni = SubCategory::factory()->create(['event_category_id' => $tni->id]);
+        $this->buatResultMedali($subTni, $kontingenA, MedalType::Gold);
+
+        // Kategori Mahasiswa: B dapat Gold
+        $mhs = EventCategory::factory()->create([
+            'event_id' => $event->id,
+            'type' => EventCategoryType::Mahasiswa,
+        ]);
+        $subMhs = SubCategory::factory()->create(['event_category_id' => $mhs->id]);
+        $this->buatResultMedali($subMhs, $kontingenB, MedalType::Gold);
+
+        // Klasemen TNI/Polri: hanya A
+        $tniStandings = app(StandingsService::class)->forEvent($event, EventCategoryType::TniPolri);
+        $this->assertCount(1, $tniStandings);
+        $this->assertSame($kontingenA->id, $tniStandings[0]->contingent_id);
+
+        // Klasemen Mahasiswa: hanya B
+        $mhsStandings = app(StandingsService::class)->forEvent($event, EventCategoryType::Mahasiswa);
+        $this->assertCount(1, $mhsStandings);
+        $this->assertSame($kontingenB->id, $mhsStandings[0]->contingent_id);
+
+        // Klasemen Open default: kosong (tidak ada kategori Open)
+        $this->assertCount(0, app(StandingsService::class)->forEvent($event));
+    }
+
+    #[Test]
+    public function klasemen_default_tanpa_argumen_tetap_open(): void
+    {
+        $event = Event::factory()->create();
+        $kontingen = Contingent::factory()->create();
+
+        $open = EventCategory::factory()->create([
+            'event_id' => $event->id,
+            'type' => EventCategoryType::Open,
+        ]);
+        $subOpen = SubCategory::factory()->create(['event_category_id' => $open->id]);
+        $this->buatResultMedali($subOpen, $kontingen, MedalType::Gold);
+
+        // Tanpa argumen kedua = perilaku lama (Open) — pemanggil lama tidak rusak
+        $standings = app(StandingsService::class)->forEvent($event);
+
+        $this->assertCount(1, $standings);
+        $this->assertSame(1, (int) $standings[0]->gold);
+    }
+
+    #[Test]
+    public function halaman_klasemen_hanya_render_section_tipe_yang_ada(): void
+    {
+        $event = Event::factory()->create(); // default factory = RegistrationOpen
+
+        // Event hanya punya kategori Open + TNI/Polri (tanpa Mahasiswa)
+        EventCategory::factory()->create([
+            'event_id' => $event->id,
+            'type' => EventCategoryType::Open,
+        ]);
+        EventCategory::factory()->create([
+            'event_id' => $event->id,
+            'type' => EventCategoryType::TniPolri,
+        ]);
+
+        $response = $this->get("/events/{$event->id}/klasemen");
+
+        $response->assertOk();
+        $response->assertSee('KLASEMEN OPEN');
+        $response->assertSee('KLASEMEN TNI/POLRI');
+        $response->assertDontSee('KLASEMEN MAHASISWA');
+    }
 }

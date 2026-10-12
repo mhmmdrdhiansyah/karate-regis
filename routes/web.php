@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IdCardController;
 use App\Http\Controllers\KontingenManagementController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\WilayahController;
@@ -34,6 +35,19 @@ Route::get('/sertifikat/peserta/{participant}', [CertificateController::class, '
 Route::get('/sertifikat/{registration}/pdf', [CertificateController::class, 'pdf'])
     ->middleware('throttle:10,1')
     ->name('certificates.public.pdf');
+
+// ID card peserta — lookup via NIK/Nama
+Route::get('/id-cards', [IdCardController::class, 'index'])->name('id-cards.public.index');
+Route::post('/id-cards', [IdCardController::class, 'lookup'])->middleware('throttle:6,1')->name('id-cards.public.lookup');
+Route::post('/id-cards/nama', [IdCardController::class, 'lookupByName'])
+    ->middleware('throttle:6,1')
+    ->name('id-cards.public.lookupByName');
+Route::get('/id-cards/peserta/{participant}', [IdCardController::class, 'show'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('id-cards.show');
+Route::get('/id-cards/{participant}/{event}/pdf', [IdCardController::class, 'pdf'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('id-cards.pdf');
 
 Route::get('/api/wilayah/provinces', [WilayahController::class, 'provinces']);
 Route::get('/api/wilayah/regencies/{provinceCode}', [WilayahController::class, 'regencies']);
@@ -83,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:view participants|create participants|edit participants'])->group(function () {
         Route::resource('participants', ParticipantController::class)->except(['destroy']);
     });
+
     Route::middleware(['permission:delete participants'])->group(function () {
         Route::delete('participants/{participant}', [ParticipantController::class, 'destroy'])->name('participants.destroy');
         Route::get('participants/{participant}/delete-preview', [ParticipantController::class, 'deletePreview'])->name('participants.delete-preview');
@@ -147,6 +162,9 @@ Route::middleware('auth')->group(function () {
         Route::get('events/{event}/certificate-templates', \App\Livewire\Admin\CertificateTemplateManagement::class)
             ->name('events.certificate-templates.index')
             ->middleware('permission:manage certificate templates');
+
+        Route::get('events/{event}/id-card-templates', \App\Livewire\Admin\IdCardTemplateManagement::class)
+            ->name('events.id-card-templates.index');
     });
 
     Route::middleware(['permission:manage master data'])->group(function () {

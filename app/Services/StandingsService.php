@@ -8,17 +8,17 @@ use Illuminate\Support\Facades\DB;
 class StandingsService
 {
     /**
-     * Ambil klasemen medali untuk satu event — HANYA kategori bertipe Open,
-     * 1 medali per TIM untuk beregu (COUNT DISTINCT team_group_id), 1 per
-     * hasil untuk individu.
-     * Medali tipe lain (Festival dst) tetap tersimpan di tabel results dan
-     * dipakai untuk status sertifikat, tapi tidak dihitung di klasemen publik.
+     * Ambil klasemen medali untuk satu event per TIPE kategori resmi
+     * (default Open), 1 medali per TIM untuk beregu (COUNT DISTINCT
+     * team_group_id), 1 per hasil untuk individu.
+     * Medali Festival tidak pernah dihitung (tipe hiburan, sertifikat
+     * seragam); tipe resmi lain punya klasemen masing-masing.
      *
      * @param  Event  $event
      * @return array  — array of objects, masing-masing berisi:
      *   rank, contingent_id, name, official_name, gold, silver, bronze, total
      */
-    public function forEvent(Event $event): array
+    public function forEvent(Event $event, \App\Enums\EventCategoryType $type = \App\Enums\EventCategoryType::Open): array
     {
         $results = DB::select("
             SELECT c.id AS contingent_id,
@@ -37,10 +37,10 @@ class StandingsService
             WHERE ec.event_id = :event_id
               AND reg.deleted_at IS NULL
               AND reg.sub_category_id IS NOT NULL
-              AND ec.type = 'Open'
+              AND ec.type = :type
             GROUP BY c.id, c.name, c.official_name
             ORDER BY gold DESC, silver DESC, bronze DESC, c.name ASC
-        ", ['event_id' => $event->id]);
+        ", ['event_id' => $event->id, 'type' => $type->value]);
 
         $standings = [];
         $currentRank = 1;

@@ -60,6 +60,11 @@ class Event extends Model
         return $this->hasMany(CertificateTemplate::class);
     }
 
+    public function idCardTemplates(): HasMany
+    {
+        return $this->hasMany(IdCardTemplate::class);
+    }
+
     public function panitia(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user');

@@ -132,6 +132,16 @@
             <div class="card-toolbar d-flex gap-2 flex-wrap">
                 <a href="{{ route('admin.events.index') }}" class="btn btn-light btn-sm">← Kembali ke Daftar Event</a>
                 <a href="{{ route('admin.events.edit', $event) }}" class="btn btn-light-warning btn-sm">Edit Event</a>
+                @can('manage certificate templates')
+                    <a href="{{ route('admin.events.certificate-templates.index', $event) }}" class="btn btn-light-primary btn-sm">
+                        <i class="bi bi-award"></i> Template Sertifikat
+                    </a>
+                @endcan
+                @can('manage event categories')
+                    <a href="{{ route('admin.events.id-card-templates.index', $event) }}" class="btn btn-light-info btn-sm">
+                        <i class="bi bi-person-badge"></i> Template ID Card
+                    </a>
+                @endcan
                 <form action="{{ route('admin.events.destroy', $event) }}" method="POST"
                     onsubmit="return confirm('Hapus event ini?')">
                     @csrf @method('DELETE')
@@ -293,12 +303,14 @@
                     <select name="type" class="form-select form-select-solid">
                         <option value="Open" @selected(old('type') === 'Open')>Open</option>
                         <option value="Festival" @selected(old('type') === 'Festival')>Festival</option>
+                        <option value="TNI/Polri" @selected(old('type') === 'TNI/Polri')>TNI/Polri</option>
+                        <option value="Mahasiswa" @selected(old('type') === 'Mahasiswa')>Mahasiswa</option>
                     </select>
                     @error('type')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <label class="required form-label">Class Name</label>
                     <input type="text" name="class_name" class="form-control form-control-solid"
                         value="{{ old('class_name') }}">
@@ -316,8 +328,8 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-12 col-md-2">
-                    <label class="form-label">Nilai Diskon</label>
+                <div class="col-12 col-md-1">
+                    <label class="form-label">Nilai</label>
                     <input type="number" step="0.01" min="0" name="discount_value" class="form-control form-control-solid"
                         value="{{ old('discount_value', 0) }}">
                     @error('discount_value')

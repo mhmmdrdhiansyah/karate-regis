@@ -618,13 +618,15 @@ class ReportController extends Controller
             : '-';
 
         // 13. Status Berkas (verified / rejected / pending)
+        // Simpan ke status_label (atribut dinamis), JANGAN overwrite status_berkas —
+        // kolom itu di-cast ke enum RegistrationStatus, nilai 'pending' bukan backing value.
         $rawStatus = is_object($registration->status_berkas) ? $registration->status_berkas->value : (string) $registration->status_berkas;
         if ($registration->is_verified || $rawStatus === 'verified') {
-            $registration->status_berkas = 'verified';
+            $registration->status_label = 'verified';
         } elseif (!empty($registration->rejection_reason) || $rawStatus === 'rejected') {
-            $registration->status_berkas = 'rejected';
+            $registration->status_label = 'rejected';
         } else {
-            $registration->status_berkas = 'pending';
+            $registration->status_label = 'pending';
         }
 
         return $registration;

@@ -108,6 +108,18 @@
                                 </span>
                             @endif
 
+                            @foreach ($idCards as $card)
+                                <a href="{{ URL::temporarySignedRoute('id-cards.pdf', now()->addMinutes(10), ['participant' => $participant->id, 'event' => $card['event']->id]) }}"
+                                    class="btn btn-light-primary btn-sm me-2" title="Cetak ID Card {{ $card['event']->name }}">
+                                    <i class="bi bi-person-badge"></i> ID Card: {{ \Illuminate\Support\Str::limit($card['event']->name, 20) }}
+                                </a>
+                            @endforeach
+                            @if ($idCards->isEmpty())
+                                <span class="btn btn-light-primary btn-sm me-2 opacity-50" style="cursor:not-allowed;" title="Peserta belum punya registrasi verified untuk ID card.">
+                                    <i class="bi bi-person-badge"></i> Cetak ID Card
+                                </span>
+                            @endif
+
                             <a href="{{ route('participants.index') }}" class="btn btn-light btn-sm">
                                 Kembali
                             </a>
